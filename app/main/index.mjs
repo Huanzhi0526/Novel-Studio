@@ -15,7 +15,7 @@ import { WritingService } from './writing.mjs';
 import { ReferenceStoreV2 } from '../kb-v2/store-v2.mjs';
 import { SearchEngineV2 } from '../kb-v2/search-v2.mjs';
 import { RetrievalEngineV2 } from '../kb-v2/retrieval-v2.mjs';
-import { AgyFlashClient } from '../kb-v2/agy-client.mjs';
+import { AgyFlashClient, resolveAgyExecutable } from '../kb-v2/agy-client.mjs';
 
 const appUrl = 'novel://studio/index.html';
 const appDir = fileURLToPath(new URL('../../', import.meta.url));
@@ -184,7 +184,7 @@ function register(writing, reference, imports, search, backup, expansion, retrie
   handlers.set('app.info', () => ({
     dataDir, model: embedding.id, modelConfigured: Boolean(embedding.modelPath),
     embeddingMode: embedding.activeBackendMode,
-    version: app.getVersion(), electron: process.versions.electron, kbV2: useKbV2
+    version: app.getVersion(), electron: process.versions.electron, kbV2: useKbV2, agyFallbackAvailable: Boolean(agyClient)
   }));
   handlers.set('app.openDataDir', async () => {
     const message = await shell.openPath(dataDir);
@@ -293,18 +293,18 @@ async function launch() {
     let customComplete = null;
     let fallbackComplete = null;
     if (process.env.NOVEL_STUDIO_AGY_RETRIEVAL === '1') {
-      agyClient = new AgyFlashClient();
+      agyClient = new AgyFlashClient({ cwd: join(dataDir, 'agy-retrieval-work') });
       customComplete = (messages, opts, sig) => agyClient.complete(messages, opts, sig);
-    } else if (!app.isPackaged && process.env.NOVEL_STUDIO_NO_AGY_FALLBACK !== '1') {
-      agyClient = new AgyFlashClient();
+    } else if (process.env.NOVEL_STUDIO_NO_AGY_FALLBACK !== '1' && existsSync(resolveAgyExecutable())) {
+      agyClient = new AgyFlashClient({ cwd: join(dataDir, 'agy-retrieval-work') });
       fallbackComplete = (messages, opts, sig) => agyClient.complete(messages, opts, sig);
     }
     const retrievalV2 = new RetrievalEngineV2(searchV2, {
       store, filename: retrievalConfigFile, vault: safeStorage, customComplete, fallbackComplete
     });
-    // Keep legacy ImportService bound to original store while decoupled reference/search/retrieval run on storeV2
-    register(new WritingService(store), storeV2, new ImportService(new ReferenceService(store)), searchV2,
-      new BackupService(store), new ExpansionService(store, join(dataDir, 'expansion.json'), safeStorage),
+    // Legacy ZIP imports must never write into the inactive v1 reference tables.
+    register(new WritingService(store), storeV2, Object.fromEntries(['inspect', 'preview', 'commit', 'cancel'].map(name => [name, () => { if (name === 'cancel') return true; fail('IMPORT_V2_UNSUPPORTED', '新版参考库请使用专用建库流程导入。'); }])), searchV2,
+      new BackupService(store, storeV2), new ExpansionService(store, join(dataDir, 'expansion.json'), safeStorage),
       retrievalV2);
   } else {
     const reference = new ReferenceService(store);
@@ -340,7 +340,6 @@ async function launch() {
   });
   await window.loadURL(appUrl);
   if (useKbV2) {
-    if (agyClient) void agyClient.warmup().catch(() => {});
     if (embedding?.modelPath) void embedding.embed(['预热'], { query: true }).catch(() => {});
   }
 }

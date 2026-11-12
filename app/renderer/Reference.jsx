@@ -105,7 +105,7 @@ export function Reference({ works, refresh, conversation, openCard, openEvidence
           setMode('shelf');
         }}>书架</button>
       </div>
-      <button type="button" className="reference-import" onClick={() => setImporting(true)}><Icon name="plus" size={15} />导入标准结果包</button>
+      {!kbV2 && <button type="button" className="reference-import" onClick={() => setImporting(true)}><Icon name="plus" size={15} />导入标准结果包</button>}
     </header>
     <ErrorMessage error={error} />
     {notice && <div className="notice success">{notice}<button className="quiet" onClick={() => setNotice('')}>关闭</button></div>}

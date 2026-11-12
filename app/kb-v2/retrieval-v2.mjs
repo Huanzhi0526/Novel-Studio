@@ -168,10 +168,10 @@ export class RetrievalEngineV2 {
     this.config = store && filename && vault ? new ExpansionService(store, filename, vault, transport) : null;
   }
 
-  async setting(method, args, context) {
+  async setting(method, args, context, options) {
     if (!this.config) fail('RETRIEVAL_CONFIG_UNAVAILABLE', '当前运行模式未挂载 Electron 密钥配置存储');
     try {
-      return await this.config[method](args, context);
+      return await this.config[method](args, context, options);
     } catch (error) {
       error.message = error.message.replaceAll('扩写', '检索');
       throw error;
@@ -274,7 +274,8 @@ export class RetrievalEngineV2 {
       return await this.search.query(args, { signal });
     }
 
-    const basePromise = this.search.query({ ...args, limit: args.limit ?? 12 }, { signal });
+    // Observe local failure immediately even if the AI path succeeds first.
+    const basePromise = this.search.query({ ...args, limit: args.limit ?? 12 }, { signal }).then(value => ({ value }), error => ({ error }));
     try {
       if (mode === 'fast') {
         return await this.#runFastMode(args, { signal });
@@ -282,7 +283,9 @@ export class RetrievalEngineV2 {
       return await this.#runDeepMode(args, { signal });
     } catch (error) {
       signal?.throwIfAborted();
-      const base = await basePromise;
+      const local = await basePromise;
+      if (local.error) throw local.error;
+      const base = local.value;
       const hint = error.code === 'EXPAND_NOT_CONFIGURED' ? '请先在「资料与设置 → AI 辅助检索」中配置接口。' : `（原因：${error.message || error.code || '接口异常'}）`;
       return {
         ...base,
@@ -438,7 +441,7 @@ export class RetrievalEngineV2 {
         return this.search.rankedPage({ ...args, limit: args.limit ?? 14 }, selections, {
           mode: 'deep',
           degraded: false,
-          reason: `AI 深度翻书完成：经 ${toolRounds} 轮检索（${totalToolCalls} 次查库、${verifiedReads} 次翻阅原文）核证出 ${selections.length} 条参考。`,
+          reason: `AI 深度翻书完成：经 ${toolRounds} 轮检索（${totalToolCalls} 次查库、${verifiedReads} 次翻阅原文）返回 ${selections.length} 条参考。`,
           channels: { lexical: validRefs.size, semantic: verifiedReads },
           synthesis: typeof parsed.synthesis === 'string' ? parsed.synthesis.trim() : ''
         });
@@ -470,8 +473,8 @@ export class RetrievalEngineV2 {
           res.forEach(r => recordRef(r.ref));
           observations.push({ tool: call.tool, hits: res });
         } else if (call.tool === 'read_original_range') {
-          verifiedReads++;
           const res = this.search.toolReadOriginalRange({ ...cArgs, scopedWorkIds });
+          if (!res.error) verifiedReads++;
           // Also find any overlapping passage_chunk so the agent can cite it if desired
           if (!res.error && cArgs.volumeId && cArgs.startOrdinal) {
             const overlapping = this.search.db.prepare(`

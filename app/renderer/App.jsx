@@ -89,7 +89,7 @@ function Settings({ info, restored, preferences, updatePreferences, settingsTarg
       <button onClick={() => run('app.openDataDir')} disabled={Boolean(busy)}>打开资料目录 ↗</button>
     </section>
     <section className="setting-card">
-      <div><h2>备份与恢复</h2><p>备份包含原创、历史、标记、参考正文、插图和知识卡。恢复时保留当前资料的快照。</p></div>
+      <div><h2>备份与恢复</h2><p>备份包含原创、历史、标记、参考正文、插图和知识卡。恢复时保留当前资料的快照。{info?.kbV2 && '新版备份同时包含独立参考库；恢复旧版备份只恢复原创与旧资料，不替换新版参考库。'}</p></div>
       <div className="button-row">
         <button onClick={() => run('backup.export')} disabled={Boolean(busy)}>导出备份</button>
         <button onClick={() => run('backup.restore')} disabled={Boolean(busy)}>恢复备份</button>
