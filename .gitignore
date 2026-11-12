@@ -61,3 +61,17 @@ retrieval-api.json
 *.rar
 # Keep the bundled public-domain integration fixture
 !scripts/fixtures/xiyou/result.zip
+# Additional local authentication and data formats
+.netrc
+.git-credentials
+auth.json
+*.token
+*.secret
+*api-key*
+*api_key*
+*.local.json
+*.sqlite3
+*.sqlite3-*
+*.ckpt
+*.h5
+*.hdf5
