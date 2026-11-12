@@ -1,8 +1,19 @@
 # 个人小说写作工作台交接
 
-工作区 `D:\Vibe Coding\Novel Studio`。2026-11-12已初始化本地Git：main基线371be17（0.1.19），当前实验分支feat/kb-v2-mvp。此前无Git仓库的记录属于历史。本文记录当前状态，早期施工及逐轮验收保存在 [项目历史](docs/project-history.md)。
+工作区 `D:\Vibe Coding\Novel Studio`。2026-11-12初始化本地Git，0.1.19基线371be17保留；2026-11-13已合并至main并正式升级0.2.0。此前无Git仓库的记录属于历史。本文记录当前状态，早期施工及逐轮验收保存在 [项目历史](docs/project-history.md)。
 
-## 当前主管快照（2026-11-13，正式升级审阅）
+## 正式上线完成（2026-11-13，0.2.0）
+
+- 当前分支main；合并提交8eae11f，Gemini交付ac91913及上线修正42df224均已包含。源码、锁文件、正式安装resources/app/package.json均0.2.0；桌面“小说工作台”目标仍为真实Windows正式安装目录，不使用沙箱重定向的LOCALAPPDATA。
+- 正式参考库已切换为 `%LOCALAPPDATA%/Novel Studio/reference-v2.sqlite`：27部/278卷/1,110,178块/676档案/1,575切面/9,077场次/80,917切片/91,569向量。源与正式数据库SHA-256一致（7975ce715ad91b3009f6ba4a1808986b233d7b8e9b8c7bf378ed193b4feeb1b2），无重拆、无向量重算。旧reference_*仅停用并保留于共库和备份，不再服务参考UI/检索；未清空原创共库。
+- 正式Vulkan运行程序位于资料目录 `runtime/llama-cpp-vulkan/llama-server.exe`，Qwen3模型及CPU回退仍引用原.local/model；180秒闲置卸载。正式程序实际本地检索返回结果且embeddingMode=gpu。源码与正式库版本实测：原创library.sqlite user_version=1、reference-v2.sqlite user_version=2001。
+- 原创作品/卷章/草稿/历史/标记逐表行数与摘要保持一致；retrieval-api.json、expansion.json及凭证文件摘要保持一致。embedding.json仅按显卡配置授权调整。旧0.1.19发布件不覆盖。
+- 未配置检索API时，打包版可自动回退本机agy.exe Gemini Flash；已配置接口仍优先，接口失败时按既有规则回退本地。桥接按需启动，工作目录位于资料目录agy-retrieval-work，不授予工具执行权限。本次隔离无API实测：快速约28.5秒、深度约28.8秒，均非降级结果；深度2轮/6次查库/2次原文翻阅。不是全库穷尽统计或内容完备性证明。
+- 68项自动测试、构建、隔离安装、原创工作流、模拟扩写、v2全库本地GPU检索、112段证据高亮、无API真实agy快/深检索、正式程序实际资料本地检索均通过。首轮测试因沙箱回环/进程权限失败，沙箱外复验通过；桌面脚本修正默认AI模式误用，并移除已通过证据定位后的可选阅读器截图等待（截图超时不作为成功截图证据）。正式程序最后验收后已正常关闭，方便用户自行打开。
+- 上线前完整备份：`.local/release-kb-v2-020/before-formal-20261113-034021`，含data全目录、旧安装program及200个文件SHA-256清单。回退须先正常退出、备份上线后新写入内容，再按manifest恢复必要文件；不要盲目整库覆盖后续原创。
+- 审计：`.local/release-kb-v2-020` 下backup-receipt/source-verification/upgrade-receipt/migration-receipt/formal-verification与installed-qa/installed-v2.json。运行数据、原文、密钥与备份不进Git；旧夜间自动化、重拆、关机不恢复。
+
+## 本轮升级前审阅快照（历史）（2026-11-13，正式升级审阅）
 
 用户已授权合并main与正式迁移。0.2.0候选安装器已生成；升级前正式资料及旧安装程序已正常退出后完整备份并逐文件校验，位置`.local/release-kb-v2-020/backup-receipt.json`。源库完整性/外键/向量对齐检查通过：27部、278卷、1,110,178块、676档案、1,575切面、9,077场次、80,917切片、91,569条1024维向量。实际原创库user_version=1，旧交接中4的记载不准确。当前测试68项通过，原创工作流与扩写桌面验收通过；迁移和最终状态以本页后续完成记录及`.local/release-kb-v2-020`回执为准。
 

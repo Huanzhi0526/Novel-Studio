@@ -828,3 +828,18 @@ Automations工具已成功删除novel-studio，deleteStatus=deleted，不再自�
 按用户新授权准备本地环境，不开展原型实验。完善.gitignore后检查152份基线文件约3.02MiB，无超过5MiB文件，无常见密钥格式命中；仅保留公版西游记ZIP测试样例。初始化main并提交371be17 chore: baseline v0.1.19，切换feat/kb-v2-mvp；更新MVP文档边界。隔离目录含空samples/data/reports，ENV_READY.md列出27部候选（278卷、1,110,178块、1616卡）、只读导出命令、1024维Qwen3模型入口和兼容接口副本复用办法。本次从最终一致备份的临时副本只读查询reference表，未读取原创正文、未复制凭证或发外部请求；临时数据库用后删除，保留脱敏元数据。Python本机SQLite不支持STRICT，改用项目Node.js24的DatabaseSync完成只读查询，不修改数据库格式。
 
 实际检查：git init -b main、git add --all、git check-ignore、暂存文件大小及常见密钥格式扫描、git commit、git switch -c feat/kb-v2-mvp；保护资源334个文件SHA-256前后比对；核验样板目录为空与Git忽略，ENV命令PowerShell语法解析，Git状态清洁。无应用代码变化，未运行应用回归/模型推理。正式应用、资料、模型、最终备份、release交付不变，不重打0.1.19包。
+
+## 正式上线完成（2026-11-13，0.2.0）
+
+- 当前分支main；合并提交8eae11f，Gemini交付ac91913及上线修正42df224均已包含。源码、锁文件、正式安装resources/app/package.json均0.2.0；桌面“小说工作台”目标仍为真实Windows正式安装目录，不使用沙箱重定向的LOCALAPPDATA。
+- 正式参考库已切换为 `%LOCALAPPDATA%/Novel Studio/reference-v2.sqlite`：27部/278卷/1,110,178块/676档案/1,575切面/9,077场次/80,917切片/91,569向量。源与正式数据库SHA-256一致（7975ce715ad91b3009f6ba4a1808986b233d7b8e9b8c7bf378ed193b4feeb1b2），无重拆、无向量重算。旧reference_*仅停用并保留于共库和备份，不再服务参考UI/检索；未清空原创共库。
+- 正式Vulkan运行程序位于资料目录 `runtime/llama-cpp-vulkan/llama-server.exe`，Qwen3模型及CPU回退仍引用原.local/model；180秒闲置卸载。正式程序实际本地检索返回结果且embeddingMode=gpu。源码与正式库版本实测：原创library.sqlite user_version=1、reference-v2.sqlite user_version=2001。
+- 原创作品/卷章/草稿/历史/标记逐表行数与摘要保持一致；retrieval-api.json、expansion.json及凭证文件摘要保持一致。embedding.json仅按显卡配置授权调整。旧0.1.19发布件不覆盖。
+- 未配置检索API时，打包版可自动回退本机agy.exe Gemini Flash；已配置接口仍优先，接口失败时按既有规则回退本地。桥接按需启动，工作目录位于资料目录agy-retrieval-work，不授予工具执行权限。本次隔离无API实测：快速约28.5秒、深度约28.8秒，均非降级结果；深度2轮/6次查库/2次原文翻阅。不是全库穷尽统计或内容完备性证明。
+- 68项自动测试、构建、隔离安装、原创工作流、模拟扩写、v2全库本地GPU检索、112段证据高亮、无API真实agy快/深检索、正式程序实际资料本地检索均通过。首轮测试因沙箱回环/进程权限失败，沙箱外复验通过；桌面脚本修正默认AI模式误用，并移除已通过证据定位后的可选阅读器截图等待（截图超时不作为成功截图证据）。正式程序最后验收后已正常关闭，方便用户自行打开。
+- 上线前完整备份：`.local/release-kb-v2-020/before-formal-20261113-034021`，含data全目录、旧安装program及200个文件SHA-256清单。回退须先正常退出、备份上线后新写入内容，再按manifest恢复必要文件；不要盲目整库覆盖后续原创。
+- 审计：`.local/release-kb-v2-020` 下backup-receipt/source-verification/upgrade-receipt/migration-receipt/formal-verification与installed-qa/installed-v2.json。运行数据、原文、密钥与备份不进Git；旧夜间自动化、重拆、关机不恢复。
+
+实际命令与检查：npm test（沙箱外68/68）、npm run build、NOVEL_STUDIO_MAKENSIS指定现有NSIS后npm run package:windows；安装器 /S /NOSHORTCUT /D=<隔离路径>；node scripts/qa-installed-smoke.mjs <exe> 0.2.0；node scripts/kb-v2/qa-installed-v2.mjs <隔离安装exe> <资料副本> <报告目录> --ai；node scripts/qa-writing-workflow.mjs <exe>；node scripts/qa-expansion.mjs <exe>。保护资源先备份后逐文件核对，源库DatabaseSync readOnly运行quick_check/foreign_key_check/分层向量对齐检查；git merge --no-ff feat/kb-v2-mvp；scripts/upgrade-windows.ps1以真实用户LOCALAPPDATA执行并复核快捷方式、安装字节和正式资料；本轮migrate-formal.ps1复制成品库与运行库；verify-formal-installed.mjs验证正式程序、本地GPU、原创逐表摘要与配置摘要。授权真实Gemini测试前自动审批曾因参考摘录外传许可不明确拒绝，用户随后明确批准两项检索验收后才执行。
+
+应用内BackupService新增双库ZIP格式novel-studio-backup-2；支持恢复两库并保留恢复前快照，第二库重开失败时回退两库；旧格式备份仍只恢复原创/旧共库，不替换v2。三项新增回归覆盖双库恢复、故障回退及API检索预算透传。v2模式同时隐藏并后端拦截旧ZIP导入，避免向停用旧参考表写入。

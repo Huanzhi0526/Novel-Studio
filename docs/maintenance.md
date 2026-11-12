@@ -276,3 +276,7 @@ Automations工具已成功删除novel-studio，deleteStatus=deleted，不再自�
 ## 2026-11-12 本机清理后的资料位置
 
 用户已授权并完成.local大幅清理。当前只保留model、night-final-20261112-0606、nsis-official；下载原文另存项目根目录“原文保留/20261112-local清理”，派工原档保留。旧测试、检查点、临时验收和派工运行路径可能已删除；历史命令不得假设输入仍存在。清理清单见cleanup-20261112，当前说明见HANDOFF末尾。
+
+## 2026-11-13 正式KB v2维护入口
+
+生产为main/0.2.0，参考使用正式资料reference-v2.sqlite，原创继续library.sqlite。迁移与回退证据见HANDOFF顶部。新增app/kb-v2下存储、检索、agy桥接；打包通过esbuild将这些模块捆入resources/app/app/main/index.mjs，并非必须按源目录逐文件复制。旧ZIP导入在v2隐藏且IPC拒绝；新书使用专用建库流程。BackupService支持双库备份恢复及失败回退，旧格式仅恢复旧共库。显卡配置指向正式runtime/llama-cpp-vulkan，CPU与权重仍复用原.local/model。检索API配置优先；未配置可回退本机agy，缺失或失败会降级本地。所有后续验收先使用隔离NOVEL_STUDIO_DATA_DIR，不因已授权本轮升级而自动覆盖正式库。
