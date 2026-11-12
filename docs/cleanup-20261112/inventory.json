@@ -1,0 +1,2543 @@
+{
+  "beforeBytes": 83903574895,
+  "rawCandidates": [
+    {
+      "path": "current-handover-audit-path.txt",
+      "bytes": 67
+    },
+    {
+      "path": "final-installed-path.txt",
+      "bytes": 100
+    },
+    {
+      "path": "qa-installed-0.1.1.txt",
+      "bytes": 100
+    },
+    {
+      "path": "acceptance\\alice\\11.epub3.images.epub",
+      "bytes": 189249
+    },
+    {
+      "path": "acceptance\\wenku8-builder\\three.epub",
+      "bytes": 5478
+    },
+    {
+      "path": "acceptance\\wenku8-builder\\two.epub",
+      "bytes": 4570
+    },
+    {
+      "path": "antigravity-run\\book-17\\施工输出\\工作\\structures.txt",
+      "bytes": 15797
+    },
+    {
+      "path": "antigravity-run\\book-17\\施工输出\\工作\\test.txt",
+      "bytes": 11
+    },
+    {
+      "path": "antigravity-run\\book-20\\施工输出\\工作\\text_cache\\第一卷.txt",
+      "bytes": 295604
+    },
+    {
+      "path": "antigravity-run\\book-20\\施工输出\\工作\\text_cache\\第七卷.txt",
+      "bytes": 282465
+    },
+    {
+      "path": "antigravity-run\\book-20\\施工输出\\工作\\text_cache\\第三卷.txt",
+      "bytes": 308507
+    },
+    {
+      "path": "antigravity-run\\book-20\\施工输出\\工作\\text_cache\\第九卷.txt",
+      "bytes": 229385
+    },
+    {
+      "path": "antigravity-run\\book-20\\施工输出\\工作\\text_cache\\第二卷.txt",
+      "bytes": 366116
+    },
+    {
+      "path": "antigravity-run\\book-20\\施工输出\\工作\\text_cache\\第五卷.txt",
+      "bytes": 265165
+    },
+    {
+      "path": "antigravity-run\\book-20\\施工输出\\工作\\text_cache\\第八卷.txt",
+      "bytes": 251731
+    },
+    {
+      "path": "antigravity-run\\book-20\\施工输出\\工作\\text_cache\\第六卷.txt",
+      "bytes": 258550
+    },
+    {
+      "path": "antigravity-run\\book-20\\施工输出\\工作\\text_cache\\第十一卷.txt",
+      "bytes": 218669
+    },
+    {
+      "path": "antigravity-run\\book-20\\施工输出\\工作\\text_cache\\第十二卷.txt",
+      "bytes": 265083
+    },
+    {
+      "path": "antigravity-run\\book-20\\施工输出\\工作\\text_cache\\第十卷.txt",
+      "bytes": 259615
+    },
+    {
+      "path": "antigravity-run\\book-20\\施工输出\\工作\\text_cache\\第四卷.txt",
+      "bytes": 306678
+    },
+    {
+      "path": "antigravity-run\\book-21\\施工输出\\工作\\final_zip_name.txt",
+      "bytes": 56
+    },
+    {
+      "path": "antigravity-run\\book-22\\施工输出\\工作\\volumes_summary.txt",
+      "bytes": 2549
+    },
+    {
+      "path": "antigravity-run\\book-25\\test_write.txt",
+      "bytes": 10
+    },
+    {
+      "path": "antigravity-run\\Tomozaki-work\\施工输出\\工作\\test.txt",
+      "bytes": 5
+    },
+    {
+      "path": "book-review-home-tutor-20261110\\dispatch-before\\release\\NovelStudio-拆书交接包-v1.0-SHA256.txt",
+      "bytes": 295
+    },
+    {
+      "path": "book-review-home-tutor-20261110\\dispatch-staged\\NovelStudio-拆书交接包-v1.0-SHA256.txt",
+      "bytes": 298
+    },
+    {
+      "path": "card-markdown-qa-K9Vwug\\failure.txt",
+      "bytes": 2210
+    },
+    {
+      "path": "card-markdown-qa-p6AOyV\\failure.txt",
+      "bytes": 2401
+    },
+    {
+      "path": "card-remediation-0114\\formal-audit.txt",
+      "bytes": 10056
+    },
+    {
+      "path": "card-remediation-0114\\phase2-audit.txt",
+      "bytes": 10054
+    },
+    {
+      "path": "card-remediation-next\\checkpoint-025-audit-console.txt",
+      "bytes": 10076
+    },
+    {
+      "path": "card-remediation-next\\checkpoint-025-publish-console.txt",
+      "bytes": 311
+    },
+    {
+      "path": "card-remediation-next\\archive-final-20261110\\publish-console.txt",
+      "bytes": 2706
+    },
+    {
+      "path": "card-remediation-next\\archive-final-20261110\\verify-console.txt",
+      "bytes": 11086
+    },
+    {
+      "path": "card-remediation-next\\knights\\v7-reading-a.txt",
+      "bytes": 61914
+    },
+    {
+      "path": "card-remediation-next\\knights\\v7-reading-b.txt",
+      "bytes": 48284
+    },
+    {
+      "path": "card-remediation-next\\knights\\v7-reading-c.txt",
+      "bytes": 43533
+    },
+    {
+      "path": "card-remediation-next\\stage-021\\checkpoint-025-console.txt",
+      "bytes": 13735
+    },
+    {
+      "path": "card-remediation-next\\stage-021\\checkpoint-025-installed-console.txt",
+      "bytes": 4563
+    },
+    {
+      "path": "card-viewer-qa-OkEGUO\\failure.txt",
+      "bytes": 2586
+    },
+    {
+      "path": "cover-handoff-20261110\\before\\发布-NovelStudio-拆书交接包-v1.0-SHA256.txt",
+      "bytes": 298
+    },
+    {
+      "path": "desktop-qa-0aTZN6\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-0aTZN6\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-0hgoV8\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-0hgoV8\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-5bMz4a\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-5bMz4a\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-7dAdGs\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-7dAdGs\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-8SeQZc\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-8SeQZc\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-aAjUt0\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-AUOjpx\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-AUOjpx\\failure-body.txt",
+      "bytes": 1125
+    },
+    {
+      "path": "desktop-qa-AUOjpx\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-DCJ9Fe\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-DCJ9Fe\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-fkV6iT\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-fkV6iT\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-g8Ncyt\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-g8Ncyt\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-IBnqIq\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-IBnqIq\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-IDingi\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-IDingi\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-JhRXX4\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-JhRXX4\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-KTqSHY\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-KTqSHY\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-len4Sw\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-len4Sw\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-lnm8wj\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-lnm8wj\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-lVccHL\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-lVccHL\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-MAl6pi\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-MAl6pi\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-N5R31P\\failure-body.txt",
+      "bytes": 480
+    },
+    {
+      "path": "desktop-qa-N5R31P\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-OhSYH5\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-OhSYH5\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-On7AIN\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-On7AIN\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-OxInol\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-OxInol\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-prC3JD\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-prC3JD\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-rNb5sE\\failure-body.txt",
+      "bytes": 463
+    },
+    {
+      "path": "desktop-qa-rNb5sE\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-sfEZ4r\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-sfEZ4r\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-tybnoT\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-tybnoT\\failure-body.txt",
+      "bytes": 1733
+    },
+    {
+      "path": "desktop-qa-tybnoT\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-wBdfug\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-wBdfug\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "desktop-qa-yY8bG0\\chapter.txt",
+      "bytes": 40
+    },
+    {
+      "path": "desktop-qa-yY8bG0\\sample.txt",
+      "bytes": 29
+    },
+    {
+      "path": "dispatch-tags-20261110\\before\\release\\NovelStudio-拆书交接包-v1.0-SHA256.txt",
+      "bytes": 298
+    },
+    {
+      "path": "downloader\\fixture-cli\\node_modules\\@isaacs\\cliui\\LICENSE.txt",
+      "bytes": 731
+    },
+    {
+      "path": "downloader\\fixture-cli\\node_modules\\@isaacs\\cliui\\node_modules\\emoji-regex\\LICENSE-MIT.txt",
+      "bytes": 1077
+    },
+    {
+      "path": "downloader\\fixture-cli\\node_modules\\ansi-align\\node_modules\\emoji-regex\\LICENSE-MIT.txt",
+      "bytes": 1077
+    },
+    {
+      "path": "downloader\\fixture-cli\\node_modules\\bare-buffer\\CMakeLists.txt",
+      "bytes": 608
+    },
+    {
+      "path": "downloader\\fixture-cli\\node_modules\\bare-fs\\CMakeLists.txt",
+      "bytes": 203
+    },
+    {
+      "path": "downloader\\fixture-cli\\node_modules\\bare-path\\CMakeLists.txt",
+      "bytes": 209
+    },
+    {
+      "path": "downloader\\fixture-cli\\node_modules\\bare-url\\CMakeLists.txt",
+      "bytes": 793
+    },
+    {
+      "path": "downloader\\fixture-cli\\node_modules\\emoji-regex\\LICENSE-MIT.txt",
+      "bytes": 1077
+    },
+    {
+      "path": "downloader\\fixture-cli\\node_modules\\signal-exit\\LICENSE.txt",
+      "bytes": 790
+    },
+    {
+      "path": "downloader\\fixture-cli\\node_modules\\string-width-cjs\\node_modules\\emoji-regex\\LICENSE-MIT.txt",
+      "bytes": 1077
+    },
+    {
+      "path": "downloader\\fixture-cli\\node_modules\\whatwg-encoding\\LICENSE.txt",
+      "bytes": 1069
+    },
+    {
+      "path": "downloader\\fixture-cli\\node_modules\\whatwg-mimetype\\LICENSE.txt",
+      "bytes": 1069
+    },
+    {
+      "path": "downloader\\fixture-cli\\node_modules\\wrap-ansi-cjs\\node_modules\\emoji-regex\\LICENSE-MIT.txt",
+      "bytes": 1077
+    },
+    {
+      "path": "downloader\\fixture-cli\\node_modules\\xmlbuilder2\\LICENSE.txt",
+      "bytes": 1070
+    },
+    {
+      "path": "downloader\\fixture-cli\\node_modules\\xmlbuilder2\\lib\\xmlbuilder2.min.js.LICENSE.txt",
+      "bytes": 277
+    },
+    {
+      "path": "formal-import-two-20261110\\backup-SHA256.txt",
+      "bytes": 85
+    },
+    {
+      "path": "handoff-20261112\\转交提示词.txt",
+      "bytes": 6302
+    },
+    {
+      "path": "handoff-format-tags-20261111\\before\\release\\NovelStudio-0.1.18-SHA256.txt",
+      "bytes": 295
+    },
+    {
+      "path": "handoff-format-tags-20261111\\before\\release\\NovelStudio-拆书交接包-v1.0-SHA256.txt",
+      "bytes": 298
+    },
+    {
+      "path": "handoff-format-tags-20261111\\staged\\NovelStudio-拆书交接包-v1.0-SHA256.txt",
+      "bytes": 298
+    },
+    {
+      "path": "handover-audit-20261111-023210\\before\\release\\NovelStudio-0.1.19-SHA256.txt",
+      "bytes": 295
+    },
+    {
+      "path": "icon-nsis-qa\\installed\\placeholder.txt",
+      "bytes": 12
+    },
+    {
+      "path": "icon-nsis-qa\\stage\\placeholder.txt",
+      "bytes": 12
+    },
+    {
+      "path": "install-0.1.1-a22bfd70591a4126928d2ce6b2063360\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "install-0.1.1-a22bfd70591a4126928d2ce6b2063360\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "install-final-3d03a85a5fa04bcbb916a856a93aef27\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "install-final-3d03a85a5fa04bcbb916a856a93aef27\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "install-old-1626e23b78c447839678078277286b5f\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "install-old-1626e23b78c447839678078277286b5f\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "install-qa-0.1.15-archive\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "install-qa-0.1.15-archive\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "install-qa-0.1.16-retrieval\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "install-qa-0.1.16-retrieval\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "install-qa-0.1.16-retrieval-final\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "install-qa-0.1.16-retrieval-final\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "install-qa-0.1.17-ui\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "install-qa-0.1.17-ui\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "install-qa-0.1.18-card\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "install-qa-0.1.18-card\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "install-qa-0.1.19-markdown\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1528
+    },
+    {
+      "path": "install-qa-0.1.19-markdown\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "install-qa-0.1.19-markdown-final\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1528
+    },
+    {
+      "path": "install-qa-0.1.19-markdown-final\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "installed-final-0.1.2\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "installed-final-0.1.2\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "installed-qa-0.1.10\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "installed-qa-0.1.10\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "installed-qa-0.1.11\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "installed-qa-0.1.11\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "installed-qa-0.1.12\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "installed-qa-0.1.12\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "installed-qa-0.1.13\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "installed-qa-0.1.13\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "installed-qa-0.1.14\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "installed-qa-0.1.14\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "installed-qa-0.1.2\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "installed-qa-0.1.2\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "installed-qa-0.1.3\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "installed-qa-0.1.3\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "installed-qa-0.1.4\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "installed-qa-0.1.4\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "installed-qa-0.1.5\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "installed-qa-0.1.5\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "installed-qa-0.1.6\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "installed-qa-0.1.6\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "installed-qa-0.1.6-final\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "installed-qa-0.1.6-final\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "installed-qa-0.1.6-reviewed\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "installed-qa-0.1.6-reviewed\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "installed-qa-0.1.7\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "installed-qa-0.1.7\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "installed-qa-0.1.8\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "installed-qa-0.1.8\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "installed-qa-0.1.8-final\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "installed-qa-0.1.8-final\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "installed-qa-0.1.9\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "installed-qa-0.1.9\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "installed-release-0.1.2\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "installed-release-0.1.2\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "knowledge-library\\available\\saga-book1.epub",
+      "bytes": 71392530
+    },
+    {
+      "path": "knowledge-library\\expansion\\incoming\\backfill\\bofuri-wenku8-2480.utf8.txt",
+      "bytes": 4171935
+    },
+    {
+      "path": "knowledge-library\\expansion\\incoming\\backfill\\silent-witch-wenku8-2964.utf8.txt",
+      "bytes": 5849990
+    },
+    {
+      "path": "knowledge-library\\expansion\\incoming\\fantasy\\grieving-souls\\source.epub",
+      "bytes": 1118825
+    },
+    {
+      "path": "knowledge-library\\expansion\\incoming\\fantasy\\leadale\\source.epub",
+      "bytes": 954706
+    },
+    {
+      "path": "knowledge-library\\expansion\\incoming\\fantasy\\magic-revolution\\source.epub",
+      "bytes": 1521943
+    },
+    {
+      "path": "knowledge-library\\expansion\\incoming\\fantasy\\witch-mercenary\\source.epub",
+      "bytes": 165989
+    },
+    {
+      "path": "knowledge-library\\expansion\\incoming\\fantasy\\zero-believers\\source.epub",
+      "bytes": 1845015
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\NO GAME NO LIFE 游戏人生.epub",
+      "bytes": 2191048
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\上古守则的魔法骑士.epub",
+      "bytes": 637535
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\世界唯一的魔物使.epub",
+      "bytes": 331183
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\为美好的世界献上祝福！.epub",
+      "bytes": 3551962
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\从Lv2开始开外挂的前勇者候补过着悠哉异世界生活.epub",
+      "bytes": 677152
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\公女殿下的家庭教师.epub",
+      "bytes": 3122164
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\凡人探索者的愉快现代地下城生活.epub",
+      "bytes": 468349
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\刀剑神域外传 Gun Gale Online.epub",
+      "bytes": 2199693
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\刹那的风景.epub",
+      "bytes": 590875
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\剑与魔法与学历社会.epub",
+      "bytes": 371109
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\原本只是协助妹妹进行迷宫直播的我.epub",
+      "bytes": 127338
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\反派千金等级99.epub",
+      "bytes": 1097888
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\变种剑士只想慵懒度日.epub",
+      "bytes": 174707
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\史上最强大魔王转生为村民A.epub",
+      "bytes": 1165481
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\君主·埃尔梅罗二世的冒险.epub",
+      "bytes": 1367865
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\因想当冒险者而前往大都市的女儿已经升到了S级.epub",
+      "bytes": 1813462
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\在异世界买土地开辟农场！.epub",
+      "bytes": 335731
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\地狱模式.epub",
+      "bytes": 496534
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\大小姐系垫底迷宫实况主.epub",
+      "bytes": 589466
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\孤单一人的异世界攻略.epub",
+      "bytes": 3959367
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\少女身，大叔魂.epub",
+      "bytes": 159878
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\异世界食堂.epub",
+      "bytes": 815281
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\成为铁匠在异世界度过悠闲人生.epub",
+      "bytes": 538613
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\战斗员派遣中！.epub",
+      "bytes": 933004
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\拥有超常技能的异世界流浪美食家.epub",
+      "bytes": 2113811
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\放学后，到异世界咖啡厅喝杯咖啡.epub",
+      "bytes": 829813
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\无属性魔法的救世主.epub",
+      "bytes": 506371
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\无能恶童王子只想活下去.epub",
+      "bytes": 337578
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\水属性的魔法师.epub",
+      "bytes": 689799
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\治愈魔法的错误使用法.epub",
+      "bytes": 1680047
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\神明渴求着游戏.epub",
+      "bytes": 703550
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\神猫小咪与猫用品召唤师的异世界奋斗记.epub",
+      "bytes": 422305
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\经验值赋予者的异世界最强单人冒险.epub",
+      "bytes": 116172
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\英雄王，为了穷尽武道而转生.epub",
+      "bytes": 860820
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\落第骑士英雄谭.epub",
+      "bytes": 2492996
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\董白传～从魔王千金开始的三国志～.epub",
+      "bytes": 237139
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\虽然是公会柜台小姐，但因为不想加班所以打算独自讨伐迷宫头目.epub",
+      "bytes": 1428335
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\被卷入了勇者召唤事件却发现异世界很和平.epub",
+      "bytes": 2115249
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\转生为故事的黑幕.epub",
+      "bytes": 586371
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\转生后的我成了英雄爸爸和精灵妈妈的女儿.epub",
+      "bytes": 1074918
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\转生就是剑.epub",
+      "bytes": 1969126
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\转生成女性向游戏只有毁灭END的坏人大小姐.epub",
+      "bytes": 1829365
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\边境的老骑士.epub",
+      "bytes": 1064404
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\重启人生的千金小姐正在攻略龙帝陛下.epub",
+      "bytes": 980902
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\野生的大魔王出现了！.epub",
+      "bytes": 1609805
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\隐世魔女不曾知晓.epub",
+      "bytes": 105259
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\魔导具师妲莉亚不向人低头.epub",
+      "bytes": 935435
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\魔术师库诺看得见一切.epub",
+      "bytes": 148187
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\魔法使的搬运铺.epub",
+      "bytes": 283308
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\魔王2099.epub",
+      "bytes": 472785
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\魔王与勇者的战斗背后.epub",
+      "bytes": 584229
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\魔王都市.epub",
+      "bytes": 409291
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\原文\\魔石传记.epub",
+      "bytes": 1167316
+    },
+    {
+      "path": "knowledge-library\\expansion3\\candidate-sources\\排除与待核\\平凡职业造就世界最强.epub",
+      "bytes": 5101580
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\e17\\knights-magic\\source.epub",
+      "bytes": 2139951
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\e17\\leadale\\spider-public-archive.epub",
+      "bytes": 2866727
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\e17\\only-sense\\source.epub",
+      "bytes": 2353508
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\e18\\border-slow-life\\因为不是真正的伙伴而被逐出勇者队伍，流落到边境展开慢活人生 - ざっぽん - 20230331.epub",
+      "bytes": 1334010
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\e18\\border-slow-life\\later-volume-probe\\border-slow-life-v11-public-zh.epub",
+      "bytes": 116160
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\e18\\border-slow-life\\later-volume-probe\\border-slow-life-v12-public-zh.epub",
+      "bytes": 114250
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\e18\\border-slow-life\\updated-archive\\因为不是真正的伙伴而被逐出勇者队伍，流落到边境展开慢活人生 - ざっぽん - 20251224.epub",
+      "bytes": 1774531
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\e18\\dendrogram\\Infinite Dendrogram 无尽连锁 - 海道左近 - UNKNOWN.epub",
+      "bytes": 3337036
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\e18\\dendrogram\\updated-archive\\Infinite Dendrogram 无尽连锁 - 海道左近 - 20250620.epub",
+      "bytes": 3884276
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\e18\\genius-prince\\天才王子的赤字国家重生术(天才王子的赤字国家振兴术) - 鸟羽彻 - 20230330.epub",
+      "bytes": 1320852
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\e18\\genius-prince\\v12-candidate\\20240611-compilation.epub",
+      "bytes": 1400854
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\e18\\leadale-new\\updated-archive\\里亚德录大地 - Ceez - 20251021.epub",
+      "bytes": 954706
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\e18\\wise-mans-disciple\\自称贤者弟子的贤者 - りゅうせんひろつぐ - 20230116.epub",
+      "bytes": 3579858
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\e18\\witch-new\\updated-archive\\魔女与佣兵 - 超法规的かえる - 20240707.epub",
+      "bytes": 165989
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\e19\\duke-tutor.epub",
+      "bytes": 3122164
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\e19\\reincarnated-sword.epub",
+      "bytes": 1969126
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\e19\\villainess-99.epub",
+      "bytes": 1097888
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\e19\\wild-last-boss.epub",
+      "bytes": 1609805
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\grieving\\vol05-zh-mt-guest.epub",
+      "bytes": 3342645
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\grieving\\vol06-zh-mt-guest.epub",
+      "bytes": 3143041
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\grieving\\vol07-zh-mt-guest.epub",
+      "bytes": 3414377
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\grieving\\vol08-zh-mt-guest.epub",
+      "bytes": 2980776
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\grieving\\vol09-zh-mt-guest.epub",
+      "bytes": 3179878
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\grieving\\vol10-zh-mt-guest.epub",
+      "bytes": 3007243
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\grieving\\vol11-zh-mt-guest.epub",
+      "bytes": 2978642
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\grieving\\vol12-zh-mt-guest.epub",
+      "bytes": 21471306
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\grieving\\vol13-zh-mt-guest.epub",
+      "bytes": 22416189
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\leadale\\sasaki-20250926.epub",
+      "bytes": 2056768
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\next-fantasy\\assassin\\source.epub",
+      "bytes": 1189694
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\next-fantasy\\dungeon-master\\source.epub",
+      "bytes": 1791800
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\next-fantasy\\unwanted-undead\\source.epub",
+      "bytes": 1930251
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\next-fantasy\\walking\\source.epub",
+      "bytes": 1133430
+    },
+    {
+      "path": "knowledge-library\\expansion3\\incoming\\sasaki\\source.epub",
+      "bytes": 2056768
+    },
+    {
+      "path": "knowledge-library\\mobuseka\\wenku8-2638.utf8.txt",
+      "bytes": 8244525
+    },
+    {
+      "path": "knowledge-library\\mobuseka\\v01\\source.txt",
+      "bytes": 486375
+    },
+    {
+      "path": "knowledge-library\\mobuseka\\v02\\source.txt",
+      "bytes": 527488
+    },
+    {
+      "path": "knowledge-library\\mobuseka\\v03\\source.txt",
+      "bytes": 586492
+    },
+    {
+      "path": "knowledge-library\\mobuseka\\v04\\source.txt",
+      "bytes": 438082
+    },
+    {
+      "path": "knowledge-library\\mobuseka\\v05\\source.txt",
+      "bytes": 403523
+    },
+    {
+      "path": "knowledge-library\\mobuseka\\v06\\source.txt",
+      "bytes": 393474
+    },
+    {
+      "path": "knowledge-library\\mobuseka\\v07\\source.txt",
+      "bytes": 427718
+    },
+    {
+      "path": "knowledge-library\\mobuseka\\v08\\source.txt",
+      "bytes": 426065
+    },
+    {
+      "path": "knowledge-library\\mobuseka\\v09\\source.txt",
+      "bytes": 369184
+    },
+    {
+      "path": "knowledge-library\\mobuseka\\v10\\source.txt",
+      "bytes": 362143
+    },
+    {
+      "path": "knowledge-library\\mobuseka\\v11\\source.txt",
+      "bytes": 377785
+    },
+    {
+      "path": "knowledge-library\\mobuseka\\v12\\source.txt",
+      "bytes": 392524
+    },
+    {
+      "path": "knowledge-library\\mobuseka\\v13\\source.txt",
+      "bytes": 556590
+    },
+    {
+      "path": "knowledge-library\\queued\\asobi\\wenku8-3988-20251210.epub",
+      "bytes": 357407
+    },
+    {
+      "path": "knowledge-library\\queued\\bisco\\wenku8-2558-20251108.epub",
+      "bytes": 1073840
+    },
+    {
+      "path": "knowledge-library\\queued\\bofuri\\wenku8-2480-20250721.epub",
+      "bytes": 1796567
+    },
+    {
+      "path": "knowledge-library\\queued\\dendrogram\\v17\\editor-review.txt",
+      "bytes": 7220
+    },
+    {
+      "path": "knowledge-library\\queued\\dendrogram\\v18\\editor-review.txt",
+      "bytes": 6653
+    },
+    {
+      "path": "knowledge-library\\queued\\dendrogram\\v19\\editor-review.txt",
+      "bytes": 6422
+    },
+    {
+      "path": "knowledge-library\\queued\\dendrogram\\v20\\editor-review.txt",
+      "bytes": 6975
+    },
+    {
+      "path": "knowledge-library\\queued\\dendrogram\\v21\\editor-review.txt",
+      "bytes": 6375
+    },
+    {
+      "path": "knowledge-library\\queued\\dendrogram\\v22\\editor-review.txt",
+      "bytes": 7335
+    },
+    {
+      "path": "knowledge-library\\queued\\genius-prince\\v08\\editor-review.txt",
+      "bytes": 6628
+    },
+    {
+      "path": "knowledge-library\\queued\\genius-prince\\v09\\editor-review.txt",
+      "bytes": 6862
+    },
+    {
+      "path": "knowledge-library\\queued\\genius-prince\\v10\\editor-review.txt",
+      "bytes": 6878
+    },
+    {
+      "path": "knowledge-library\\queued\\genius-prince\\v11\\editor-review.txt",
+      "bytes": 6536
+    },
+    {
+      "path": "knowledge-library\\queued\\genius-prince\\v12\\editor-review.txt",
+      "bytes": 6760
+    },
+    {
+      "path": "knowledge-library\\queued\\hero\\wenku8-3635-20251222.epub",
+      "bytes": 421418
+    },
+    {
+      "path": "knowledge-library\\queued\\makeine\\wenku8-3057-20250630.epub",
+      "bytes": 1360998
+    },
+    {
+      "path": "knowledge-library\\queued\\silent-witch\\wenku8-2964-20250928.epub",
+      "bytes": 2338587
+    },
+    {
+      "path": "knowledge-library\\queued\\tomozaki\\wenku8-2254-20240212.epub",
+      "bytes": 2051940
+    },
+    {
+      "path": "knowledge-library\\queued\\unnamed\\wenku8-2906-20251102.epub",
+      "bytes": 2132705
+    },
+    {
+      "path": "knowledge-library\\queued\\watanare\\wenku8-2751-20251012.epub",
+      "bytes": 1657716
+    },
+    {
+      "path": "knowledge-library\\scp-pilot\\scp-antimemetics-notes.epub",
+      "bytes": 46175
+    },
+    {
+      "path": "knowledge-library\\scp-pilot\\scp-antimemetics.epub",
+      "bytes": 45726
+    },
+    {
+      "path": "markdown-release-0119\\dispatch-before\\release\\NovelStudio-拆书交接包-v1.0-SHA256.txt",
+      "bytes": 298
+    },
+    {
+      "path": "markdown-release-0119\\source-check\\dist\\app.js.LEGAL.txt",
+      "bytes": 1528
+    },
+    {
+      "path": "markdown-release-0119\\source-check\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "markdown-release-0119\\source-check\\node_modules\\electron\\path.txt",
+      "bytes": 12
+    },
+    {
+      "path": "markdown-release-0119\\source-check\\node_modules\\opencc-js\\LICENSES\\Apache-2.0.txt",
+      "bytes": 9165
+    },
+    {
+      "path": "markdown-release-0119\\source-check\\node_modules\\playwright\\ThirdPartyNotices.txt",
+      "bytes": 262774
+    },
+    {
+      "path": "markdown-release-0119\\source-check\\node_modules\\playwright-core\\ThirdPartyNotices.txt",
+      "bytes": 198280
+    },
+    {
+      "path": "night-cycle-20261112-0525\\scan.txt",
+      "bytes": 3894
+    },
+    {
+      "path": "nsis-official\\install-probe\\probe-ok.txt",
+      "bytes": 17
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Docs\\AdvSplash\\advsplash.txt",
+      "bytes": 2019
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Docs\\Banner\\Readme.txt",
+      "bytes": 1215
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Docs\\BgImage\\BgImage.txt",
+      "bytes": 3134
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Docs\\Dialer\\Dialer.txt",
+      "bytes": 2993
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Docs\\InstallOptions\\Changelog.txt",
+      "bytes": 6314
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Docs\\makensisw\\License.txt",
+      "bytes": 910
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Docs\\makensisw\\Readme.txt",
+      "bytes": 7396
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Docs\\Math\\Math.txt",
+      "bytes": 10258
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Docs\\Modern UI\\Changelog.txt",
+      "bytes": 11738
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Docs\\Modern UI\\License.txt",
+      "bytes": 840
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Docs\\Modern UI 2\\License.txt",
+      "bytes": 840
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Docs\\nsExec\\nsExec.txt",
+      "bytes": 1632
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Docs\\NSISdl\\License.txt",
+      "bytes": 943
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Docs\\NSISdl\\ReadMe.txt",
+      "bytes": 2969
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Docs\\Splash\\splash.txt",
+      "bytes": 1235
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Docs\\StartMenu\\Readme.txt",
+      "bytes": 2264
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Docs\\StrFunc\\StrFunc.txt",
+      "bytes": 24311
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Docs\\System\\WhatsNew.txt",
+      "bytes": 2205
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Examples\\Math\\mathtest.txt",
+      "bytes": 482
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Examples\\VPatch\\newfile.txt",
+      "bytes": 125
+    },
+    {
+      "path": "nsis-official\\nsis-3.13\\Examples\\VPatch\\oldfile.txt",
+      "bytes": 125
+    },
+    {
+      "path": "prompt-strengthening-20261111\\before\\release\\NovelStudio-0.1.19-SHA256.txt",
+      "bytes": 295
+    },
+    {
+      "path": "prompt-strengthening-20261111\\before\\release\\NovelStudio-拆书交接包-v1.0-SHA256.txt",
+      "bytes": 298
+    },
+    {
+      "path": "release-model-probe\\model\\LICENSE-LLAMA.txt",
+      "bytes": 1078
+    },
+    {
+      "path": "release-model-probe\\model\\LICENSE-QWEN.txt",
+      "bytes": 11358
+    },
+    {
+      "path": "release-model-probe\\model\\README.txt",
+      "bytes": 508
+    },
+    {
+      "path": "release-model-probe-full\\model\\LICENSE-LLAMA.txt",
+      "bytes": 1078
+    },
+    {
+      "path": "release-model-probe-full\\model\\LICENSE-QWEN.txt",
+      "bytes": 11358
+    },
+    {
+      "path": "release-model-probe-full\\model\\README.txt",
+      "bytes": 508
+    },
+    {
+      "path": "rework-books-20261110\\handoff\\NovelStudio-拆书交接包-v1.0-SHA256.txt",
+      "bytes": 298
+    },
+    {
+      "path": "rework-books-20261110\\handoff\\before\\release\\NovelStudio-拆书交接包-v1.0-SHA256.txt",
+      "bytes": 298
+    },
+    {
+      "path": "rework-books-20261110\\variant\\handoff\\before\\release\\NovelStudio-拆书交接包-v1.0-SHA256.txt",
+      "bytes": 298
+    },
+    {
+      "path": "samples\\pg23962.epub",
+      "bytes": 1098550
+    },
+    {
+      "path": "shelf-proportion-gjwGwr\\application\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "shelf-proportion-zQKh4x\\application\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "spec-pack-probe-0afa288d897f485f9a46fff48ccc2800\\输入.txt",
+      "bytes": 28
+    },
+    {
+      "path": "standard-import-20261111\\SHA256-before.txt",
+      "bytes": 295
+    },
+    {
+      "path": "takeover-qa-11bfdca6f9\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "takeover-qa-11bfdca6f9\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "takeover-qa-11bfdca6f9\\node_modules\\opencc-js\\LICENSES\\Apache-2.0.txt",
+      "bytes": 9165
+    },
+    {
+      "path": "takeover-qa-11bfdca6f9\\node_modules\\playwright\\ThirdPartyNotices.txt",
+      "bytes": 262774
+    },
+    {
+      "path": "takeover-qa-11bfdca6f9\\node_modules\\playwright-core\\ThirdPartyNotices.txt",
+      "bytes": 198280
+    },
+    {
+      "path": "takeover-qa-4883ecedb0\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "takeover-qa-4883ecedb0\\node_modules\\opencc-js\\LICENSES\\Apache-2.0.txt",
+      "bytes": 9165
+    },
+    {
+      "path": "takeover-qa-4883ecedb0\\node_modules\\playwright\\ThirdPartyNotices.txt",
+      "bytes": 262774
+    },
+    {
+      "path": "takeover-qa-4883ecedb0\\node_modules\\playwright-core\\ThirdPartyNotices.txt",
+      "bytes": 198280
+    },
+    {
+      "path": "takeover-qa-577b606eec\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "takeover-qa-577b606eec\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "takeover-qa-577b606eec\\node_modules\\electron\\path.txt",
+      "bytes": 12
+    },
+    {
+      "path": "takeover-qa-577b606eec\\node_modules\\opencc-js\\LICENSES\\Apache-2.0.txt",
+      "bytes": 9165
+    },
+    {
+      "path": "takeover-qa-577b606eec\\node_modules\\playwright\\ThirdPartyNotices.txt",
+      "bytes": 262774
+    },
+    {
+      "path": "takeover-qa-577b606eec\\node_modules\\playwright-core\\ThirdPartyNotices.txt",
+      "bytes": 198280
+    },
+    {
+      "path": "win-package-1pGDj9\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-1pGDj9\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-3AaYbT\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-3AaYbT\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-5EKF17\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-5EKF17\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-5PekBg\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-5PekBg\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-BQHWCU\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1528
+    },
+    {
+      "path": "win-package-BQHWCU\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-ClQSf2\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-ClQSf2\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-D40arW\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-D40arW\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-Efyt76\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-Efyt76\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-EgsmBo\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-EgsmBo\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-eI6qFQ\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-eI6qFQ\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-eSKy2d\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-eSKy2d\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-FiMfZK\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-FiMfZK\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-gLKQcG\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-gLKQcG\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-h62r7t\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-h62r7t\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-IK4gxk\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-IK4gxk\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-iv3tng\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-iv3tng\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-kVZSTu\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-kVZSTu\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-ldzKNi\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-ldzKNi\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-lfwz96\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-lfwz96\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-lOqGor\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-lOqGor\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-lPPF3o\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-lPPF3o\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-lw4ZO8\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-lw4ZO8\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-Me5qlZ\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-Me5qlZ\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-Pzrj6z\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-Pzrj6z\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-Qea4wC\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-Qea4wC\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-qM7R4Q\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1528
+    },
+    {
+      "path": "win-package-qM7R4Q\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-RoGzrJ\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-RoGzrJ\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-Sv2xWc\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-Sv2xWc\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-U9zVA0\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-U9zVA0\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-USaA65\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-USaA65\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-Usx2YZ\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-Usx2YZ\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-vBb35O\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-vBb35O\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-XpLRB8\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-XpLRB8\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-YvqLEg\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-YvqLEg\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "win-package-zaDujZ\\resources\\app\\dist\\app.js.LEGAL.txt",
+      "bytes": 1219
+    },
+    {
+      "path": "win-package-zaDujZ\\resources\\app\\model\\requirements.txt",
+      "bytes": 114
+    },
+    {
+      "path": "writing-audit-ZnGZ9s\\audit-export.txt",
+      "bytes": 109
+    },
+    {
+      "path": "writing-regressions-1KvN8m\\chapter.txt",
+      "bytes": 117
+    },
+    {
+      "path": "writing-regressions-321N5L\\chapter.txt",
+      "bytes": 117
+    },
+    {
+      "path": "writing-regressions-dFT0UD\\chapter.txt",
+      "bytes": 117
+    },
+    {
+      "path": "writing-regressions-G4j6Qe\\chapter.txt",
+      "bytes": 117
+    },
+    {
+      "path": "writing-regressions-oSjU8X\\chapter.txt",
+      "bytes": 117
+    },
+    {
+      "path": "writing-regressions-WByhSK\\chapter.txt",
+      "bytes": 117
+    },
+    {
+      "path": "writing-regressions-xlptN1\\chapter.txt",
+      "bytes": 117
+    },
+    {
+      "path": "writing-regressions-zU8OkM\\chapter.txt",
+      "bytes": 117
+    },
+    {
+      "path": "writing-workflow-579r2E\\failure-body.txt",
+      "bytes": 2065
+    }
+  ],
+  "extensions": {
+    ".txt": 342,
+    ".epub": 108
+  },
+  "links": [
+    "antigravity-run\\Tomozaki",
+    "book-review-home-tutor-20261110\\profile\\model",
+    "external-book-qa\\assassin-BD6slg\\profile\\model",
+    "installed-model-qa-0SKkfP\\profile\\model",
+    "installed-model-qa-NAeeFi\\profile\\model",
+    "installed-model-qa-w4RLJZ\\profile\\model",
+    "installed-model-qa-xHO5sj\\profile\\model",
+    "knowledge-library\\mobuseka\\accepted-v01-v05\\qa-ezLqbo\\model",
+    "knowledge-library\\mobuseka\\accepted-v01-v06\\qa-nfNvdh\\model",
+    "knowledge-library\\mobuseka\\accepted-v01-v13\\qa-oDspEU\\model",
+    "knowledge-library\\mobuseka\\accepted-v01-v13\\qa-zYR2DA\\model",
+    "knowledge-library\\mobuseka\\cross-review-v01-v13\\qa-9v1GGr\\model",
+    "knowledge-library\\mobuseka\\cross-review-v01-v13\\qa-AyFWAl\\model",
+    "knowledge-library\\mobuseka\\v01\\qa-profile-QSWYCx\\model",
+    "knowledge-library\\mobuseka\\v01\\qa-profile-SM55D9\\model",
+    "knowledge-library\\mobuseka\\v02\\qa-profile-tNRX3P\\model",
+    "knowledge-library\\mobuseka\\v03\\qa-profile-rXer1d\\model",
+    "knowledge-library\\mobuseka\\v04\\qa-profile-DVWcpp\\model",
+    "knowledge-library\\mobuseka\\v05\\qa-profile-AHgz0e\\model",
+    "knowledge-library\\mobuseka\\v06\\qa-profile-T2xbqW\\model",
+    "knowledge-library\\mobuseka\\v07\\qa-profile-gMzOaW\\model",
+    "knowledge-library\\mobuseka\\v08\\qa-profile-xYgseB\\model",
+    "knowledge-library\\mobuseka\\v09\\qa-profile-bwX6M9\\model",
+    "knowledge-library\\mobuseka\\v10\\qa-profile-YLEKjS\\model",
+    "knowledge-library\\mobuseka\\v11\\qa-profile-5g2pRw\\model",
+    "knowledge-library\\mobuseka\\v11\\qa-profile-gpt5Hj\\model",
+    "knowledge-library\\mobuseka\\v12\\qa-profile-iYI2SX\\model",
+    "knowledge-library\\mobuseka\\v13\\qa-profile-Jxb6nk\\model",
+    "knowledge-library\\queued\\asobi\\accepted-v01-v02\\qa-1BKBIm\\model",
+    "knowledge-library\\queued\\asobi\\v01\\qa-profile-sfcAEJ\\model",
+    "knowledge-library\\queued\\asobi\\v02\\qa-profile-RZOgLv\\model",
+    "knowledge-library\\queued\\assassin\\accepted-v01-v01\\qa-rCGEiv\\model",
+    "knowledge-library\\queued\\assassin\\cross-review-v01-v08\\qa-btV19X\\model",
+    "knowledge-library\\queued\\assassin\\v01\\qa-profile-QQjG3S\\model",
+    "knowledge-library\\queued\\assassin\\v02\\qa-profile-zZjXH2\\model",
+    "knowledge-library\\queued\\assassin\\v03\\qa-profile-10IxdY\\model",
+    "knowledge-library\\queued\\assassin\\v04\\qa-profile-LiO2kB\\model",
+    "knowledge-library\\queued\\assassin\\v05\\qa-profile-Hha3Qw\\model",
+    "knowledge-library\\queued\\assassin\\v06\\qa-profile-51p5jS\\model",
+    "knowledge-library\\queued\\assassin\\v07\\qa-profile-GvmKkM\\model",
+    "knowledge-library\\queued\\assassin\\v08\\qa-profile-E4Gjy3\\model",
+    "knowledge-library\\queued\\bisco\\accepted-v01-v03\\qa-QXB75O\\model",
+    "knowledge-library\\queued\\bisco\\accepted-v01-v06\\qa-i2rNs1\\model",
+    "knowledge-library\\queued\\bisco\\v01\\qa-profile-twViJO\\model",
+    "knowledge-library\\queued\\bisco\\v02\\qa-profile-QX50rN\\model",
+    "knowledge-library\\queued\\bisco\\v03\\qa-profile-pdarHy\\model",
+    "knowledge-library\\queued\\bisco\\v04\\qa-profile-SJfBdI\\model",
+    "knowledge-library\\queued\\bisco\\v05\\qa-profile-evDDcj\\model",
+    "knowledge-library\\queued\\bisco\\v06\\qa-profile-ve5zOY\\model",
+    "knowledge-library\\queued\\bofuri\\accepted-v01-v05\\qa-0pr48j\\model",
+    "knowledge-library\\queued\\bofuri\\accepted-v01-v17\\qa-H621f8\\model",
+    "knowledge-library\\queued\\bofuri\\accepted-v01-v18\\qa-5uQEe2\\model",
+    "knowledge-library\\queued\\bofuri\\v01\\qa-profile-wUp1d4\\model",
+    "knowledge-library\\queued\\bofuri\\v02\\qa-profile-dy0Upg\\model",
+    "knowledge-library\\queued\\bofuri\\v03\\qa-profile-1jvrGB\\model",
+    "knowledge-library\\queued\\bofuri\\v03\\qa-profile-IYTYVH\\model",
+    "knowledge-library\\queued\\bofuri\\v04\\qa-profile-0tANN6\\model",
+    "knowledge-library\\queued\\bofuri\\v05\\qa-profile-5M1VcR\\model",
+    "knowledge-library\\queued\\bofuri\\v06\\qa-profile-XVa7eY\\model",
+    "knowledge-library\\queued\\bofuri\\v07\\qa-profile-AtwRse\\model",
+    "knowledge-library\\queued\\bofuri\\v08\\qa-profile-LMHXJr\\model",
+    "knowledge-library\\queued\\bofuri\\v09\\qa-profile-2RY5LX\\model",
+    "knowledge-library\\queued\\bofuri\\v10\\qa-profile-8BgzwI\\model",
+    "knowledge-library\\queued\\bofuri\\v11\\qa-profile-uPxtmc\\model",
+    "knowledge-library\\queued\\bofuri\\v12\\qa-profile-qdgeAw\\model",
+    "knowledge-library\\queued\\bofuri\\v13\\qa-profile-TrCdge\\model",
+    "knowledge-library\\queued\\bofuri\\v14\\qa-profile-32fHd0\\model",
+    "knowledge-library\\queued\\bofuri\\v15\\qa-profile-xX5HFT\\model",
+    "knowledge-library\\queued\\bofuri\\v16\\qa-profile-cKTT5n\\model",
+    "knowledge-library\\queued\\bofuri\\v17\\qa-profile-8oDCQk\\model",
+    "knowledge-library\\queued\\bofuri\\v18\\qa-profile-1qwGXu\\model",
+    "knowledge-library\\queued\\border-slow-life\\accepted-v01-v03\\qa-QKdvrm\\model",
+    "knowledge-library\\queued\\border-slow-life\\accepted-v01-v07\\qa-7GEzwg\\model",
+    "knowledge-library\\queued\\border-slow-life\\accepted-v01-v14\\qa-vLZDHJ\\model",
+    "knowledge-library\\queued\\border-slow-life\\cross-review-v01-v14\\qa-xx43Gp\\model",
+    "knowledge-library\\queued\\border-slow-life\\v01\\qa-profile-UO1cxE\\model",
+    "knowledge-library\\queued\\border-slow-life\\v02\\qa-profile-faFSCG\\model",
+    "knowledge-library\\queued\\border-slow-life\\v03\\qa-profile-idKOv0\\model",
+    "knowledge-library\\queued\\border-slow-life\\v04\\qa-profile-Oncnc6\\model",
+    "knowledge-library\\queued\\border-slow-life\\v05\\qa-profile-zmskXR\\model",
+    "knowledge-library\\queued\\border-slow-life\\v06\\qa-profile-RtjEg0\\model",
+    "knowledge-library\\queued\\border-slow-life\\v07\\qa-profile-wKKsy3\\model",
+    "knowledge-library\\queued\\border-slow-life\\v08\\qa-profile-WKzM0r\\model",
+    "knowledge-library\\queued\\border-slow-life\\v09\\qa-profile-72PzR1\\model",
+    "knowledge-library\\queued\\border-slow-life\\v10\\qa-profile-1JTddq\\model",
+    "knowledge-library\\queued\\border-slow-life\\v11\\qa-profile-UcfnDj\\model",
+    "knowledge-library\\queued\\border-slow-life\\v12\\qa-profile-Y8ELgK\\model",
+    "knowledge-library\\queued\\border-slow-life\\v13\\qa-profile-c2vgTt\\model",
+    "knowledge-library\\queued\\border-slow-life\\v14\\qa-profile-2N7Cmb\\model",
+    "knowledge-library\\queued\\dendrogram\\accepted-v01-v03\\qa-WAG2SP\\model",
+    "knowledge-library\\queued\\dendrogram\\accepted-v01-v04\\qa-gruHO5\\model",
+    "knowledge-library\\queued\\dendrogram\\accepted-v01-v09\\qa-rA63wY\\model",
+    "knowledge-library\\queued\\dendrogram\\accepted-v01-v22\\qa-RSDYij\\model",
+    "knowledge-library\\queued\\dendrogram\\cross-review-v01-v22\\qa-UcCc5o\\model",
+    "knowledge-library\\queued\\dendrogram\\v01\\qa-profile-iSywV5\\model",
+    "knowledge-library\\queued\\dendrogram\\v02\\qa-profile-pnAcfW\\model",
+    "knowledge-library\\queued\\dendrogram\\v03\\qa-profile-DiXVlB\\model",
+    "knowledge-library\\queued\\dendrogram\\v04\\qa-profile-VULkaI\\model",
+    "knowledge-library\\queued\\dendrogram\\v05\\qa-profile-DKaSzB\\model",
+    "knowledge-library\\queued\\dendrogram\\v05\\qa-profile-lIKfAo\\model",
+    "knowledge-library\\queued\\dendrogram\\v06\\qa-profile-iaDhY6\\model",
+    "knowledge-library\\queued\\dendrogram\\v07\\qa-profile-GSvRIV\\model",
+    "knowledge-library\\queued\\dendrogram\\v08\\qa-profile-pH2eU2\\model",
+    "knowledge-library\\queued\\dendrogram\\v09\\qa-profile-zeO0Cx\\model",
+    "knowledge-library\\queued\\dendrogram\\v10\\qa-profile-kKzg5J\\model",
+    "knowledge-library\\queued\\dendrogram\\v11\\qa-profile-y1BFL1\\model",
+    "knowledge-library\\queued\\dendrogram\\v12\\qa-profile-ahfxzy\\model",
+    "knowledge-library\\queued\\dendrogram\\v13\\qa-profile-4EquiP\\model",
+    "knowledge-library\\queued\\dendrogram\\v14\\qa-profile-gCx8Gs\\model",
+    "knowledge-library\\queued\\dendrogram\\v15\\qa-profile-xynAmQ\\model",
+    "knowledge-library\\queued\\dendrogram\\v16\\qa-profile-JJAnTT\\model",
+    "knowledge-library\\queued\\dendrogram\\v17\\qa-profile-GSFnvw\\model",
+    "knowledge-library\\queued\\dendrogram\\v18\\qa-profile-vjLQTW\\model",
+    "knowledge-library\\queued\\dendrogram\\v19\\qa-profile-NmLZmi\\model",
+    "knowledge-library\\queued\\dendrogram\\v20\\qa-profile-NbCbds\\model",
+    "knowledge-library\\queued\\dendrogram\\v21\\qa-profile-VEt9oR\\model",
+    "knowledge-library\\queued\\dendrogram\\v22\\qa-profile-l9QE1t\\model",
+    "knowledge-library\\queued\\genius-prince\\accepted-v01-v03\\qa-FJ7uTr\\model",
+    "knowledge-library\\queued\\genius-prince\\accepted-v01-v12\\qa-DMg6ic\\model",
+    "knowledge-library\\queued\\genius-prince\\cross-review-v01-v12\\qa-J63Kb1\\model",
+    "knowledge-library\\queued\\genius-prince\\v01\\qa-profile-0RnLc8\\model",
+    "knowledge-library\\queued\\genius-prince\\v02\\qa-profile-htcs6t\\model",
+    "knowledge-library\\queued\\genius-prince\\v03\\qa-profile-aekzuN\\model",
+    "knowledge-library\\queued\\genius-prince\\v04\\qa-profile-JCf1it\\model",
+    "knowledge-library\\queued\\genius-prince\\v05\\qa-profile-pdvPh8\\model",
+    "knowledge-library\\queued\\genius-prince\\v06\\qa-profile-WAyRb0\\model",
+    "knowledge-library\\queued\\genius-prince\\v07\\qa-profile-kjkwbx\\model",
+    "knowledge-library\\queued\\genius-prince\\v08\\qa-profile-82ZvAq\\model",
+    "knowledge-library\\queued\\genius-prince\\v09\\qa-profile-9hnrpm\\model",
+    "knowledge-library\\queued\\genius-prince\\v10\\qa-profile-MIl8qJ\\model",
+    "knowledge-library\\queued\\genius-prince\\v11\\qa-profile-R86eem\\model",
+    "knowledge-library\\queued\\genius-prince\\v12\\qa-profile-8LHKeY\\model",
+    "knowledge-library\\queued\\grieving-souls\\accepted-v01-v04\\qa-NC1NhI\\model",
+    "knowledge-library\\queued\\grieving-souls\\accepted-v01-v05\\qa-Y5D4MI\\model",
+    "knowledge-library\\queued\\grieving-souls\\accepted-v01-v06\\qa-838ep3\\model",
+    "knowledge-library\\queued\\grieving-souls\\accepted-v01-v07\\qa-MX7Lqo\\model",
+    "knowledge-library\\queued\\grieving-souls\\cross-review-v01-v13\\qa-o8w5Jp\\model",
+    "knowledge-library\\queued\\grieving-souls\\v01\\qa-profile-kRWWch\\model",
+    "knowledge-library\\queued\\grieving-souls\\v02\\qa-profile-3mBhtW\\model",
+    "knowledge-library\\queued\\grieving-souls\\v03\\qa-profile-TQt1us\\model",
+    "knowledge-library\\queued\\grieving-souls\\v04\\qa-profile-ojWA31\\model",
+    "knowledge-library\\queued\\grieving-souls\\v05\\qa-profile-SdqE38\\model",
+    "knowledge-library\\queued\\grieving-souls\\v06\\qa-profile-qFG7T3\\model",
+    "knowledge-library\\queued\\grieving-souls\\v07\\qa-profile-QIbv8q\\model",
+    "knowledge-library\\queued\\grieving-souls\\v08\\qa-profile-Z47jfh\\model",
+    "knowledge-library\\queued\\grieving-souls\\v09\\qa-profile-U7e9Db\\model",
+    "knowledge-library\\queued\\grieving-souls\\v10\\qa-profile-vR7Vqy\\model",
+    "knowledge-library\\queued\\grieving-souls\\v11\\qa-profile-vLUft7\\model",
+    "knowledge-library\\queued\\grieving-souls\\v12\\qa-profile-25Ca9O\\model",
+    "knowledge-library\\queued\\grieving-souls\\v13\\qa-profile-prGh5d\\model",
+    "knowledge-library\\queued\\hero\\accepted-v01-v03\\qa-cTd2yU\\model",
+    "knowledge-library\\queued\\hero\\v01\\qa-profile-WlmIFg\\model",
+    "knowledge-library\\queued\\hero\\v02\\qa-profile-G7FJQg\\model",
+    "knowledge-library\\queued\\hero\\v03\\qa-profile-t5c1me\\model",
+    "knowledge-library\\queued\\knights-magic\\accepted-v01-v04\\qa-Fh7jLr\\model",
+    "knowledge-library\\queued\\knights-magic\\cross-review-v01-v11\\qa-AkGfhs\\model",
+    "knowledge-library\\queued\\knights-magic\\cross-review-v01-v11\\qa-pKBY4x\\model",
+    "knowledge-library\\queued\\knights-magic\\v01\\qa-profile-mgvJSQ\\model",
+    "knowledge-library\\queued\\knights-magic\\v02\\qa-profile-Iui6Sg\\model",
+    "knowledge-library\\queued\\knights-magic\\v03\\qa-profile-bkTvgg\\model",
+    "knowledge-library\\queued\\knights-magic\\v04\\qa-profile-Oqg7pj\\model",
+    "knowledge-library\\queued\\knights-magic\\v05\\qa-profile-Q4iH6N\\model",
+    "knowledge-library\\queued\\knights-magic\\v06\\qa-profile-ewnTgG\\model",
+    "knowledge-library\\queued\\knights-magic\\v07\\qa-profile-LBGSuy\\model",
+    "knowledge-library\\queued\\knights-magic\\v08\\qa-profile-5I0tnc\\model",
+    "knowledge-library\\queued\\knights-magic\\v09\\qa-profile-dmjy7g\\model",
+    "knowledge-library\\queued\\knights-magic\\v10\\qa-profile-bCH0WT\\model",
+    "knowledge-library\\queued\\knights-magic\\v11\\qa-profile-zhNPJo\\model",
+    "knowledge-library\\queued\\leadale\\accepted-v01-v06\\qa-44ntyn\\model",
+    "knowledge-library\\queued\\leadale\\v01\\qa-profile-ZFmovL\\model",
+    "knowledge-library\\queued\\leadale\\v02\\qa-profile-WqbhDv\\model",
+    "knowledge-library\\queued\\leadale\\v03\\qa-profile-zMwRS5\\model",
+    "knowledge-library\\queued\\leadale\\v04\\qa-profile-Bdeb6G\\model",
+    "knowledge-library\\queued\\leadale\\v05\\qa-profile-Y2wS1c\\model",
+    "knowledge-library\\queued\\leadale\\v06\\qa-profile-Uxaro3\\model",
+    "knowledge-library\\queued\\magic-revolution\\accepted-v01-v01\\qa-0b6fgL\\model",
+    "knowledge-library\\queued\\magic-revolution\\accepted-v01-v02\\qa-T8sQkT\\model",
+    "knowledge-library\\queued\\magic-revolution\\accepted-v01-v03\\qa-tAJW3o\\model",
+    "knowledge-library\\queued\\magic-revolution\\accepted-v01-v04\\qa-LlHg6n\\model",
+    "knowledge-library\\queued\\magic-revolution\\cross-review-v01-v09\\qa-8dgljX\\model",
+    "knowledge-library\\queued\\magic-revolution\\v01\\qa-profile-0HvTW0\\model",
+    "knowledge-library\\queued\\magic-revolution\\v02\\qa-profile-p7vkEO\\model",
+    "knowledge-library\\queued\\magic-revolution\\v03\\qa-profile-sx79jN\\model",
+    "knowledge-library\\queued\\magic-revolution\\v04\\qa-profile-21Msjj\\model",
+    "knowledge-library\\queued\\magic-revolution\\v05\\qa-profile-6oj7XA\\model",
+    "knowledge-library\\queued\\magic-revolution\\v06\\qa-profile-CBVOI6\\model",
+    "knowledge-library\\queued\\magic-revolution\\v07\\qa-profile-IGk6dA\\model",
+    "knowledge-library\\queued\\magic-revolution\\v08\\qa-profile-aW4Zcd\\model",
+    "knowledge-library\\queued\\magic-revolution\\v09\\qa-profile-LqNqhj\\model",
+    "knowledge-library\\queued\\makeine\\accepted-v01-v08\\qa-sAS1Y7\\model",
+    "knowledge-library\\queued\\makeine\\v01\\qa-profile-bAJNum\\model",
+    "knowledge-library\\queued\\makeine\\v02\\qa-profile-gK0cRm\\model",
+    "knowledge-library\\queued\\makeine\\v03\\qa-profile-NMEBd3\\model",
+    "knowledge-library\\queued\\makeine\\v04\\qa-profile-78JDLL\\model",
+    "knowledge-library\\queued\\makeine\\v05\\qa-profile-8VWB9q\\model",
+    "knowledge-library\\queued\\makeine\\v06\\qa-profile-UVNRSK\\model",
+    "knowledge-library\\queued\\makeine\\v07\\qa-profile-re5Cqj\\model",
+    "knowledge-library\\queued\\makeine\\v08\\qa-profile-x2s172\\model",
+    "knowledge-library\\queued\\only-sense\\accepted-v01-v05\\qa-Arg3eD\\model",
+    "knowledge-library\\queued\\only-sense\\cross-review-v01-v16\\qa-bQgPCk\\model",
+    "knowledge-library\\queued\\only-sense\\v01\\qa-profile-GTGq67\\model",
+    "knowledge-library\\queued\\only-sense\\v02\\qa-profile-zaINQb\\model",
+    "knowledge-library\\queued\\only-sense\\v03\\qa-profile-lLMPWF\\model",
+    "knowledge-library\\queued\\only-sense\\v04\\qa-profile-ihGNMh\\model",
+    "knowledge-library\\queued\\only-sense\\v05\\qa-profile-C5BPuy\\model",
+    "knowledge-library\\queued\\only-sense\\v06\\qa-profile-dk4kUW\\model",
+    "knowledge-library\\queued\\only-sense\\v07\\qa-profile-siysqw\\model",
+    "knowledge-library\\queued\\only-sense\\v08\\qa-profile-8wNXeZ\\model",
+    "knowledge-library\\queued\\only-sense\\v09\\qa-profile-BpDARa\\model",
+    "knowledge-library\\queued\\only-sense\\v09\\qa-profile-WeoiYW\\model",
+    "knowledge-library\\queued\\only-sense\\v10\\qa-profile-pmxwgR\\model",
+    "knowledge-library\\queued\\only-sense\\v11\\qa-profile-K1TsWk\\model",
+    "knowledge-library\\queued\\only-sense\\v12\\qa-profile-Un0D3d\\model",
+    "knowledge-library\\queued\\only-sense\\v13\\qa-profile-qGwv2y\\model",
+    "knowledge-library\\queued\\only-sense\\v14\\qa-profile-AnlAzI\\model",
+    "knowledge-library\\queued\\only-sense\\v15\\qa-profile-HM7SU4\\model",
+    "knowledge-library\\queued\\only-sense\\v16\\qa-profile-nfGk3K\\model",
+    "knowledge-library\\queued\\sasaki-pii\\accepted-v01-v01\\qa-KhezdF\\model",
+    "knowledge-library\\queued\\sasaki-pii\\accepted-v01-v02\\qa-SEgKPv\\model",
+    "knowledge-library\\queued\\sasaki-pii\\accepted-v01-v03\\qa-WnOvqS\\model",
+    "knowledge-library\\queued\\sasaki-pii\\accepted-v01-v04\\qa-ana5Wb\\model",
+    "knowledge-library\\queued\\sasaki-pii\\accepted-v01-v05\\qa-YaN1ln\\model",
+    "knowledge-library\\queued\\sasaki-pii\\accepted-v01-v10\\qa-8zbcop\\model",
+    "knowledge-library\\queued\\sasaki-pii\\cross-review-v01-v10\\qa-5GLvQ2\\model",
+    "knowledge-library\\queued\\sasaki-pii\\v01\\qa-profile-OHujTG\\model",
+    "knowledge-library\\queued\\sasaki-pii\\v02\\qa-profile-mKgRYu\\model",
+    "knowledge-library\\queued\\sasaki-pii\\v03\\qa-profile-QC7E1U\\model",
+    "knowledge-library\\queued\\sasaki-pii\\v04\\qa-profile-c0bdV4\\model",
+    "knowledge-library\\queued\\sasaki-pii\\v05\\qa-profile-qPZ3UX\\model",
+    "knowledge-library\\queued\\sasaki-pii\\v06\\qa-profile-ZgmnRL\\model",
+    "knowledge-library\\queued\\sasaki-pii\\v07\\qa-profile-9aTiBf\\model",
+    "knowledge-library\\queued\\sasaki-pii\\v08\\qa-profile-NQYSLi\\model",
+    "knowledge-library\\queued\\sasaki-pii\\v09\\qa-profile-5Tqat2\\model",
+    "knowledge-library\\queued\\sasaki-pii\\v10\\qa-profile-IGZsRp\\model",
+    "knowledge-library\\queued\\silent-witch\\accepted-v01-v04\\qa-li5Gxc\\model",
+    "knowledge-library\\queued\\silent-witch\\accepted-v01-v09\\qa-YIeo1g\\model",
+    "knowledge-library\\queued\\silent-witch\\accepted-v01-v10\\qa-c7mdq3\\model",
+    "knowledge-library\\queued\\silent-witch\\v01\\qa-profile-Sjf3lt\\model",
+    "knowledge-library\\queued\\silent-witch\\v02\\qa-profile-pg3kNQ\\model",
+    "knowledge-library\\queued\\silent-witch\\v03\\qa-profile-4obUGI\\model",
+    "knowledge-library\\queued\\silent-witch\\v04\\qa-profile-7LelpW\\model",
+    "knowledge-library\\queued\\silent-witch\\v05\\qa-profile-XCaLH0\\model",
+    "knowledge-library\\queued\\silent-witch\\v06\\qa-profile-WJNDRL\\model",
+    "knowledge-library\\queued\\silent-witch\\v07\\qa-profile-6NZaH3\\model",
+    "knowledge-library\\queued\\silent-witch\\v08\\qa-profile-DjW5tc\\model",
+    "knowledge-library\\queued\\silent-witch\\v09\\qa-profile-21o0Mc\\model",
+    "knowledge-library\\queued\\silent-witch\\v10\\qa-profile-7NqDY5\\model",
+    "knowledge-library\\queued\\spider-isekai\\accepted-v01-v01\\qa-nm2faV\\model",
+    "knowledge-library\\queued\\spider-isekai\\cross-review-v01-v16\\qa-9wunde\\model",
+    "knowledge-library\\queued\\spider-isekai\\v01\\qa-profile-YgolSI\\model",
+    "knowledge-library\\queued\\spider-isekai\\v02\\qa-profile-wh852i\\model",
+    "knowledge-library\\queued\\spider-isekai\\v03\\qa-profile-P9RdDy\\model",
+    "knowledge-library\\queued\\spider-isekai\\v04\\qa-profile-GvwT6U\\model",
+    "knowledge-library\\queued\\spider-isekai\\v05\\qa-profile-txwTwX\\model",
+    "knowledge-library\\queued\\spider-isekai\\v06\\qa-profile-9lUVwO\\model",
+    "knowledge-library\\queued\\spider-isekai\\v07\\qa-profile-TPil8H\\model",
+    "knowledge-library\\queued\\spider-isekai\\v08\\qa-profile-LwbdAW\\model",
+    "knowledge-library\\queued\\spider-isekai\\v09\\qa-profile-tPErid\\model",
+    "knowledge-library\\queued\\spider-isekai\\v10\\qa-profile-it1M2N\\model",
+    "knowledge-library\\queued\\spider-isekai\\v11\\qa-profile-TmSN5e\\model",
+    "knowledge-library\\queued\\spider-isekai\\v12\\qa-profile-Ajz7NK\\model",
+    "knowledge-library\\queued\\spider-isekai\\v13\\qa-profile-tf4Jv9\\model",
+    "knowledge-library\\queued\\spider-isekai\\v14\\qa-profile-qyCFSV\\model",
+    "knowledge-library\\queued\\spider-isekai\\v15\\qa-profile-3MkFoA\\model",
+    "knowledge-library\\queued\\spider-isekai\\v16\\qa-profile-G23Cdp\\model",
+    "knowledge-library\\queued\\tomozaki\\accepted-v01-v02\\qa-pYRnpB\\model",
+    "knowledge-library\\queued\\tomozaki\\accepted-v01-v09\\qa-dOge2j\\model",
+    "knowledge-library\\queued\\tomozaki\\accepted-v01-v11\\qa-2HrJk8\\model",
+    "knowledge-library\\queued\\tomozaki\\v01\\qa-profile-ZqqbQ1\\model",
+    "knowledge-library\\queued\\tomozaki\\v02\\qa-profile-pT9TcS\\model",
+    "knowledge-library\\queued\\tomozaki\\v03\\qa-profile-j9fTmK\\model",
+    "knowledge-library\\queued\\tomozaki\\v04\\qa-profile-kyfZJS\\model",
+    "knowledge-library\\queued\\tomozaki\\v05\\qa-profile-hzhkha\\model",
+    "knowledge-library\\queued\\tomozaki\\v06\\qa-profile-aGNGFe\\model",
+    "knowledge-library\\queued\\tomozaki\\v06\\qa-profile-hBPgJ2\\model",
+    "knowledge-library\\queued\\tomozaki\\v07\\qa-profile-b8eslQ\\model",
+    "knowledge-library\\queued\\tomozaki\\v08\\qa-profile-jQIHuK\\model",
+    "knowledge-library\\queued\\tomozaki\\v08\\qa-profile-OHDmJO\\model",
+    "knowledge-library\\queued\\tomozaki\\v09\\qa-profile-cbQV7U\\model",
+    "knowledge-library\\queued\\tomozaki\\v10\\qa-profile-vZjM86\\model",
+    "knowledge-library\\queued\\tomozaki\\v11\\qa-profile-ChNDUV\\model",
+    "knowledge-library\\queued\\unnamed\\accepted-v01-v06\\qa-FjwU5N\\model",
+    "knowledge-library\\queued\\unnamed\\v01\\qa-profile-oJ4UOZ\\model",
+    "knowledge-library\\queued\\unnamed\\v02\\qa-profile-5Q02D4\\model",
+    "knowledge-library\\queued\\unnamed\\v03\\qa-profile-lv8ihn\\model",
+    "knowledge-library\\queued\\unnamed\\v04\\qa-profile-uErul2\\model",
+    "knowledge-library\\queued\\unnamed\\v05\\qa-profile-74qp5N\\model",
+    "knowledge-library\\queued\\unnamed\\v06\\qa-profile-1gw7NK\\model",
+    "knowledge-library\\queued\\unnamed-after-end\\accepted-v01-v02\\qa-mbzreA\\model",
+    "knowledge-library\\queued\\unnamed-after-end\\v01\\qa-profile-8pbHth\\model",
+    "knowledge-library\\queued\\unnamed-after-end\\v02\\qa-profile-vw7OTf\\model",
+    "knowledge-library\\queued\\unwanted-undead\\cross-review-v01-v13\\qa-eWqh59\\model",
+    "knowledge-library\\queued\\unwanted-undead\\v01\\qa-profile-DsAl8F\\model",
+    "knowledge-library\\queued\\unwanted-undead\\v01\\qa-profile-vFhsRK\\model",
+    "knowledge-library\\queued\\unwanted-undead\\v02\\qa-profile-n2Pdkt\\model",
+    "knowledge-library\\queued\\unwanted-undead\\v03\\qa-profile-tRg0yB\\model",
+    "knowledge-library\\queued\\unwanted-undead\\v04\\qa-profile-Uj2sQF\\model",
+    "knowledge-library\\queued\\unwanted-undead\\v05\\qa-profile-Hp2dG5\\model",
+    "knowledge-library\\queued\\unwanted-undead\\v06\\qa-profile-J4RMZx\\model",
+    "knowledge-library\\queued\\unwanted-undead\\v07\\qa-profile-I5iSmC\\model",
+    "knowledge-library\\queued\\unwanted-undead\\v08\\qa-profile-MYczQ7\\model",
+    "knowledge-library\\queued\\unwanted-undead\\v09\\qa-profile-x2mI89\\model",
+    "knowledge-library\\queued\\unwanted-undead\\v10\\qa-profile-uJanF3\\model",
+    "knowledge-library\\queued\\unwanted-undead\\v11\\qa-profile-Z97fSL\\model",
+    "knowledge-library\\queued\\unwanted-undead\\v12\\qa-profile-rMQPG8\\model",
+    "knowledge-library\\queued\\unwanted-undead\\v13\\qa-profile-3q7TKG\\model",
+    "knowledge-library\\queued\\walking\\accepted-v01-v01\\qa-UzwkoL\\model",
+    "knowledge-library\\queued\\walking\\cross-review-v01-v06\\qa-W7vuk0\\model",
+    "knowledge-library\\queued\\walking\\v01\\qa-profile-EBUvPu\\model",
+    "knowledge-library\\queued\\walking\\v02\\qa-profile-XD1WGi\\model",
+    "knowledge-library\\queued\\walking\\v03\\qa-profile-Itfmh2\\model",
+    "knowledge-library\\queued\\walking\\v04\\qa-profile-tBGSlg\\model",
+    "knowledge-library\\queued\\walking\\v05\\qa-profile-O617MS\\model",
+    "knowledge-library\\queued\\walking\\v06\\qa-profile-l0pc38\\model",
+    "knowledge-library\\queued\\watanare\\accepted-v01-v08\\qa-vOHFDp\\model",
+    "knowledge-library\\queued\\watanare\\v01\\qa-profile-L9jwda\\model",
+    "knowledge-library\\queued\\watanare\\v02\\qa-profile-9KWpp7\\model",
+    "knowledge-library\\queued\\watanare\\v03\\qa-profile-D116RG\\model",
+    "knowledge-library\\queued\\watanare\\v04\\qa-profile-6ArRNC\\model",
+    "knowledge-library\\queued\\watanare\\v05\\qa-profile-aCRyKU\\model",
+    "knowledge-library\\queued\\watanare\\v06\\qa-profile-YoIiBq\\model",
+    "knowledge-library\\queued\\watanare\\v07\\qa-profile-GY6sWn\\model",
+    "knowledge-library\\queued\\watanare\\v08\\qa-profile-jerWE4\\model",
+    "knowledge-library\\queued\\witch-mercenary\\accepted-v01-v01\\qa-BiRwbI\\model",
+    "knowledge-library\\queued\\witch-mercenary\\v01\\qa-profile-TL66jJ\\model",
+    "knowledge-library\\queued\\zero-believers\\accepted-v01-v01\\qa-0umdek\\model",
+    "knowledge-library\\queued\\zero-believers\\accepted-v01-v03\\qa-HVz1o0\\model",
+    "knowledge-library\\queued\\zero-believers\\cross-review-v01-v12\\qa-XmOCTj\\model",
+    "knowledge-library\\queued\\zero-believers\\v01\\qa-profile-l0YmoX\\model",
+    "knowledge-library\\queued\\zero-believers\\v02\\qa-profile-0UfP8e\\model",
+    "knowledge-library\\queued\\zero-believers\\v02\\qa-profile-0WBujL\\model",
+    "knowledge-library\\queued\\zero-believers\\v02\\qa-profile-MhRS39\\model",
+    "knowledge-library\\queued\\zero-believers\\v03\\qa-profile-vNLhWU\\model",
+    "knowledge-library\\queued\\zero-believers\\v04\\qa-profile-3EMxOI\\model",
+    "knowledge-library\\queued\\zero-believers\\v05\\qa-profile-I5LzJZ\\model",
+    "knowledge-library\\queued\\zero-believers\\v06\\qa-profile-tpXGnO\\model",
+    "knowledge-library\\queued\\zero-believers\\v07\\qa-profile-MPJtog\\model",
+    "knowledge-library\\queued\\zero-believers\\v08\\qa-profile-8YMZ0z\\model",
+    "knowledge-library\\queued\\zero-believers\\v09\\qa-profile-iOaFE1\\model",
+    "knowledge-library\\queued\\zero-believers\\v10\\qa-profile-2tSji6\\model",
+    "knowledge-library\\queued\\zero-believers\\v11\\qa-profile-Y7VIs9\\model",
+    "knowledge-library\\queued\\zero-believers\\v12\\qa-profile-SUaUgR\\model",
+    "knowledge-library\\replay-search-eTBqJj\\model",
+    "knowledge-library\\replay-search-P5SUFY\\model",
+    "knowledge-library\\scp-pilot\\qa-profile-DovDa4\\model",
+    "knowledge-library\\scp-pilot\\qa-profile-ofkDgE\\model",
+    "knowledge-library\\scp-pilot\\qa-profile-ZUUrUS\\model",
+    "retrieval-live-20261111\\profile-tCns1h\\model",
+    "retrieval-live-20261111\\profile-yvcGKl\\model",
+    "rework-books-20261110\\qa-uB7vcK\\profile\\model",
+    "rework-books-20261110\\variant\\qa-vgnbNK\\profile\\model",
+    "standard-upgrade-20261111\\profile-E8JAda\\model",
+    "standard-upgrade-20261111\\profile-mwxZCW\\model",
+    "standard-upgrade-20261111\\profile-UxtH6R\\model",
+    "visual-qa-SUS6dI\\profile\\model"
+  ],
+  "groups": {
+    "audit-reference-covers.py": 4218,
+    "codebuddy-hy4-smoke.json": 0,
+    "create-book-handoff.py": 13216,
+    "current-handover-audit-path.txt": 67,
+    "desktop-0.1.4.log": 1010,
+    "final-installed-path.txt": 100,
+    "formal-upgrade-0.1.12.json": 366,
+    "formal-upgrade-0.1.13.json": 490,
+    "formal-upgrade-0.1.14.json": 490,
+    "formal-upgrade-0.1.15.json": 490,
+    "gemini-quota-current-20261112.json": 2633,
+    "handover-docs.py": 10553,
+    "qa-expansion-ui.mjs": 7521,
+    "qa-inline-expansion-visual.mjs": 6785,
+    "qa-installed-0.1.1.txt": 100,
+    "qa-manuscript-surface.mjs": 6676,
+    "qa-original-shelf-proportions.mjs": 4959,
+    "qa-polish-bookshelves.mjs": 8752,
+    "qa-reference-bookshelf.mjs": 6561,
+    "qa-shelf-layout-v011.mjs": 4595,
+    "reference-cover-audit.json": 14538,
+    "reference-room-qa.mjs": 5720,
+    "shortcut-qa-0.1.2.json": 327,
+    "shortcut-qa-0.1.3.json": 303,
+    "sqlite-probe.cjs": 232,
+    "uninstall-files.nsh": 3532,
+    "win-package-1pGDj9-uninstall.nsh": 3689,
+    "win-package-3AaYbT-uninstall.nsh": 3532,
+    "win-package-5EKF17-uninstall.nsh": 3532,
+    "win-package-5PekBg-uninstall.nsh": 3689,
+    "win-package-BQHWCU-uninstall.nsh": 3689,
+    "win-package-ClQSf2-uninstall.nsh": 3532,
+    "win-package-D40arW-uninstall.nsh": 3532,
+    "win-package-EgsmBo-uninstall.nsh": 3532,
+    "win-package-eI6qFQ-uninstall.nsh": 3689,
+    "win-package-eSKy2d-uninstall.nsh": 3532,
+    "win-package-FiMfZK-uninstall.nsh": 3532,
+    "win-package-gLKQcG-uninstall.nsh": 3532,
+    "win-package-h62r7t-uninstall.nsh": 3689,
+    "win-package-IK4gxk-uninstall.nsh": 3532,
+    "win-package-iv3tng-uninstall.nsh": 3532,
+    "win-package-kVZSTu-uninstall.nsh": 3532,
+    "win-package-ldzKNi-uninstall.nsh": 3532,
+    "win-package-lfwz96-uninstall.nsh": 3532,
+    "win-package-lOqGor-uninstall.nsh": 3532,
+    "win-package-lPPF3o-uninstall.nsh": 3532,
+    "win-package-lw4ZO8-uninstall.nsh": 3689,
+    "win-package-Me5qlZ-uninstall.nsh": 3532,
+    "win-package-Pzrj6z-uninstall.nsh": 3532,
+    "win-package-Qea4wC-uninstall.nsh": 3532,
+    "win-package-qM7R4Q-uninstall.nsh": 3689,
+    "win-package-RoGzrJ-uninstall.nsh": 3532,
+    "win-package-Sv2xWc-uninstall.nsh": 3689,
+    "win-package-U9zVA0-uninstall.nsh": 3689,
+    "win-package-USaA65-uninstall.nsh": 3532,
+    "win-package-Usx2YZ-uninstall.nsh": 3532,
+    "win-package-vBb35O-uninstall.nsh": 3532,
+    "win-package-XpLRB8-uninstall.nsh": 3532,
+    "win-package-YvqLEg-uninstall.nsh": 3532,
+    "win-package-zaDujZ-uninstall.nsh": 3532,
+    "writing-0.1.4.log": 1538,
+    "writing-audit-repro.mjs": 8341,
+    "acceptance": 35350665,
+    "antigravity-batch-20261111-2240": 164763,
+    "antigravity-review-20261111-1726": 597136045,
+    "antigravity-review-20261111-1903": 11147,
+    "antigravity-review-20261111-2130": 730163089,
+    "antigravity-review-20261111-2323": 4520,
+    "antigravity-run": 314660303,
+    "antigravity-two-books-20261111": 165396,
+    "antigravity-wanling-permissions-20261111-1907": 16627271,
+    "antigravity-wanling-resume-20261111-1735": 16504911,
+    "book-review-home-tutor-20261110": 33770619,
+    "card-markdown-qa-5LDPOQ": 8588175,
+    "card-markdown-qa-8Lqeu6": 8478012,
+    "card-markdown-qa-CTVISh": 8588681,
+    "card-markdown-qa-K9Vwug": 8591156,
+    "card-markdown-qa-kCjmlI": 8588737,
+    "card-markdown-qa-KOlo6m": 8588127,
+    "card-markdown-qa-p6AOyV": 8477392,
+    "card-release-0118": 134973824,
+    "card-remediation-0114": 5411842301,
+    "card-remediation-next": 22354149964,
+    "card-revision-pilot": 1841966,
+    "card-viewer-qa-1AVVj4": 8591858,
+    "card-viewer-qa-7SnJce": 8591849,
+    "card-viewer-qa-9IAG2H": 9366532,
+    "card-viewer-qa-CEJYW1": 8591896,
+    "card-viewer-qa-j4mAL5": 8872045,
+    "card-viewer-qa-K7YBot": 9293457,
+    "card-viewer-qa-kJG4dw": 8593566,
+    "card-viewer-qa-OkEGUO": 9444479,
+    "card-viewer-qa-tYhtmm": 8469043,
+    "content-spotcheck-20261111": 628576,
+    "cover-handoff-20261110": 430197,
+    "deepseek-probe-dD5ezd": 4849179,
+    "deepseek-probe-Lm5Ld9": 4849179,
+    "design-reference": 431211,
+    "desktop-qa-0aTZN6": 6108459,
+    "desktop-qa-0hgoV8": 6096164,
+    "desktop-qa-5bMz4a": 6108399,
+    "desktop-qa-7dAdGs": 6185161,
+    "desktop-qa-8SeQZc": 6108397,
+    "desktop-qa-aAjUt0": 1686,
+    "desktop-qa-AUOjpx": 6108286,
+    "desktop-qa-DCJ9Fe": 6185292,
+    "desktop-qa-fkV6iT": 6106274,
+    "desktop-qa-g8Ncyt": 6185247,
+    "desktop-qa-IBnqIq": 6100616,
+    "desktop-qa-IDingi": 6108485,
+    "desktop-qa-JhRXX4": 6185246,
+    "desktop-qa-KTqSHY": 6185162,
+    "desktop-qa-len4Sw": 6108401,
+    "desktop-qa-lnm8wj": 6185158,
+    "desktop-qa-lVccHL": 6185298,
+    "desktop-qa-MAl6pi": 6108489,
+    "desktop-qa-N5R31P": 5889453,
+    "desktop-qa-OhSYH5": 6108482,
+    "desktop-qa-On7AIN": 6185160,
+    "desktop-qa-OxInol": 6108493,
+    "desktop-qa-prC3JD": 6108362,
+    "desktop-qa-rNb5sE": 5889355,
+    "desktop-qa-sfEZ4r": 6185214,
+    "desktop-qa-tybnoT": 5986407,
+    "desktop-qa-wBdfug": 6106349,
+    "desktop-qa-yY8bG0": 6100743,
+    "dispatch-20261111": 72791,
+    "dispatch-all-20261110": 31291,
+    "dispatch-cycle-20261111-0614": 581122944,
+    "dispatch-cycle-20261111-0815": 583953054,
+    "dispatch-cycle-20261111-1018": 587606352,
+    "dispatch-cycle-20261111-1220": 661435265,
+    "dispatch-cycle-20261111-1310": 4559471,
+    "dispatch-cycle-20261111-1340": 20254,
+    "dispatch-tags-20261110": 1164433,
+    "dispatch-timing-20261111": 2503,
+    "downloader": 58245286,
+    "expansion-model": 2104953502,
+    "expansion-prefs-profiles-Y2P4J7": 4800131,
+    "expansion-prefs-thinking-0P4M8Y": 4800529,
+    "expansion-prefs-ui-GUUF33": 4800122,
+    "expansion-qa-5Z2Z8c": 5889675,
+    "expansion-qa-86RVww": 5889014,
+    "expansion-qa-G39B9K": 5888785,
+    "expansion-qa-g3m1zY": 5889243,
+    "expansion-qa-GigUbD": 5886857,
+    "expansion-qa-Ikftg8": 5889569,
+    "expansion-qa-KXcKlr": 5887706,
+    "expansion-qa-nPsZ5U": 5888209,
+    "expansion-qa-o3cKWe": 5889570,
+    "expansion-qa-SjcEkl": 5889549,
+    "expansion-qa-tRlMPF": 5889596,
+    "expansion-qa-VQ3nv0": 5886744,
+    "expansion-qa-wAs6iU": 5888291,
+    "expansion-ui-Fzrjdz": 5886108,
+    "expansion-ui-jx5jKb": 5886108,
+    "expansion-ui-mUSGBh": 5886108,
+    "expansion-upgrade-42JVzc": 2847325,
+    "expansion-upgrade-9aihFy": 2847304,
+    "expansion-upgrade-cT5vNW": 2847325,
+    "expansion-upgrade-QAC9Nd": 2847304,
+    "expansion-upgrade-SFffoe": 2847224,
+    "expansion-upgrade-zmEFpC": 2847325,
+    "external-book-qa": 15542245,
+    "focus-repro-cNJ78c": 2846929,
+    "formal-import-two-20261110": 1023050799,
+    "gemini-import-timing-20261112": 113745,
+    "handoff-20261112": 7798,
+    "handoff-format-tags-20261111": 2881150,
+    "handoff-qa-fdadc3f487214f0a8426bdf9c0d41cb2": 220217017,
+    "handoff-refresh-20261110": 242250,
+    "handover-audit-20261111-023210": 2175871,
+    "icon-dev-mHCIYN": 2847169,
+    "icon-nsis-qa": 918467,
+    "icon-qa": 225985692,
+    "inline-expansion-visual-c9erxJ": 6264432,
+    "inline-expansion-visual-IiuY9M": 6265448,
+    "inline-expansion-visual-KLznrr": 6265400,
+    "inline-expansion-visual-VJOFOT": 5976773,
+    "install-0.1.1-a22bfd70591a4126928d2ce6b2063360": 367712990,
+    "install-final-3d03a85a5fa04bcbb916a856a93aef27": 367699006,
+    "install-old-1626e23b78c447839678078277286b5f": 367696914,
+    "install-qa-0.1.15-archive": 368520925,
+    "install-qa-0.1.16-retrieval": 368529538,
+    "install-qa-0.1.16-retrieval-final": 368530324,
+    "install-qa-0.1.17-ui": 368535932,
+    "install-qa-0.1.18-card": 368537020,
+    "install-qa-0.1.19-markdown": 368662785,
+    "install-qa-0.1.19-markdown-final": 368663204,
+    "installed-final-0.1.2": 367744812,
+    "installed-model-qa-0SKkfP": 9436948,
+    "installed-model-qa-NAeeFi": 9437218,
+    "installed-model-qa-w4RLJZ": 9437188,
+    "installed-model-qa-xHO5sj": 9437185,
+    "installed-qa-0.1.10": 367822504,
+    "installed-qa-0.1.11": 367823007,
+    "installed-qa-0.1.12": 367823300,
+    "installed-qa-0.1.13": 368955802,
+    "installed-qa-0.1.14": 368520053,
+    "installed-qa-0.1.2": 367744790,
+    "installed-qa-0.1.3": 367743264,
+    "installed-qa-0.1.4": 367744132,
+    "installed-qa-0.1.5": 367744343,
+    "installed-qa-0.1.6": 367779957,
+    "installed-qa-0.1.6-final": 367781469,
+    "installed-qa-0.1.6-reviewed": 367782405,
+    "installed-qa-0.1.7": 367796270,
+    "installed-qa-0.1.8": 367799842,
+    "installed-qa-0.1.8-final": 367799903,
+    "installed-qa-0.1.9": 367815586,
+    "installed-release-0.1.2": 367745060,
+    "installed-smoke-0Tq9gG": 4800114,
+    "installed-smoke-6NNoba": 2847237,
+    "installed-smoke-bojtp2": 2847317,
+    "installed-smoke-cHgOQF": 4158331,
+    "installed-smoke-DhohH5": 4800130,
+    "installed-smoke-dntDC8": 2847325,
+    "installed-smoke-fexyla": 2847245,
+    "installed-smoke-fvzrXc": 4800123,
+    "installed-smoke-gJzOyv": 2847237,
+    "installed-smoke-ICVoYH": 2847333,
+    "installed-smoke-IwkVXh": 2847237,
+    "installed-smoke-jos1nX": 4800122,
+    "installed-smoke-MOnXb0": 4800130,
+    "installed-smoke-nQ0BT1": 2847237,
+    "installed-smoke-TiBTWf": 4800123,
+    "installed-smoke-vBMamX": 2847325,
+    "installed-smoke-X7fl0X": 2847237,
+    "installed-smoke-xxK0YE": 2847317,
+    "knowledge-library": 14507510047,
+    "maintenance-archive": 30,
+    "manual-review-20261111-1604": 611863545,
+    "manuscript-surface-Ellhlh": 340280,
+    "manuscript-surface-mTFDJp": 5888697,
+    "manuscript-surface-YI7QSb": 7861225,
+    "markdown-release-0119": 573401519,
+    "model": 728297505,
+    "night-check-20261112-0327": 8104,
+    "night-cycle-20261112-0115": 605796182,
+    "night-cycle-20261112-0249": 606757670,
+    "night-cycle-20261112-0350": 603752756,
+    "night-cycle-20261112-0525": 611986532,
+    "night-final-20261112-0606": 142598656,
+    "nightly-setup-20261111": 131628,
+    "nsis-official": 9544496,
+    "overnight-dispatch": 82127,
+    "polish-bookshelves-f4oFfS": 6009326,
+    "polish-bookshelves-fJkbFQ": 6214006,
+    "polish-bookshelves-rwIkaf": 6709134,
+    "polish-bookshelves-tbrRci": 6709085,
+    "prompt-strengthening-20261111": 2699153,
+    "qa-card-audit": 13313698,
+    "rail-menu-qa-qmBSQZ": 5885792,
+    "reference-bookshelf-build": 113535,
+    "reference-bookshelf-qa-6OJ5GG": 7857575,
+    "reference-card-reset-20261110": 7622,
+    "reference-room-2eqaHs": 8580698,
+    "reference-room-b9efLV": 9424884,
+    "release-model-probe": 684313005,
+    "release-model-probe-full": 690911661,
+    "retrieval-diagnosis-20261112": 494786089,
+    "retrieval-intent-20261111": 25762,
+    "retrieval-live-20261111": 44402695,
+    "retrieval-qa-2ldsFR": 9294138,
+    "retrieval-qa-apUw06": 9413123,
+    "retrieval-qa-Dqg6Db": 9413416,
+    "retrieval-qa-OHSnOl": 9425004,
+    "retrieval-qa-QSCtPj": 9425003,
+    "retrieval-qa-RwqM95": 9294138,
+    "retrieval-release-0116": 134973955,
+    "rework-books-20261110": 128872376,
+    "samples": 1098550,
+    "search-qa": 19883,
+    "settings-probe-Mh4Wj6": 4801420,
+    "shelf-layout-qa-dfaQLs": 5886374,
+    "shelf-layout-qa-S7D9hu": 5886361,
+    "shelf-proportion-gjwGwr": 6719934,
+    "shelf-proportion-zQKh4x": 5899607,
+    "shortcut-011-rJtC2i": 2847204,
+    "shortcut-smoke-nmDHnr": 2847292,
+    "shortcut-smoke-YhSIZW": 2847212,
+    "spec-pack-probe-0afa288d897f485f9a46fff48ccc2800": 75001,
+    "standard-import-20261111": 588107197,
+    "standard-upgrade-20261111": 2793,
+    "takeover-qa-11bfdca6f9": 59636177,
+    "takeover-qa-4883ecedb0": 423211774,
+    "takeover-qa-577b606eec": 436869645,
+    "theme-polish-qa-3Awhyl": 9297056,
+    "ui-polish-0117": 449627714,
+    "ui-release-0117": 134973822,
+    "unarchive-20261112": 603199381,
+    "upgrade012-y30Cqi": 2847196,
+    "visual-qa-0xwrt4": 9560332,
+    "visual-qa-19wTGE": 10124874,
+    "visual-qa-4lTOBj": 10072499,
+    "visual-qa-5XFlhH": 10049100,
+    "visual-qa-BnrJeh": 10478004,
+    "visual-qa-BUNNAC": 9952414,
+    "visual-qa-GLLYXd": 10477996,
+    "visual-qa-HqOvNl": 9943557,
+    "visual-qa-kO0WnK": 9946859,
+    "visual-qa-Kp5BFs": 10123922,
+    "visual-qa-pC3Ne3": 9908214,
+    "visual-qa-qzy19Z": 9715963,
+    "visual-qa-SUS6dI": 9934889,
+    "visual-qa-tZamlf": 10264531,
+    "visual-qa-u0c4rm": 10124888,
+    "win-package-1pGDj9": 368421294,
+    "win-package-3AaYbT": 367643863,
+    "win-package-5EKF17": 367689608,
+    "win-package-5PekBg": 368422166,
+    "win-package-BQHWCU": 368564445,
+    "win-package-ClQSf2": 367689139,
+    "win-package-D40arW": 367727201,
+    "win-package-Efyt76": 367643693,
+    "win-package-EgsmBo": 367724753,
+    "win-package-eI6qFQ": 368437173,
+    "win-package-eSKy2d": 367689856,
+    "win-package-FiMfZK": 367686139,
+    "win-package-gLKQcG": 367726265,
+    "win-package-h62r7t": 368438261,
+    "win-package-IK4gxk": 367688928,
+    "win-package-iv3tng": 367744638,
+    "win-package-kVZSTu": 367724258,
+    "win-package-ldzKNi": 367741066,
+    "win-package-lfwz96": 367643802,
+    "win-package-lOqGor": 367657786,
+    "win-package-lPPF3o": 367767803,
+    "win-package-lw4ZO8": 368431565,
+    "win-package-Me5qlZ": 367767388,
+    "win-package-Pzrj6z": 367767300,
+    "win-package-Qea4wC": 367768096,
+    "win-package-qM7R4Q": 368564026,
+    "win-package-RoGzrJ": 367689517,
+    "win-package-Sv2xWc": 368545235,
+    "win-package-U9zVA0": 368430779,
+    "win-package-USaA65": 367689586,
+    "win-package-Usx2YZ": 367744699,
+    "win-package-vBb35O": 367760382,
+    "win-package-XpLRB8": 367744655,
+    "win-package-YvqLEg": 367688060,
+    "win-package-zaDujZ": 367760332,
+    "window-probe": 2846865,
+    "workflow-audit-M8zPnj": 2847276,
+    "workflow-audit-Nq8a5F": 5919104,
+    "workflow-audit-TwVo0x": 4816538,
+    "workspace-ui-1nIc8b": 9895991,
+    "workspace-ui-Otwm2X": 8991930,
+    "workspace-ui-RH9maY": 9895826,
+    "workspace-ui-Wi4gFW": 8992851,
+    "writing-audit-iyMRX6": 5885287,
+    "writing-audit-ZnGZ9s": 5885395,
+    "writing-regressions-1KvN8m": 5886390,
+    "writing-regressions-321N5L": 5886381,
+    "writing-regressions-dFT0UD": 5886363,
+    "writing-regressions-G4j6Qe": 5885731,
+    "writing-regressions-oSjU8X": 5886381,
+    "writing-regressions-WByhSK": 5885658,
+    "writing-regressions-xlptN1": 5886380,
+    "writing-regressions-zU8OkM": 5886337,
+    "writing-upgrade-qa-3zC1aq": 4834749,
+    "writing-workflow-1dQtKW": 6118377,
+    "writing-workflow-2j3EGw": 6227144,
+    "writing-workflow-3K8C3Y": 6222573,
+    "writing-workflow-579r2E": 5905118,
+    "writing-workflow-9kZYyC": 6118633,
+    "writing-workflow-jCQ2b6": 6254953,
+    "writing-workflow-jmm2oo": 6231091,
+    "writing-workflow-M57OvI": 5935815,
+    "writing-workflow-o3I90N": 6227904,
+    "writing-workflow-QCf7KU": 6227893,
+    "writing-workflow-vY7gd8": 6232606,
+    "writing-workflow-wVR4Hy": 6227852,
+    "writing-workflow-zmifbu": 6281772,
+    "writing-workflow-zwA80j": 6281636
+  }
+}

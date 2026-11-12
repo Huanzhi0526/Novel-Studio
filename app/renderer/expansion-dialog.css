@@ -1,0 +1,58 @@
+.modal.expansion-dialog {
+  width: min(620px, calc(100% - 36px));
+  max-height: calc(100dvh - 36px);
+  margin: auto;
+  color: var(--ink);
+}
+.expansion-dialog::backdrop { background: #23242856; }
+.expansion-dialog h3 { margin: 0 0 6px; font-size: 13px; }
+.expansion-instruction p {
+  margin: 0;
+  overflow: auto;
+  max-height: 108px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+}
+.expansion-options { margin: 13px 0; }
+.expansion-options label { display: flex; align-items: center; gap: 7px; width: fit-content; }
+.expansion-options label input[type=checkbox] { min-height: auto; margin: 0; }
+.expansion-options p, .expansion-status { margin: 6px 0 0; color: var(--muted); font-size: 12px; }
+.expansion-error { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; color: #a0353c; font-size: 13px; }
+.expansion-error span { overflow-wrap: anywhere; }
+.expansion-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.writing-focus-actions { display: flex; align-items: center; gap: 6px; }
+
+.expansion-inline-preview {
+  --expansion-review-accent: #69419a;
+  display: flex; flex: 1; min-height: 0; flex-direction: column;
+}
+[data-writing-paper=dark] .expansion-inline-preview { --expansion-review-accent: #cdb0f9; color-scheme: dark; }
+.expansion-review-bar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 6px 12px; padding: 6px 0; border-bottom: 1px solid var(--writing-ruling-color, var(--border));
+}
+.expansion-review-caption, .expansion-review-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.expansion-review-caption strong { color: var(--expansion-review-accent); font-size: 12px; }
+.expansion-review-caption span { color: var(--writing-muted, var(--muted)); font-size: 11px; }
+.expansion-inline-preview .expansion-review-actions button {
+  min-height: 28px; padding: 3px 8px; border-color: var(--writing-ruling-color, var(--border));
+  background: transparent; color: var(--writing-ink, var(--ink)); font-size: 12px;
+}
+.expansion-review-actions kbd { margin-left: 2px; color: var(--writing-muted, var(--muted)); font-size: 10px; }
+.expansion-review-actions button.expansion-keep {
+  border-color: var(--expansion-review-accent); color: var(--expansion-review-accent); font-weight: 600;
+}
+.expansion-review-actions button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--expansion-review-accent) 11%, var(--writing-paper));
+}
+.expansion-preview-insert {
+  color: inherit;
+  background: color-mix(in srgb, var(--expansion-review-accent) 10%, transparent);
+  text-decoration: underline dashed var(--expansion-review-accent);
+  text-underline-offset: .22em;
+}

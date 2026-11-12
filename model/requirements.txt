@@ -1,0 +1,2 @@
+# Install only into an application-managed virtual environment; never global Python.
+sentence-transformers==5.1.2

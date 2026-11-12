@@ -1,0 +1,73 @@
+.book-cover {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  container-type: inline-size;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--panel) 55%, var(--accent-soft));
+}
+.book-cover-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 7;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-inline: 11%;
+  font: 650 clamp(9px, 11cqi, 19px)/1.35 "Microsoft YaHei UI", "Segoe UI Variable", sans-serif;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.book-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+.original-shelf-page { flex: 1; min-width: 0; min-height: 0; overflow: auto; }
+.original-shelf-content { width: min(100%, 1160px); margin-inline: auto; padding: clamp(18px, 3vw, 42px); }
+.original-shelf-header {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end;
+  gap: 12px; padding-bottom: 18px; border-bottom: 1px solid var(--border);
+}
+.original-shelf-header h1 { margin: 4px 0 0; }
+.original-shelf-create { min-height: 35px; white-space: nowrap; }
+.original-shelf-tools {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+  gap: 10px; margin: 16px 0 14px; color: var(--muted);
+}
+.original-shelf-search { position: relative; width: min(244px, 100%); }
+.original-shelf-search > svg { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+.original-shelf-search input { width: 100%; padding-left: 31px; }
+.original-shelf-content > .notice { margin-block: 14px; }
+.original-shelf-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 144px), 1fr));
+  gap: clamp(12px, 1.6vw, 22px); margin: 0; padding: 0; list-style: none;
+}
+.original-shelf-grid > li { display: flex; min-width: 0; }
+.original-shelf-grid .original-shelf-card {
+  display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; align-items: stretch;
+  gap: 0; width: 100%; padding: 0; border-radius: 8px; background: var(--panel);
+  text-align: left;
+}
+.original-shelf-grid .original-shelf-card:hover:not(:disabled),
+.original-shelf-grid .original-shelf-card[aria-current] {
+  border-color: color-mix(in srgb, var(--accent) 38%, var(--border)); background: var(--hover);
+}
+.original-shelf-card .book-cover {
+  width: 100%; aspect-ratio: 5 / 6; border: 0; border-bottom: 1px solid var(--border); border-radius: 7px 7px 0 0;
+}
+.original-shelf-card-label {
+  display: flex; flex-direction: column; gap: 3px; min-width: 0; padding: 8px 10px 9px;
+}
+.original-shelf-card strong {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden; overflow-wrap: anywhere; font-size: 13px; line-height: 1.35;
+}
+.original-shelf-card small { color: var(--muted); font-size: 11px; }
+.original-shelf-card[aria-current] small { color: var(--accent); font-weight: 600; }
+.original-shelf-empty {
+  margin-top: 18px; padding: clamp(28px, 6vw, 64px) 16px; border: 1px dashed var(--border);
+  border-radius: 9px; color: var(--muted); text-align: center;
+}
+.original-shelf-empty h2 { margin: 0 0 8px; color: var(--ink); }
+.original-shelf-empty p { margin: 0; }

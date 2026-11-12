@@ -1,0 +1,100 @@
+{
+  "schema_version": "draft-0.1",
+  "package_id": "3730ac19-abb4-59b1-afcc-d6d4acc7240b",
+  "work": {
+    "work_id": "a2213e04-5fd1-5756-ac23-95165a58fc3b",
+    "title": "测试作品 灯塔记忆"
+  },
+  "volumes": [
+    {
+      "volume_id": "076c0d56-d7d8-5a8d-831e-3f853372646f",
+      "title": "第一卷",
+      "revision_id": "7ae74587fde0d37470213dd1b1aa4bba554e8014ac7b3880020afcf573a943f6",
+      "normalized_payload": {
+        "volume_id": "076c0d56-d7d8-5a8d-831e-3f853372646f",
+        "blocks": [
+          {
+            "kind": "text",
+            "text": "序章 灯塔",
+            "asset_sha256": null,
+            "note_target": null
+          },
+          {
+            "kind": "text",
+            "text": "林遥守着一座废弃灯塔。灯塔每次亮起，都会消耗她一天的记忆。",
+            "asset_sha256": null,
+            "note_target": null
+          },
+          {
+            "kind": "text",
+            "text": "暴雨夜，海面传来求救声。她点亮灯塔，让迷航的小船驶回港口。",
+            "asset_sha256": null,
+            "note_target": null
+          },
+          {
+            "kind": "text",
+            "text": "天亮后，她忘记了昨日与妹妹的约定，却记得归航的船铃。",
+            "asset_sha256": null,
+            "note_target": null
+          }
+        ]
+      }
+    }
+  ],
+  "structures": [
+    {
+      "structure_id": "cd402c67-8cc3-566a-8dc0-9a97d938aa3c",
+      "volume_id": "076c0d56-d7d8-5a8d-831e-3f853372646f",
+      "revision_id": "7ae74587fde0d37470213dd1b1aa4bba554e8014ac7b3880020afcf573a943f6",
+      "parent_id": null,
+      "type": "prologue",
+      "title": "序章 灯塔",
+      "start": "p000001",
+      "end": "p000004"
+    }
+  ],
+  "cards": [
+    {
+      "card_id": "617ff8c7-e0a8-5fc7-8b3e-cfbda4c34f41",
+      "category": "power_system",
+      "title": "灯塔以记忆作为代价",
+      "content": "点亮灯塔能够帮助船只归航，但每次会消耗守塔人一天的记忆。",
+      "claim_type": "fact",
+      "evidence": [
+        {
+          "volume_id": "076c0d56-d7d8-5a8d-831e-3f853372646f",
+          "revision_id": "7ae74587fde0d37470213dd1b1aa4bba554e8014ac7b3880020afcf573a943f6",
+          "start": "p000002",
+          "end": "p000004"
+        }
+      ],
+      "aliases": [],
+      "related_card_ids": []
+    }
+  ],
+  "report": {
+    "processed_ranges": [
+      {
+        "volume_id": "076c0d56-d7d8-5a8d-831e-3f853372646f",
+        "revision_id": "7ae74587fde0d37470213dd1b1aa4bba554e8014ac7b3880020afcf573a943f6",
+        "start": "p000001",
+        "end": "p000004"
+      }
+    ],
+    "category_status": {
+      "character": "not_processed",
+      "setting": "not_processed",
+      "power_system": "extracted",
+      "organization": "not_processed",
+      "event": "not_processed",
+      "storyline": "not_processed",
+      "location": "not_processed",
+      "item": "not_processed",
+      "technique": "not_processed"
+    },
+    "issues": [
+      "自创机制测试样例；仅示范力量体系卡，其他类别尚未拆解。"
+    ]
+  },
+  "resources": []
+}

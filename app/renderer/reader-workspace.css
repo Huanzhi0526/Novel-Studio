@@ -1,0 +1,186 @@
+.reader-workspace {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  background: var(--reader-paper, var(--panel));
+  color: var(--ink);
+}
+
+.reader-toolbar {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) minmax(0, 2fr) minmax(140px, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 10px clamp(14px, 3vw, 44px);
+  min-height: 57px;
+  border-bottom: 1px solid var(--border);
+  background: var(--chrome, var(--panel));
+}
+
+.reader-toolbar button, .reader-footer button {
+  min-height: 33px;
+  padding: 5px 9px;
+  white-space: nowrap;
+  background: transparent;
+  border-color: transparent;
+}
+.reader-toolbar button:hover:not(:disabled), .reader-footer button:hover:not(:disabled),
+.reader-tools button[aria-expanded=true] {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.reader-toolbar .reader-back { justify-self: start; color: var(--accent); }
+.reader-back span { font-size: 21px; line-height: 1; }
+.reader-breadcrumb { text-align: center; min-width: 0; }
+.reader-breadcrumb h1, .reader-breadcrumb p {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.reader-breadcrumb h1 { font-size: 14px; }
+.reader-breadcrumb p { font-size: 11px; color: var(--muted); }
+.reader-tools { position: relative; justify-self: end; display: flex; gap: 4px; }
+.reader-settings {
+  position: absolute;
+  inset: calc(100% + 10px) 0 auto auto;
+  width: min(320px, calc(100vw - 30px));
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--ink) 14%, transparent);
+  display: grid;
+  gap: 9px;
+}
+.reader-settings label {
+  display: grid;
+  grid-template-columns: 57px minmax(0, 1fr);
+  gap: 7px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 12px;
+}
+.reader-settings select { width: 100%; }
+
+.reader-workspace .reader-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 0;
+  overflow: hidden;
+}
+.reader-workspace .reader-body.has-contents {
+  grid-template-columns: minmax(160px, min(24vw, 300px)) minmax(0, 1fr);
+}
+.reader-workspace .reader-toc {
+  padding: 17px 11px;
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.reader-toc h2 { padding: 0 9px 10px; font-size: 13px; color: var(--muted); }
+.reader-toc > p { padding: 0 9px; }
+.reader-workspace .reader-toc button {
+  display: block;
+  width: 100%;
+  padding: 7px 9px;
+  margin-bottom: 3px;
+  background: transparent;
+  border-color: transparent;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+.reader-workspace .reader-toc .child-node { padding-inline-start: 21px; }
+.reader-workspace .reader-toc button:hover { background: var(--hover); }
+.reader-workspace .reader-toc button[aria-current] { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+
+.reader-workspace .reader-text {
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: var(--reader-paper, var(--panel));
+  padding: 0 clamp(22px, 5.5vw, 78px);
+}
+.reader-text:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.reader-paper {
+  width: min(100%, 42em);
+  margin: 0 auto;
+  padding: clamp(28px, 6vh, 72px) 0 clamp(80px, 16vh, 200px);
+  font-size: var(--reader-font, 18px);
+}
+.reader-title {
+  margin: 0 0 2.15em;
+  padding: 0 0 1.05em;
+  border-bottom: 1px solid var(--border);
+}
+.reader-title p { margin-bottom: .35em; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.reader-title h2 {
+  font: 650 clamp(25px, 1.65em, 40px)/1.35 "Noto Serif SC", "Songti SC", SimSun, serif;
+  overflow-wrap: anywhere;
+}
+.reader-workspace .reader-block { position: relative; margin: 0 0 .75em; padding: 0; border: 0; }
+.reader-workspace .reader-block:empty { margin: 0; }
+.reader-workspace .reader-block p {
+  margin: 0;
+  font: 400 1em/1.94 "Noto Serif SC", "Songti SC", SimSun, "Microsoft YaHei", serif;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.reader-workspace .reader-block.proof {
+  border: 0;
+  border-radius: 4px;
+  background: var(--accent-soft);
+  box-shadow: -3px 0 var(--accent), 0 0 0 4px var(--accent-soft);
+}
+.reader-workspace .reader-block figure { margin: 1.4em 0; text-align: center; }
+.reader-workspace .reader-block img {
+  display: block;
+  max-width: 100%;
+  max-height: 74vh;
+  object-fit: contain;
+  margin: 0 auto;
+}
+.reader-workspace .reader-block figcaption { margin-top: .5em; color: var(--muted); font-size: 12px; }
+.reader-workspace .reader-note { color: var(--muted); font-size: .9em; }
+.reader-note-link {
+  min-height: 25px;
+  padding: 1px 5px;
+  border: 0;
+  background: transparent;
+  color: var(--link);
+  font-size: 12px;
+}
+.reader-note-link:hover { text-decoration: underline; }
+.reader-block summary { color: var(--link); font-size: 13px; cursor: pointer; }
+.reader-status { color: var(--muted); text-align: center; font-size: 13px; }
+
+.reader-footer {
+  display: grid;
+  grid-template-columns: 1fr minmax(85px, min(34vw, 300px)) 1fr;
+  align-items: center;
+  gap: 8px;
+  min-height: 45px;
+  padding: 4px clamp(10px, 3vw, 44px);
+  border-top: 1px solid var(--border);
+  background: var(--chrome, var(--panel));
+}
+.reader-footer-edge { display: flex; gap: 4px; }
+.reader-footer-edge:last-child { justify-content: end; }
+.reader-footer .reader-evidence { color: var(--accent); }
+.reader-progress { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.reader-progress progress { flex: 1; min-width: 0; height: 5px; appearance: none; }
+.reader-progress progress::-webkit-progress-bar { border-radius: 5px; background: var(--border); }
+.reader-progress progress::-webkit-progress-value { border-radius: 5px; background: var(--accent); }
+.reader-progress small { min-width: 30px; text-align: right; font-variant-numeric: tabular-nums; font-size: 11px; }
+
+@media (max-width: 670px) {
+  .reader-toolbar { grid-template-columns: auto minmax(0, 1fr) auto; gap: 5px; padding-inline: 8px; }
+  .reader-toolbar button { padding-inline: 5px; }
+  .reader-tools button svg { display: none; }
+  .reader-workspace .reader-text { padding-inline: 17px; }
+}

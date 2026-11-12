@@ -1,0 +1,460 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NTS NKS result draft-0.1",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "draft-0.1"
+    },
+    "package_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "work": {
+      "type": "object",
+      "properties": {
+        "work_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "work_id",
+        "title"
+      ],
+      "additionalProperties": false
+    },
+    "volumes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "volume_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "revision_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "normalized_payload": {
+            "type": "object",
+            "properties": {
+              "volume_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "blocks": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "text",
+                        "image",
+                        "note"
+                      ]
+                    },
+                    "text": {
+                      "type": "string"
+                    },
+                    "asset_sha256": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "note_target": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^p[0-9]{6,}$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "text",
+                    "asset_sha256",
+                    "note_target"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1
+              }
+            },
+            "required": [
+              "volume_id",
+              "blocks"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "volume_id",
+          "title",
+          "revision_id",
+          "normalized_payload"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "structures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "structure_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "volume_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "type": {
+            "enum": [
+              "volume",
+              "chapter",
+              "prologue",
+              "epilogue",
+              "interlude",
+              "afterword",
+              "scene",
+              "frontmatter",
+              "unclassified"
+            ]
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "start": {
+            "type": "string",
+            "pattern": "^p[0-9]{6,}$"
+          },
+          "end": {
+            "type": "string",
+            "pattern": "^p[0-9]{6,}$"
+          }
+        },
+        "required": [
+          "structure_id",
+          "volume_id",
+          "revision_id",
+          "parent_id",
+          "type",
+          "title",
+          "start",
+          "end"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "cards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "card_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "category": {
+            "enum": [
+              "character",
+              "setting",
+              "power_system",
+              "organization",
+              "event",
+              "storyline",
+              "location",
+              "item",
+              "technique"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "string",
+            "minLength": 1
+          },
+          "claim_type": {
+            "enum": [
+              "fact",
+              "interpretation"
+            ]
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "volume_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "revision_id": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "start": {
+                  "type": "string",
+                  "pattern": "^p[0-9]{6,}$"
+                },
+                "end": {
+                  "type": "string",
+                  "pattern": "^p[0-9]{6,}$"
+                }
+              },
+              "required": [
+                "volume_id",
+                "revision_id",
+                "start",
+                "end"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "related_card_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "card_id",
+          "category",
+          "title",
+          "content",
+          "claim_type",
+          "evidence"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "report": {
+      "type": "object",
+      "properties": {
+        "processed_ranges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "volume_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "revision_id": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "start": {
+                "type": "string",
+                "pattern": "^p[0-9]{6,}$"
+              },
+              "end": {
+                "type": "string",
+                "pattern": "^p[0-9]{6,}$"
+              }
+            },
+            "required": [
+              "volume_id",
+              "revision_id",
+              "start",
+              "end"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "category_status": {
+          "type": "object",
+          "properties": {
+            "character": {
+              "enum": [
+                "extracted",
+                "absent",
+                "not_processed",
+                "uncertain"
+              ]
+            },
+            "setting": {
+              "enum": [
+                "extracted",
+                "absent",
+                "not_processed",
+                "uncertain"
+              ]
+            },
+            "power_system": {
+              "enum": [
+                "extracted",
+                "absent",
+                "not_processed",
+                "uncertain"
+              ]
+            },
+            "organization": {
+              "enum": [
+                "extracted",
+                "absent",
+                "not_processed",
+                "uncertain"
+              ]
+            },
+            "event": {
+              "enum": [
+                "extracted",
+                "absent",
+                "not_processed",
+                "uncertain"
+              ]
+            },
+            "storyline": {
+              "enum": [
+                "extracted",
+                "absent",
+                "not_processed",
+                "uncertain"
+              ]
+            },
+            "location": {
+              "enum": [
+                "extracted",
+                "absent",
+                "not_processed",
+                "uncertain"
+              ]
+            },
+            "item": {
+              "enum": [
+                "extracted",
+                "absent",
+                "not_processed",
+                "uncertain"
+              ]
+            },
+            "technique": {
+              "enum": [
+                "extracted",
+                "absent",
+                "not_processed",
+                "uncertain"
+              ]
+            }
+          },
+          "required": [
+            "character",
+            "setting",
+            "power_system",
+            "organization",
+            "event",
+            "storyline",
+            "location",
+            "item",
+            "technique"
+          ],
+          "additionalProperties": false
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "processed_ranges",
+        "category_status",
+        "issues"
+      ],
+      "additionalProperties": false
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "purpose": {
+            "enum": [
+              "image",
+              "source"
+            ]
+          }
+        },
+        "required": [
+          "path",
+          "sha256",
+          "purpose"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "package_id",
+    "work",
+    "volumes",
+    "structures",
+    "cards",
+    "report",
+    "resources"
+  ],
+  "additionalProperties": false
+}

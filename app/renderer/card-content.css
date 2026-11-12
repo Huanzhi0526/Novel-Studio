@@ -1,0 +1,37 @@
+.knowledge-card { --card-ink: #526075; --card-tint: #edf0f5; }
+.knowledge-card[data-category=character] { --card-ink: #4c5c92; --card-tint: #eef0fa; }
+.knowledge-card[data-category=setting] { --card-ink: #347367; --card-tint: #eaf5ef; }
+.knowledge-card[data-category=power_system] { --card-ink: #79559c; --card-tint: #f3edf8; }
+.knowledge-card[data-category=organization] { --card-ink: #4d6d83; --card-tint: #edf3f7; }
+.knowledge-card[data-category=event] { --card-ink: #906222; --card-tint: #fbf2e3; }
+.knowledge-card[data-category=storyline] { --card-ink: #9b5754; --card-tint: #faefed; }
+.knowledge-card[data-category=location] { --card-ink: #337784; --card-tint: #eaf5f6; }
+.knowledge-card[data-category=item] { --card-ink: #805f47; --card-tint: #f6efe9; }
+.knowledge-card[data-category=technique] { --card-ink: #5e6570; --card-tint: #eef0f3; }
+.knowledge-card .card-kicker > .pill:first-child { color: var(--card-ink); background: var(--card-tint); }
+.knowledge-card .card-content { overflow-wrap: anywhere; line-height: 1.8; }
+.knowledge-card .card-content > :first-child { margin-top: 0; }
+.knowledge-card .card-content > :last-child { margin-bottom: 0; }
+.knowledge-card .card-content p { white-space: pre-wrap; margin: 8px 0; }
+.knowledge-card .card-content :is(h2, h3) { font-size: 14px; line-height: 1.6; margin: 20px 0 7px; font-weight: 650; }
+.knowledge-card .card-content h3 { font-size: 13px; }
+.knowledge-card .card-content strong { font-weight: 650; color: var(--card-ink); background: var(--card-tint); border-radius: 3px; padding: 0 2px; box-decoration-break: clone; }
+.knowledge-card .card-content :is(ul, ol) { margin: 7px 0 12px; padding-inline-start: 22px; }
+.knowledge-card .card-content li { margin-block: 4px; }
+.knowledge-card .card-content blockquote { margin: 12px 0; padding: 1px 14px; border-inline-start: 3px solid var(--card-ink); background: var(--card-tint); color: var(--muted); }
+.card-tag-group { --tag-ink: #5e6570; --tag-tint: #eef0f3; }
+.knowledge-card .card-content .card-tag-group { display: flex; align-items: baseline; flex-wrap: wrap; gap: 5px 10px; margin: 7px 0; list-style: none; }
+.knowledge-card .card-content ul:has(> .card-tag-group) { padding-inline-start: 0; }
+.card-tag-group[data-tone=identity] { --tag-ink: #4c5c92; --tag-tint: #eef0fa; }
+.card-tag-group[data-tone=trait] { --tag-ink: #79559c; --tag-tint: #f3edf8; }
+.card-tag-group[data-tone=relation] { --tag-ink: #945d74; --tag-tint: #f8eef2; }
+.card-tag-group[data-tone=ability] { --tag-ink: #347367; --tag-tint: #eaf5ef; }
+.card-tag-group[data-tone=cost] { --tag-ink: #906222; --tag-tint: #fbf2e3; }
+.card-tag-group[data-tone=plot] { --tag-ink: #9b5754; --tag-tint: #faefed; }
+.card-tag-group[data-tone=place] { --tag-ink: #337784; --tag-tint: #eaf5f6; }
+.card-tag-label { flex: 0 0 auto; min-width: 4em; font-size: 11px; color: var(--muted); }
+.card-tag-items { display: inline-flex; flex: 1; flex-wrap: wrap; gap: 5px; min-width: 0; }
+.card-tag { display: inline-block; max-width: 100%; padding: 2px 7px; border-radius: 5px; color: var(--tag-ink); background: var(--tag-tint); font-size: 12px; line-height: 1.6; }
+.card-compact .card-content { max-height: 10rem; overflow: hidden; margin-bottom: 10px; }
+.card-compact .card-content-clipped { mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent); }
+.card-compact .card-content :is(h2, h3) { margin-top: 11px; }
