@@ -1,6 +1,6 @@
 {
   "name": "novel-studio",
-  "version": "0.1.19",
+  "version": "0.2.0",
   "private": true,
   "description": "个人小说写作工作台",
   "type": "module",
@@ -11,6 +11,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "start": "node scripts/start.mjs",
+    "start:kb-v2": "node scripts/kb-v2/start-v2.mjs",
     "setup:electron": "node scripts/setup-electron.mjs",
     "test": "node --disable-warning=ExperimentalWarning --test tests/*.test.mjs",
     "package:windows": "node scripts/release.mjs",

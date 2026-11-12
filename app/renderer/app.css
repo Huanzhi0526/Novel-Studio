@@ -194,6 +194,8 @@ ul { padding-left: 22px; }
 .retrieval-toggle input:checked::before { margin-inline-start: 14px; background: var(--panel); }
 .retrieval-toggle:has(input:checked) { color: var(--accent); }
 .composer-actions { display: flex; align-items: center; gap: 10px; }
+.v2-mode-switch button { min-width: 52px; min-height: 25px; padding: 2px 8px; font-size: 11px; }
+.v2-synthesis { margin: 8px 0 10px; padding: 10px 12px; border-radius: 9px; background: var(--accent-soft); border-left: 3px solid var(--accent); color: var(--ink); font-size: 12.5px; line-height: 1.65; white-space: pre-wrap; }
 .retrieval-settings-link { gap: 5px; font-size: 11px; padding: 3px 5px; }
 .retrieval-disclosure { display: block; margin-top: 8px; line-height: 1.5; font-size: 11px; }
 .query-examples { display: grid; gap: 6px; margin: 22px auto 0; text-align: start; }

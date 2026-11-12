@@ -342,7 +342,7 @@ export class ExpansionService {
         } catch { fail('EXPAND_KEY_READ', '无法读取 API Key，请在设置中重新保存。'); }
       }
       if (signal?.aborted) fail('EXPAND_CANCELLED', '已取消扩写。');
-      const target = { endpoint: config.endpoint, model: config.model, ...(config.thinking ? { thinking: true } : {}) };
+      const target = { endpoint: config.endpoint, model: config.model, ...(config.thinking && !options.disableThinking ? { thinking: true } : {}) };
       return await this.transport({ config: target, apiKey, messages, signal, ...options });
     } finally {
       this.active = false;

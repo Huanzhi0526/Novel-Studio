@@ -822,3 +822,9 @@ Automations工具已成功删除novel-studio，deleteStatus=deleted，不再自�
 保留 `.local/model`（正式embedding.json正在引用）、`.local/night-final-20261112-0606`（最终备份）和`.local/nsis-official`（发布工具）。正式资料库、安装程序、源码、依赖和拆书工作区未改。旧整改检查点、测试数据库、隔离安装/打包副本、旧模型副本、派工临时运行目录及旧审计临时文件已删除；文档中对应历史.local路径可能已不可访问，不再作为当前可用恢复依据。检索诊断结论保留在文档，本次未修检索。
 
 实际操作：只读盘点；原文复制、SHA-256去重与复验；PowerShell检查所有绝对目标均为工作区.local直属项，先移除目录联接本身，再用Remove-Item -LiteralPath逐项删除；未跟随联接删除目标。清单与计数见 `docs/cleanup-20261112`。仅清理本机产物，未启动应用或外部请求，未运行应用回归测试。
+
+## 2026-11-12 Git基线与KB v2 MVP环境准备
+
+按用户新授权准备本地环境，不开展原型实验。完善.gitignore后检查152份基线文件约3.02MiB，无超过5MiB文件，无常见密钥格式命中；仅保留公版西游记ZIP测试样例。初始化main并提交371be17 chore: baseline v0.1.19，切换feat/kb-v2-mvp；更新MVP文档边界。隔离目录含空samples/data/reports，ENV_READY.md列出27部候选（278卷、1,110,178块、1616卡）、只读导出命令、1024维Qwen3模型入口和兼容接口副本复用办法。本次从最终一致备份的临时副本只读查询reference表，未读取原创正文、未复制凭证或发外部请求；临时数据库用后删除，保留脱敏元数据。Python本机SQLite不支持STRICT，改用项目Node.js24的DatabaseSync完成只读查询，不修改数据库格式。
+
+实际检查：git init -b main、git add --all、git check-ignore、暂存文件大小及常见密钥格式扫描、git commit、git switch -c feat/kb-v2-mvp；保护资源334个文件SHA-256前后比对；核验样板目录为空与Git忽略，ENV命令PowerShell语法解析，Git状态清洁。无应用代码变化，未运行应用回归/模型推理。正式应用、资料、模型、最终备份、release交付不变，不重打0.1.19包。

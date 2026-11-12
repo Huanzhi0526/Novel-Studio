@@ -12,6 +12,10 @@ import { SearchService } from './search.mjs';
 import { RetrievalService } from './retrieval.mjs';
 import { Store, fail } from './store.mjs';
 import { WritingService } from './writing.mjs';
+import { ReferenceStoreV2 } from '../kb-v2/store-v2.mjs';
+import { SearchEngineV2 } from '../kb-v2/search-v2.mjs';
+import { RetrievalEngineV2 } from '../kb-v2/retrieval-v2.mjs';
+import { AgyFlashClient, resolveAgyExecutable } from '../kb-v2/agy-client.mjs';
 
 const appUrl = 'novel://studio/index.html';
 const appDir = fileURLToPath(new URL('../../', import.meta.url));
@@ -24,6 +28,9 @@ const contentTypes = {
 const policy = "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'";
 let window;
 let store;
+let storeV2;
+let agyClient;
+let useKbV2 = false;
 let embedding;
 let waitingForClose = false;
 let canClose = false;
@@ -66,17 +73,26 @@ async function chooseDestination(filename, extension, type) {
   return extname(selection.filePath).toLowerCase() === '.' + extension ? selection.filePath : selection.filePath + '.' + extension;
 }
 
-async function modelOptions() {
+async function modelOptions(preferVulkan = false) {
   if (process.env.NOVEL_STUDIO_NO_MODEL === '1') return { modelPath: '' };
   const configPath = join(dataDir, 'embedding.json');
   if (existsSync(configPath)) {
     try {
       const config = JSON.parse(await readFile(configPath, 'utf8'));
       const options = {};
-      for (const key of ['modelPath', 'pythonPath', 'runtimePath']) {
+      for (const key of ['modelPath', 'pythonPath', 'runtimePath', 'fallbackRuntimePath']) {
         if (typeof config[key] === 'string' && isAbsolute(config[key])) options[key] = config[key];
       }
       if (typeof config.id === 'string') options.id = config.id;
+      if (Array.isArray(config.extraArgs) && config.extraArgs.every(v => typeof v === 'string')) {
+        options.extraArgs = config.extraArgs;
+      }
+      if (typeof config.idleTimeoutMs === 'number' && Number.isFinite(config.idleTimeoutMs) && config.idleTimeoutMs >= 0) {
+        options.idleTimeoutMs = config.idleTimeoutMs;
+      }
+      if (typeof config.startupTimeoutMs === 'number' && Number.isFinite(config.startupTimeoutMs) && config.startupTimeoutMs > 0) {
+        options.startupTimeoutMs = config.startupTimeoutMs;
+      }
       if (options.modelPath) return options;
     } catch {
       // A partial configuration can still fall back to the installed model pack.
@@ -85,12 +101,25 @@ async function modelOptions() {
   if (process.env.NOVEL_STUDIO_EMBEDDING_MODEL) return {};
   const candidates = [join(dataDir, 'model')];
   if (!app.isPackaged) candidates.push(join(appDir, '.local', 'model'));
+  const vulkanCandidate = !app.isPackaged ? join(appDir, '.local', 'kb-v2-mvp', 'llama-cpp-vulkan', 'llama-server.exe') : '';
   for (const directory of candidates) {
     const modelPath = join(directory, 'Qwen3-Embedding-0.6B-Q8_0.gguf');
-    const runtimePath = join(directory, 'llama-cpp', 'llama-server.exe');
-    if (!existsSync(modelPath) || !existsSync(runtimePath)) continue;
+    const cpuRuntimePath = join(directory, 'llama-cpp', 'llama-server.exe');
+    if (!existsSync(modelPath) || !existsSync(cpuRuntimePath)) continue;
     const { size, mtimeMs } = await stat(modelPath);
-    return { modelPath, runtimePath, id: `Qwen3-Embedding-0.6B-Q8_0:${size}:${Math.trunc(mtimeMs)}` };
+    const id = `Qwen3-Embedding-0.6B-Q8_0:${size}:${Math.trunc(mtimeMs)}`;
+    if (preferVulkan && vulkanCandidate && existsSync(vulkanCandidate)) {
+      return {
+        modelPath,
+        runtimePath: vulkanCandidate,
+        fallbackRuntimePath: cpuRuntimePath,
+        id,
+        extraArgs: ['-ngl', '99', '--device', 'Vulkan0', '--ctx-size', '16384', '--batch-size', '4096', '--ubatch-size', '2048'],
+        idleTimeoutMs: 180_000,
+        startupTimeoutMs: 45_000
+      };
+    }
+    return { modelPath, runtimePath: cpuRuntimePath, id };
   }
   return {};
 }
@@ -154,7 +183,8 @@ function register(writing, reference, imports, search, backup, expansion, retrie
   });
   handlers.set('app.info', () => ({
     dataDir, model: embedding.id, modelConfigured: Boolean(embedding.modelPath),
-    version: app.getVersion(), electron: process.versions.electron
+    embeddingMode: embedding.activeBackendMode,
+    version: app.getVersion(), electron: process.versions.electron, kbV2: useKbV2, agyFallbackAvailable: Boolean(agyClient)
   }));
   handlers.set('app.openDataDir', async () => {
     const message = await shell.openPath(dataDir);
@@ -253,12 +283,36 @@ async function launch() {
   session.defaultSession.setPermissionCheckHandler(() => false);
   session.defaultSession.webRequest.onBeforeRequest({ urls: ['http://*/*', 'https://*/*', 'ws://*/*', 'wss://*/*'] }, (_details, reply) => reply({ cancel: true }));
   store = new Store(join(dataDir, 'library.sqlite'));
-  embedding = new EmbeddingProvider(await modelOptions());
-  const reference = new ReferenceService(store);
-  const search = new SearchService(reference, embedding);
-  register(new WritingService(store), reference, new ImportService(reference), search,
-    new BackupService(store), new ExpansionService(store, join(dataDir, 'expansion.json'), safeStorage),
-    new RetrievalService(search, store, join(dataDir, 'retrieval-api.json'), safeStorage));
+  const v2DbPath = join(dataDir, 'reference-v2.sqlite');
+  useKbV2 = process.env.NOVEL_STUDIO_KB_V2 === '1' || existsSync(v2DbPath);
+  embedding = new EmbeddingProvider(await modelOptions(useKbV2));
+  if (useKbV2) {
+    storeV2 = new ReferenceStoreV2(v2DbPath);
+    const searchV2 = new SearchEngineV2(storeV2, embedding);
+    const retrievalConfigFile = join(dataDir, 'retrieval-api.json');
+    let customComplete = null;
+    let fallbackComplete = null;
+    if (process.env.NOVEL_STUDIO_AGY_RETRIEVAL === '1') {
+      agyClient = new AgyFlashClient({ cwd: join(dataDir, 'agy-retrieval-work') });
+      customComplete = (messages, opts, sig) => agyClient.complete(messages, opts, sig);
+    } else if (process.env.NOVEL_STUDIO_NO_AGY_FALLBACK !== '1' && existsSync(resolveAgyExecutable())) {
+      agyClient = new AgyFlashClient({ cwd: join(dataDir, 'agy-retrieval-work') });
+      fallbackComplete = (messages, opts, sig) => agyClient.complete(messages, opts, sig);
+    }
+    const retrievalV2 = new RetrievalEngineV2(searchV2, {
+      store, filename: retrievalConfigFile, vault: safeStorage, customComplete, fallbackComplete
+    });
+    // Legacy ZIP imports must never write into the inactive v1 reference tables.
+    register(new WritingService(store), storeV2, Object.fromEntries(['inspect', 'preview', 'commit', 'cancel'].map(name => [name, () => { if (name === 'cancel') return true; fail('IMPORT_V2_UNSUPPORTED', '新版参考库请使用专用建库流程导入。'); }])), searchV2,
+      new BackupService(store, storeV2), new ExpansionService(store, join(dataDir, 'expansion.json'), safeStorage),
+      retrievalV2);
+  } else {
+    const reference = new ReferenceService(store);
+    const search = new SearchService(reference, embedding);
+    register(new WritingService(store), reference, new ImportService(reference), search,
+      new BackupService(store), new ExpansionService(store, join(dataDir, 'expansion.json'), safeStorage),
+      new RetrievalService(search, store, join(dataDir, 'retrieval-api.json'), safeStorage));
+  }
   Menu.setApplicationMenu(null);
   window = new BrowserWindow({
     width: 1460, height: 930, minWidth: 880, minHeight: 600, show: false, backgroundColor: '#ffffff',
@@ -285,6 +339,9 @@ async function launch() {
     if (process.env.NOVEL_STUDIO_TEST_HIDDEN !== '1') window.show();
   });
   await window.loadURL(appUrl);
+  if (useKbV2) {
+    if (embedding?.modelPath) void embedding.embed(['预热'], { query: true }).catch(() => {});
+  }
 }
 
 if (!app.requestSingleInstanceLock()) {
@@ -299,6 +356,8 @@ if (!app.requestSingleInstanceLock()) {
   app.on('will-quit', () => {
     for (const request of requests.values()) request.abort(cancellation());
     void embedding?.close();
+    agyClient?.close();
+    storeV2?.close();
     store?.close();
   });
   launch().catch(error => {

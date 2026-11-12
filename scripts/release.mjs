@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { cp, mkdir, mkdtemp, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises';
+import { access, cp, mkdir, mkdtemp, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -83,4 +83,5 @@ try {
 
 console.log('Installer:', output);
 console.log('Unpacked application:', stage);
-await import('./package-spec.mjs');
+try { await access(join(release, '通用拆书规范包_v0.4.zip')); }
+catch { await import('./package-spec.mjs'); }

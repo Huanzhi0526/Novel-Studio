@@ -91,7 +91,7 @@ export function Card({ card, openCard, openEvidence, compact = false, collapseEv
   </div>;
   return <article className={`knowledge-card ${compact ? 'card-compact' : ''}`} data-category={card.category}>
     <div className="card-kicker">
-      <span className="pill">{categories[card.category]}</span>
+      <span className="pill">{card.v2_badge ?? categories[card.category]}</span>
       {card.claim_type === 'interpretation' && <span className="pill amber">分析推断</span>}
       {card.work_title && <span>{card.work_title}</span>}
     </div>
