@@ -15,7 +15,7 @@ function revisionLabel(revision, index) {
   return `归档版本 ${index}${date ? ` · ${date}` : ''}`;
 }
 
-export function Reference({ works, refresh, conversation, openCard, openEvidence, openReader, onSettings }) {
+export function Reference({ works, refresh, conversation, openCard, openEvidence, openReader, onSettings, kbV2 = false }) {
   const [mode, setMode] = useState('search');
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [selected, setSelected] = useState('');
@@ -110,7 +110,7 @@ export function Reference({ works, refresh, conversation, openCard, openEvidence
     <ErrorMessage error={error} />
     {notice && <div className="notice success">{notice}<button className="quiet" onClick={() => setNotice('')}>关闭</button></div>}
     {mode === 'search'
-      ? <Conversation state={conversation} works={works} openEvidence={openEvidence} openCard={openCard} onSettings={onSettings} />
+      ? <Conversation state={conversation} works={works} openEvidence={openEvidence} openCard={openCard} onSettings={onSettings} kbV2={kbV2} />
       : <div ref={shelfBody} className="reference-shelf-scroll">
         {work ? <section className="reference-shelf-pane" aria-labelledby="reference-work-title">
           <button className="reference-shelf-back" type="button" onClick={returnToShelf}>

@@ -2,7 +2,15 @@
 
 工作区 `D:\Vibe Coding\Novel Studio`。2026-11-12已初始化本地Git：main基线371be17（0.1.19），当前实验分支feat/kb-v2-mvp。此前无Git仓库的记录属于历史。本文记录当前状态，早期施工及逐轮验收保存在 [项目历史](docs/project-history.md)。
 
-## 当前主管快照（2026-11-12，优先于下方历史流水）
+## 当前主管快照（2026-11-13 分支 `feat/kb-v2-mvp` 更新，优先于下方历史流水）
+
+### 2026-11-13 KB v2 全书库（27 部 / 278 卷）实验分支闭环交接（待合并审阅）
+
+- **全库建库已完成（100% 满卷无截断）**：已在 `feat/kb-v2-mvp` 分支与隔离目录 `.local/kb-v2-mvp/` 完成全部 **27 部在用参考书、278 卷、1,110,178 正文块** 的无截断场次拆解、跨卷人物/设定切面合成及 `RTX 4060 Vulkan0` GPU 全量向量索引。
+- **成品库与核心指标**：`.local/kb-v2-mvp/data/app-profile/reference-v2.sqlite`（已 `PRAGMA wal_checkpoint(TRUNCATE);`，单文件 `1,630.5 MB`）内含 **676 份档案（`1,575` 条独立切面）、`9,077` 场顺序场次、`80,917` 片原文滑窗切片**，以及 **91,569 条 `Qwen3-Embedding-0.6B` 1024 维向量**（三层 100% 对齐，模型 ID 与正式库一致，后续迁移零重拆、零重算）。全部逐卷与整书原始 JSON 保存在 `.local/kb-v2-mvp/data/extractions/`，全库进度总表见 `.local/kb-v2-mvp/reports/full-library-progress.md`。
+- **测试与冒烟验证通过**：`npm run build` 与 `npm test`（**65 / 65 项通过**）及 `scripts/kb-v2/qa-ui-v2.mjs`（27 部全库 Electron 桌面端 `本地混合 / AI 快速 / AI 深度翻书` + 阅读器原文高亮定位 + `library.sqlite` 零参考书物理隔离核验）全部通过。
+- **合并与正式迁移入口（供 GPT 接手审阅）**：详见 **[KB v2 分支交接与合并迁移说明](docs/kb-v2-handoff-for-gpt.md)** 与 **[KB v2 设计与全库实测记录](docs/kb-v2-mvp-report.md)**。
+- **红线核验**：`main` 基线（`371be17`，`0.1.19`）、正式 `%LOCALAPPDATA%\Novel Studio`、正式安装目录 `%LOCALAPPDATA%\Programs\Novel Studio`、`.local/model`、`.local/night-final-20261112-0606` 及 `release/` 下全部交付包均保持只读原状未动；未自行合并 `main` 或迁移正式库。
 
 ## 2026-11-12 最新授权：KB v2 MVP（优先于旧讨论/派工规则）
 

@@ -210,12 +210,12 @@ function App() {
         <Writing key={epoch} api={api} setFocused={setFocused} railTarget={view === 'writing' ? railTarget : null}
           preferences={preferences} updatePreferences={updatePreferences}
           onExpansionSettings={() => changeView('settings', 'expansion-settings')}
-          renderReference={close => <Conversation sidebar state={writingChat} works={works} close={close}
+          renderReference={close => <Conversation sidebar state={writingChat} works={works} close={close} kbV2={Boolean(info?.kbV2)}
             openCard={setCard} openEvidence={openEvidence} onSettings={() => changeView('settings', 'retrieval-settings')} />} />
       </main>
       {view === 'reference' && <main className="workspace-main">
         <Reference works={works} refresh={refresh} conversation={libraryChat} openCard={setCard} openEvidence={openEvidence} openReader={openReader}
-          onSettings={() => changeView('settings', 'retrieval-settings')} />
+          kbV2={Boolean(info?.kbV2)} onSettings={() => changeView('settings', 'retrieval-settings')} />
       </main>}
       {view === 'settings' && <main className="workspace-main settings-main">
         <Settings info={info} preferences={preferences} updatePreferences={updatePreferences} settingsTarget={settingsTarget} restored={async () => {
