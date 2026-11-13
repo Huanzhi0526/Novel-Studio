@@ -30,6 +30,7 @@ let window;
 let store;
 let storeV2;
 let agyClient;
+let expansionProvider;
 let useKbV2 = false;
 let embedding;
 let waitingForClose = false;
@@ -145,6 +146,7 @@ function register(writing, reference, imports, search, backup, expansion, retrie
   if (retrieval.sourceProvider) {
     expose('retrieval.provider', retrieval.sourceProvider, ['get', 'save', 'listModels', 'test']);
   }
+  if (expansion.sourceProvider) expose('expand.provider', expansion.sourceProvider, ['get', 'save', 'listModels', 'test']);
   expose('expand', expansion, ['generate']);
   handlers.set('expand.config.get', expansion.configGet.bind(expansion));
   handlers.set('expand.config.save', expansion.configSave.bind(expansion));
@@ -234,7 +236,7 @@ function register(writing, reference, imports, search, backup, expansion, retrie
     return true;
   });
   const expansionRequests = new Set();
-  const cancellable = new Set(['import.inspect', 'search.query', 'search.prepare', 'expand.generate', 'expand.config.test', 'retrieval.config.test', 'retrieval.provider.listModels', 'retrieval.provider.test']);
+  const cancellable = new Set(['import.inspect', 'search.query', 'search.prepare', 'expand.generate', 'expand.config.test', 'retrieval.config.test', 'retrieval.provider.listModels', 'retrieval.provider.test', 'expand.provider.listModels', 'expand.provider.test']);
   ipcMain.handle('novel:invoke', async (event, method, args) => {
     if (event.sender !== window?.webContents || event.senderFrame?.url !== appUrl || !handlers.has(method)) {
       return { ok: false, error: { code: 'IPC_METHOD', message: '操作不可用' } };
@@ -286,6 +288,8 @@ async function launch() {
   session.defaultSession.setPermissionCheckHandler(() => false);
   session.defaultSession.webRequest.onBeforeRequest({ urls: ['http://*/*', 'https://*/*', 'ws://*/*', 'wss://*/*'] }, (_details, reply) => reply({ cancel: true }));
   store = new Store(join(dataDir, 'library.sqlite'));
+  expansionProvider = new AgyRetrievalProvider(dataDir, { purpose: 'expand' });
+  const expansion = new ExpansionService(store, join(dataDir, 'expansion.json'), safeStorage, undefined, expansionProvider);
   const v2DbPath = join(dataDir, 'reference-v2.sqlite');
   useKbV2 = process.env.NOVEL_STUDIO_KB_V2 === '1' || existsSync(v2DbPath);
   embedding = new EmbeddingProvider(await modelOptions(useKbV2));
@@ -299,13 +303,13 @@ async function launch() {
     });
     // Legacy ZIP imports must never write into the inactive v1 reference tables.
     register(new WritingService(store), storeV2, Object.fromEntries(['inspect', 'preview', 'commit', 'cancel'].map(name => [name, () => { if (name === 'cancel') return true; fail('IMPORT_V2_UNSUPPORTED', '新版参考库请使用专用建库流程导入。'); }])), searchV2,
-      new BackupService(store, storeV2), new ExpansionService(store, join(dataDir, 'expansion.json'), safeStorage),
+      new BackupService(store, storeV2), expansion,
       retrievalV2);
   } else {
     const reference = new ReferenceService(store);
     const search = new SearchService(reference, embedding);
     register(new WritingService(store), reference, new ImportService(reference), search,
-      new BackupService(store), new ExpansionService(store, join(dataDir, 'expansion.json'), safeStorage),
+      new BackupService(store), expansion,
       new RetrievalService(search, store, join(dataDir, 'retrieval-api.json'), safeStorage));
   }
   Menu.setApplicationMenu(null);
@@ -352,6 +356,7 @@ if (!app.requestSingleInstanceLock()) {
     for (const request of requests.values()) request.abort(cancellation());
     void embedding?.close();
     agyClient?.close();
+    expansionProvider?.close();
     storeV2?.close();
     store?.close();
   });

@@ -119,6 +119,7 @@ export class AgyFlashClient {
     cwd = DEFAULT_WORKER_CWD,
     modelId = 'gemini-3.8-flash-low',
     thoughtLevel = 'low',
+    outputMode = 'json',
     env = null,
     spawnImpl = spawn,
     initializeTimeoutMs = 45_000,
@@ -128,6 +129,7 @@ export class AgyFlashClient {
     this.cwd = cwd;
     this.modelId = modelId;
     this.thoughtLevel = thoughtLevel;
+    this.outputMode = outputMode;
     this.customEnv = env;
     this.spawnImpl = spawnImpl;
     this.initializeTimeoutMs = initializeTimeoutMs;
@@ -371,7 +373,9 @@ export class AgyFlashClient {
     this.sessionChunks.set(sessionId, []);
     try {
       const fullPrompt = [
-        '【重要执行要求：你处于纯文本分析模式，严禁调用任何工具、读取文件或执行终端命令。直接依据下方输入文本输出要求的纯 JSON 结果，不要输出任何额外说明文字。】',
+        this.outputMode === 'text'
+          ? '【你处于小说局部补写模式。严禁调用工具、读取文件或执行命令。只根据输入写出缺口里的新增正文，不输出JSON、代码围栏或解释；连接测试则按测试句要求输出。】'
+          : '【重要执行要求：你处于纯文本分析模式，严禁调用任何工具、读取文件或执行终端命令。直接依据下方输入文本输出要求的纯 JSON 结果，不要输出任何额外说明文字。】',
         promptString
       ].join('\n\n');
 

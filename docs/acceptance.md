@@ -855,3 +855,14 @@ Automations工具已成功删除novel-studio，deleteStatus=deleted，不再自�
 - 审计`.local/agy-model-release-021`：tests-final.txt、ui-final/report.json、account-model-settings.png、backup-receipt.json、upgrade-receipt.json及发布校验。旧0.1.19/0.2.0发布件保留。用户升级后可直接打开桌面快捷方式自行选择，未代改其正式模型来源。
 
 实际命令：node --test tests/agy-provider.test.mjs（7/7）；沙箱外npm test（75/75）及npm run build；NOVEL_STUDIO_MAKENSIS指定现有NSIS后npm run package:windows；安装器/S /NOSHORTCUT /D=<隔离目录>；node scripts/qa-agy-model-settings.mjs <隔离EXE> .local/agy-model-release-021/ui-final --real-test（15模型，保存Carbon/high，重启记忆，Flash固定句连接，原API字节保留）；全目录backup-formal.ps1及SHA核对；scripts/upgrade-windows.ps1 -Version 0.2.1 -IsolatedInstall <隔离目录>并核对实际版本、EXE/bundle/UI、桌面目标与资料指纹。初轮UI验收定位不到隐式label，补充明确aria-label后最终验收通过；完整测试初轮沙箱回环/子进程权限失败，沙箱外复验通过。未自动更新agy CLI。
+
+## 0.2.2 已上线：反重力账号扩写（2026-11-13）
+
+- 当前main，源码/锁文件/正式安装版本0.2.2。用户已授权把反重力账号模型接入AI扩写；现于“资料与设置 → AI扩写 → 扩写模型来源”刷新CLI模型，选择模型/思考强度并保存。参考库仍86部/657卷，本次不迁移、不重拆、不重建向量。
+- 扩写选择独立保存为expansion-provider.json（初始api，保留旧API行为），检索仍用retrieval-provider.json，两者可各选不同模型。明确选agy后直接用账号CLI；选auto时优先API、未配置才用账号；API失败或额度不足不自动换模型重写。旧expansion.json/retrieval-api.json及加密Key不改。
+- 客户端按用途区分：检索维持JSON，扩写使用纯正文指令；拒绝工具权限不变。ExpansionService沿用括号选区、有限上下文和资料勾选、预览采纳流程，只在用户主动生成时请求，不读取其他作品、不自动写回原稿。取消、选模中途变更、空/超长输出被拦截。
+- 78项自动测试、构建、打包、扩写模拟API桌面回归均通过。安装版动态读取15模型选项，Carbon/high保存后重启保留，切回API时配置和加密Key字节不变。真实合成制服章节通过Carbon/low生成中文纯正文，原稿前后读取一致。Flash本轮固定测试句及合成扩写均遇到等待/90秒prompt超时，未宣称该模型本轮成功；另直接Carbon合成短句约16秒返回。无真实用户原创或参考正文外传。
+- 升级前完整备份`.local/agy-expansion-release-022/before-formal-20261113-165659`（data+旧0.2.1程序，253个文件，摘要校验一致）。正式升级和既有数据逐文件摘要核验见本轮upgrade-receipt.json、formal-data-verification.json；桌面快捷方式目标仍正式EXE。不会代用户改变正式扩写来源，需在设置里自行选择。
+- 审计`.local/agy-expansion-release-022`含tests.txt、ui-carbon/report.json与截图、expansion-regression.txt、备份和升级回执；ui.txt/ui-retry.txt保留Flash超时证据。旧发布件全部保留，0.2.2另交安装器/源码/SHA清单。
+
+实际命令：沙箱外npm test（78/78），npm run build、npm run package:windows（指定现有NSIS）；隔离安装/S /NOSHORTCUT /D=...；node scripts/qa-agy-expansion-settings.mjs <隔离EXE> .local/agy-expansion-release-022/ui-carbon --real-test --carbon（模型目录、选模重启、合成章节真实生成、不写原稿、API摘要保留）；node scripts/qa-expansion.mjs <隔离EXE>（模拟接口取消/预览/资料勾选/原稿保护/重启/多配置）；backup-formal.ps1完整备份校验；scripts/upgrade-windows.ps1 -Version 0.2.2 -IsolatedInstall ... -GracefulClose，随后逐文件SHA核对既有正式资料。真实模型验收仅用新建的虚构制服合成章节，Flash超时如实留档，Carbon成功后才升级。

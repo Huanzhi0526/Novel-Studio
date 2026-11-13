@@ -2,7 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { api } from './ui.jsx';
 import { ExpansionPreferences } from './Preferences.jsx';
 
-export function RetrievalPreferences({ kbV2 }) {
+export function RetrievalPreferences({ kbV2, purpose = 'retrieval' }) {
+  const expand = purpose === 'expand';
+  const enabled = expand || kbV2;
+  const label = expand ? '扩写' : '检索';
   const [saved, setSaved] = useState(null);
   const [draft, setDraft] = useState(null);
   const [models, setModels] = useState([]);
@@ -12,14 +15,14 @@ export function RetrievalPreferences({ kbV2 }) {
   const request = useRef(null);
 
   useEffect(() => {
-    if (!kbV2) return;
+    if (!enabled) return;
     let live = true;
-    api('retrieval.provider.get').then(value => {
+    api(`${purpose}.provider.get`).then(value => {
       if (!live) return;
       setSaved(value); setDraft(value); setModels(value.models);
     }).catch(error => { if (live) setNotice({ error: true, text: error.message }); });
     return () => { live = false; };
-  }, [kbV2, reload]);
+  }, [enabled, purpose, reload]);
 
   useEffect(() => () => {
     if (request.current) api('request.cancel', { id: request.current }).catch(() => {});
@@ -30,7 +33,7 @@ export function RetrievalPreferences({ kbV2 }) {
     const requestId = crypto.randomUUID();
     request.current = requestId;
     try {
-      const value = await api('retrieval.provider.' + action,
+      const value = await api(purpose + '.provider.' + action,
         action === 'save' ? { source: draft.source, modelId: draft.modelId } : { requestId });
       if (request.current !== requestId) return;
       if (action === 'listModels') {
@@ -38,7 +41,7 @@ export function RetrievalPreferences({ kbV2 }) {
         setNotice({ text: `已刷新 ${value.models.length} 个 Gemini 模型选项。` });
       } else if (action === 'save') {
         setSaved(value); setDraft(value);
-        setNotice({ text: '检索模型来源已保存，现有 API 配置保持不变。' });
+        setNotice({ text: `${label}模型来源已保存，现有 API 配置保持不变。` });
       } else setNotice({ text: `连接成功：${value.modelId}。` });
     } catch (error) {
       if (request.current === requestId) setNotice({ error: true, text: error.message });
@@ -62,9 +65,9 @@ export function RetrievalPreferences({ kbV2 }) {
   const change = patch => { setDraft(value => ({ ...value, ...patch })); setNotice(null); };
 
   return <>
-    {kbV2 && <section className="settings-preferences expansion-preferences" aria-labelledby="retrieval-provider-heading">
-      <h2 id="retrieval-provider-heading">检索模型来源</h2>
-      <p>选择用于 AI 快速和 AI 深度翻书的模型。本地混合检索始终在本机运行。</p>
+    {enabled && <section className="settings-preferences expansion-preferences" aria-labelledby={purpose + '-provider-heading'}>
+      <h2 id={purpose + '-provider-heading'}>{label}模型来源</h2>
+      <p>{expand ? '选择主动AI扩写使用的模型。扩写与检索各自保存选模，互不影响。' : '选择用于 AI 快速和 AI 深度翻书的模型。本地混合检索始终在本机运行。'}</p>
       {draft ? <div className="expansion-preferences-form">
         <label><span>模型来源</span>
           <select aria-label="模型来源" value={draft.source} disabled={Boolean(busy)} onChange={event => change({ source: event.target.value })}>
@@ -94,7 +97,7 @@ export function RetrievalPreferences({ kbV2 }) {
               {variants.map(model => <option key={model.id} value={model.id}>{model.effort ?? '模型默认'}</option>)}
             </select>
           </label>
-          <small>列表来自本机 CLI，列出不代表逐个推理测试成功。额度不足或调用失败会显示原因，并回退本地检索。</small>
+          <small>列表来自本机 CLI，列出不代表逐个推理测试成功。{expand ? '额度不足或调用失败会保留原稿并显示原因，不自动换模型生成。' : '额度不足或调用失败会显示原因，并回退本地检索。'}</small>
         </>}
         <div className="button-row">
           <button type="button" className="primary" disabled={Boolean(busy) || !dirty} onClick={() => run('save')}>保存模型来源</button>
@@ -107,6 +110,6 @@ export function RetrievalPreferences({ kbV2 }) {
       {busy && <p role="status">{busy === 'listModels' ? '正在读取账号可用模型…' : busy === 'test' ? '正在测试所选模型…' : '正在保存…'}</p>}
       {notice && <p className={`notice ${notice.error ? 'danger' : 'success'}`} role={notice.error ? 'alert' : 'status'}>{notice.text}</p>}
     </section>}
-    <div hidden={kbV2 && draft?.source === 'agy'}><ExpansionPreferences purpose="retrieval" /></div>
+    <div hidden={enabled && draft?.source === 'agy'}><ExpansionPreferences purpose={purpose === 'expand' ? 'expand' : 'retrieval'} /></div>
   </>;
 }

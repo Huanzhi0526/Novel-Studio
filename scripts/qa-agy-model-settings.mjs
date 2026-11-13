@@ -34,7 +34,7 @@ try {
     endpoint: 'http://127.0.0.1:1/chat/completions', model: 'synthetic', apiKey: 'qa-synthetic-only' });
   const apiPath = join(profile, 'retrieval-api.json');
   const before = await readFile(apiPath);
-  await page.getByLabel('模型来源', { exact: true }).selectOption('agy');
+  await page.getByRole('region', { name: '检索模型来源', exact: true }).getByLabel('模型来源', { exact: true }).selectOption('agy');
   await page.getByRole('button', { name: '刷新反重力模型', exact: true }).click();
   await page.getByText(/已刷新 \d+ 个 Gemini 模型选项/).waitFor();
   const catalogue = await invoke(page, 'retrieval.provider.get');
@@ -43,8 +43,8 @@ try {
   for (const family of ['gemini-3.8-flash', 'gemini-4-argon', 'gemini-4-carbon', 'gemini-4-hydrogen']) {
     assert.ok(catalogue.models.some(model => model.family === family), family);
   }
-  await page.getByLabel('反重力模型', { exact: true }).selectOption('gemini-4-carbon');
-  await page.getByLabel('思考强度', { exact: true }).selectOption('gemini-4-carbon-high');
+  await page.getByRole('region', { name: '检索模型来源', exact: true }).getByLabel('反重力模型', { exact: true }).selectOption('gemini-4-carbon');
+  await page.getByRole('region', { name: '检索模型来源', exact: true }).getByLabel('思考强度', { exact: true }).selectOption('gemini-4-carbon-high');
   await page.getByRole('button', { name: '保存模型来源', exact: true }).click();
   await page.getByText('检索模型来源已保存，现有 API 配置保持不变。').waitFor();
   assert.equal((await invoke(page, 'retrieval.provider.get')).modelId, 'gemini-4-carbon-high');
@@ -55,12 +55,12 @@ try {
   const persisted = await invoke(page, 'retrieval.provider.get');
   assert.equal(persisted.source, 'agy');
   assert.equal(persisted.modelId, 'gemini-4-carbon-high');
-  assert.equal(await page.getByLabel('模型来源', { exact: true }).inputValue(), 'agy');
+  assert.equal(await page.getByRole('region', { name: '检索模型来源', exact: true }).getByLabel('模型来源', { exact: true }).inputValue(), 'agy');
   await page.getByRole('button', { name: '刷新反重力模型', exact: true }).click();
   await page.getByText(/已刷新 \d+ 个 Gemini 模型选项/).waitFor();
-  assert.equal(await page.getByLabel('反重力模型', { exact: true }).inputValue(), 'gemini-4-carbon');
-  assert.equal(await page.getByLabel('思考强度', { exact: true }).inputValue(), 'gemini-4-carbon-high');
-  await page.getByLabel('反重力模型', { exact: true }).selectOption('gemini-3.8-flash');
+  assert.equal(await page.getByRole('region', { name: '检索模型来源', exact: true }).getByLabel('反重力模型', { exact: true }).inputValue(), 'gemini-4-carbon');
+  assert.equal(await page.getByRole('region', { name: '检索模型来源', exact: true }).getByLabel('思考强度', { exact: true }).inputValue(), 'gemini-4-carbon-high');
+  await page.getByRole('region', { name: '检索模型来源', exact: true }).getByLabel('反重力模型', { exact: true }).selectOption('gemini-3.8-flash');
   await page.getByRole('button', { name: '保存模型来源', exact: true }).click();
   await page.getByText('检索模型来源已保存，现有 API 配置保持不变。').waitFor();
   if (report.realTest) {
@@ -72,7 +72,7 @@ try {
   }
   await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].showInactive());
   await page.screenshot({ path: join(output, 'account-model-settings.png') });
-  await page.getByLabel('模型来源', { exact: true }).selectOption('api');
+  await page.getByRole('region', { name: '检索模型来源', exact: true }).getByLabel('模型来源', { exact: true }).selectOption('api');
   await page.getByRole('button', { name: '保存模型来源', exact: true }).click();
   await page.getByRole('heading', { name: 'AI 辅助检索', exact: true }).waitFor();
   const config = await invoke(page, 'retrieval.config.get');

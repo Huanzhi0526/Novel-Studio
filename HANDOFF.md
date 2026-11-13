@@ -2,6 +2,15 @@
 
 工作区 `D:\Vibe Coding\Novel Studio`。2026-11-12初始化本地Git，0.1.19基线371be17保留；2026-11-13已合并至main并正式升级0.2.0。此前无Git仓库的记录属于历史。本文记录当前状态，早期施工及逐轮验收保存在 [项目历史](docs/project-history.md)。
 
+## 0.2.2 已上线：反重力账号扩写（2026-11-13）
+
+- 当前main，源码/锁文件/正式安装版本0.2.2。用户已授权把反重力账号模型接入AI扩写；现于“资料与设置 → AI扩写 → 扩写模型来源”刷新CLI模型，选择模型/思考强度并保存。参考库仍86部/657卷，本次不迁移、不重拆、不重建向量。
+- 扩写选择独立保存为expansion-provider.json（初始api，保留旧API行为），检索仍用retrieval-provider.json，两者可各选不同模型。明确选agy后直接用账号CLI；选auto时优先API、未配置才用账号；API失败或额度不足不自动换模型重写。旧expansion.json/retrieval-api.json及加密Key不改。
+- 客户端按用途区分：检索维持JSON，扩写使用纯正文指令；拒绝工具权限不变。ExpansionService沿用括号选区、有限上下文和资料勾选、预览采纳流程，只在用户主动生成时请求，不读取其他作品、不自动写回原稿。取消、选模中途变更、空/超长输出被拦截。
+- 78项自动测试、构建、打包、扩写模拟API桌面回归均通过。安装版动态读取15模型选项，Carbon/high保存后重启保留，切回API时配置和加密Key字节不变。真实合成制服章节通过Carbon/low生成中文纯正文，原稿前后读取一致。Flash本轮固定测试句及合成扩写均遇到等待/90秒prompt超时，未宣称该模型本轮成功；另直接Carbon合成短句约16秒返回。无真实用户原创或参考正文外传。
+- 升级前完整备份`.local/agy-expansion-release-022/before-formal-20261113-165659`（data+旧0.2.1程序，253个文件，摘要校验一致）。正式升级和既有数据逐文件摘要核验见本轮upgrade-receipt.json、formal-data-verification.json；桌面快捷方式目标仍正式EXE。不会代用户改变正式扩写来源，需在设置里自行选择。
+- 审计`.local/agy-expansion-release-022`含tests.txt、ui-carbon/report.json与截图、expansion-regression.txt、备份和升级回执；ui.txt/ui-retry.txt保留Flash超时证据。旧发布件全部保留，0.2.2另交安装器/源码/SHA清单。
+
 ## 0.2.1 已上线：反重力模型手选（2026-11-13）
 
 - 当前main，源码/锁文件/正式安装应用版本0.2.1，桌面“小说工作台”仍指向正式安装目录。参考库维持Gemini Batch 2成品86部/657卷/225,535向量，本次不重拆、不重算、不迁移数据库。

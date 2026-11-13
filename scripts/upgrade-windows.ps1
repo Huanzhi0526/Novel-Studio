@@ -23,7 +23,7 @@ function Get-FormalProcess {
   Get-Process -Name 'Novel Studio' -ErrorAction SilentlyContinue | Where-Object Path -eq $program
 }
 function Get-DataFingerprint {
-  foreach ($name in @('library.sqlite', 'library.sqlite-wal', 'reference-v2.sqlite', 'reference-v2.sqlite-wal', 'expansion.json', 'embedding.json', 'retrieval-api.json', 'retrieval-provider.json')) {
+  foreach ($name in @('library.sqlite', 'library.sqlite-wal', 'reference-v2.sqlite', 'reference-v2.sqlite-wal', 'expansion.json', 'embedding.json', 'retrieval-api.json', 'retrieval-provider.json', 'expansion-provider.json')) {
     $file = Join-Path $data $name
     if (Test-Path -LiteralPath $file) {
       [pscustomobject]@{ file = $name; sha256 = (Get-FileHash -LiteralPath $file).Hash }

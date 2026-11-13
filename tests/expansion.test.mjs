@@ -290,3 +290,40 @@ test('a damaged config can be reset only by the explicit clear action', async t 
   assert.equal(readFileSync(filename, 'utf8'), '{ invalid');
   assert.deepEqual(await service.configSave({ endpoint: '', model: '', removeKey: true }), blank);
 });
+
+
+test('account expansion uses bounded original selection, preserves manuscripts and keeps API configuration', async t => {
+  const { service, input, store, filename, calls } = fixture(t);
+  await service.configSave({ endpoint, model: 'existing-api', apiKey: 'existing-key' });
+  const beforeConfig = readFileSync(filename);
+  const beforeDocs = store.db.prepare('SELECT * FROM original_docs ORDER BY id').all();
+  let sent;
+  service.sourceProvider = { read: () => ({ source: 'agy' }), snapshot: () => 'agy-flash', complete: async messages => {
+    sent = messages; return '衣领旁的银线映着窗边的日光。';
+  } };
+  const result = await service.generate(input);
+  assert.equal(result.text, '衣领旁的银线映着窗边的日光。');
+  assert.equal(calls.length, 0);
+  const payload = JSON.parse(sent[1].content);
+  assert.equal(payload.task, '补写许青的学院制服');
+  assert.ok(!('materials' in payload));
+  assert.deepEqual(store.db.prepare('SELECT * FROM original_docs ORDER BY id').all(), beforeDocs);
+  assert.deepEqual(readFileSync(filename), beforeConfig);
+});
+
+test('account expansion rejects cancelled, stale, empty and excessive output without touching originals', async t => {
+  const { service, input, store } = fixture(t);
+  let state = 'old';
+  const provider = { read: () => ({ source: 'agy' }), snapshot: () => state, complete: async () => { state = 'new'; return '晚风掠过衣角。'; } };
+  service.sourceProvider = provider;
+  const before = store.db.prepare('SELECT * FROM original_docs').all();
+  await assert.rejects(service.generate(input), { code: 'EXPAND_CONFIG_CHANGED' });
+  provider.complete = async () => '';
+  await assert.rejects(service.generate(input), { code: 'EXPAND_INVALID_RESPONSE' });
+  provider.complete = async () => '字'.repeat(12001);
+  await assert.rejects(service.generate(input), { code: 'EXPAND_OUTPUT_TOO_LARGE' });
+  const controller = new AbortController();
+  provider.complete = async () => { controller.abort(); return '不能采纳。'; };
+  await assert.rejects(service.generate(input, { signal: controller.signal }), { code: 'EXPAND_CANCELLED' });
+  assert.deepEqual(store.db.prepare('SELECT * FROM original_docs').all(), before);
+});

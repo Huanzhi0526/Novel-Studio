@@ -106,3 +106,20 @@ test('corrupt provider settings fail visibly rather than silently choosing a dif
   writeFileSync(provider.filename, '{broken');
   assert.throws(() => provider.get(), { code: 'RETRIEVAL_PROVIDER_READ' });
 });
+
+
+test('expansion and retrieval use independent selections and plain prose client mode', async t => {
+  const { directory, provider: retrieval } = setup(t);
+  let options;
+  const expansion = new AgyRetrievalProvider(directory, { purpose: 'expand', env: { NOVEL_STUDIO_AGY_BIN: process.execPath }, clientFactory: value => {
+    options = value; return { complete: async () => '正文', close() {} };
+  } });
+  t.after(() => expansion.close());
+  assert.equal(expansion.read().source, 'api');
+  assert.equal(retrieval.read().source, 'auto');
+  await expansion.save({ source: 'agy', modelId: 'gemini-3.8-flash-low' });
+  assert.equal(retrieval.read().source, 'auto');
+  await expansion.complete([], {});
+  assert.equal(options.outputMode, 'text');
+  assert.notEqual(expansion.filename, retrieval.filename);
+});

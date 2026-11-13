@@ -177,7 +177,8 @@ const systemPrompt = [
 ].join('\n');
 
 export class ExpansionService {
-  constructor(store, filename, vault, transport = requestExpansion) {
+  constructor(store, filename, vault, transport = requestExpansion, sourceProvider = null) {
+    this.sourceProvider = sourceProvider;
     this.store = store;
     this.filename = filename;
     this.vault = vault;
@@ -328,7 +329,18 @@ export class ExpansionService {
     try {
       await this.writes;
       if (signal?.aborted) fail('EXPAND_CANCELLED', '已取消扩写。');
-      const config = selectedProfile(this.read());
+      await this.sourceProvider?.writes;
+      const snapshot = this.sourceProvider?.snapshot();
+      const source = this.sourceProvider?.read().source ?? 'api';
+      const config = source === 'agy' ? null : selectedProfile(this.read());
+      if (source === 'agy' || (source === 'auto' && !config)) {
+        const output = await this.sourceProvider.complete(buildMessages(), options, signal);
+        if (signal?.aborted) fail('EXPAND_CANCELLED', '已取消扩写。');
+        if (snapshot !== this.sourceProvider.snapshot()) fail('EXPAND_CONFIG_CHANGED', '扩写模型已切换，请重新生成。');
+        if (typeof output !== 'string' || !output.trim() || output.includes('\0') || !output.isWellFormed()) fail('EXPAND_INVALID_RESPONSE', '模型未返回可用正文。');
+        if (output.length > 12000) fail('EXPAND_OUTPUT_TOO_LARGE', '扩写内容过长，请缩短提示后重试。');
+        return output.replace(/\r\n?/g, '\n').trim();
+      }
       if (!config) fail('EXPAND_NOT_CONFIGURED', '请先在「资料与设置 → AI 扩写」配置模型。');
       const messages = buildMessages();
       let apiKey = '';
@@ -343,7 +355,9 @@ export class ExpansionService {
       }
       if (signal?.aborted) fail('EXPAND_CANCELLED', '已取消扩写。');
       const target = { endpoint: config.endpoint, model: config.model, ...(config.thinking && !options.disableThinking ? { thinking: true } : {}) };
-      return await this.transport({ config: target, apiKey, messages, signal, ...options });
+      const output = await this.transport({ config: target, apiKey, messages, signal, ...options });
+      if (snapshot !== this.sourceProvider?.snapshot()) fail('EXPAND_CONFIG_CHANGED', '扩写模型已切换，请重新生成。');
+      return output;
     } finally {
       this.active = false;
     }

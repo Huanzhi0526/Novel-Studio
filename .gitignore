@@ -77,3 +77,5 @@ auth.json
 *.hdf5
 
 retrieval-provider.json
+
+expansion-provider.json

@@ -78,7 +78,7 @@ function Settings({ info, restored, preferences, updatePreferences, settingsTarg
     </section>
     </div>
     <div className="settings-group" hidden={group !== 'expansion'}>
-    <ExpansionPreferences />
+    <RetrievalPreferences purpose="expand" />
     </div>
     <div className="settings-group" hidden={group !== 'retrieval'}>
     <RetrievalPreferences kbV2={info?.kbV2} />

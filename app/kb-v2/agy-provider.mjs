@@ -32,9 +32,11 @@ export function accountEnvironment(env = process.env) {
 }
 
 export class AgyRetrievalProvider {
-  constructor(directory, { run = execFile, clientFactory = options => new AgyFlashClient(options), env = process.env } = {}) {
-    this.filename = join(directory, 'retrieval-provider.json');
-    this.cwd = join(directory, 'agy-retrieval-work');
+  constructor(directory, { run = execFile, clientFactory = options => new AgyFlashClient(options), env = process.env, purpose = 'retrieval' } = {}) {
+    this.purpose = purpose;
+    this.defaults = { ...defaults, ...(purpose === 'expand' ? { source: 'api' } : {}) };
+    this.filename = join(directory, purpose === 'expand' ? 'expansion-provider.json' : 'retrieval-provider.json');
+    this.cwd = join(directory, purpose === 'expand' ? 'agy-expansion-work' : 'agy-retrieval-work');
     this.env = accountEnvironment(env);
     this.executable = resolveAgyExecutable(this.env);
     this.run = run;
@@ -51,7 +53,7 @@ export class AgyRetrievalProvider {
     let value;
     try { value = JSON.parse(readFileSync(this.filename, 'utf8')); }
     catch (error) {
-      if (error.code === 'ENOENT') return { ...defaults };
+      if (error.code === 'ENOENT') return { ...this.defaults };
       fail('RETRIEVAL_PROVIDER_READ', '模型来源配置无法读取，请保留原文件并检查。');
     }
     if (value?.version !== 1 || !sources.has(value.source) ||
@@ -117,6 +119,7 @@ export class AgyRetrievalProvider {
     if (!this.client || this.clientModel !== modelId) {
       this.close();
       this.client = this.clientFactory({ executable: this.executable, cwd: this.cwd, modelId,
+        outputMode: this.purpose === 'expand' ? 'text' : 'json',
         thoughtLevel: /-(low|medium|high|xhigh|max)$/u.exec(modelId)?.[1] ?? null, env: this.env });
       this.clientModel = modelId;
     }
