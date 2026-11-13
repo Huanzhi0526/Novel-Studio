@@ -2,6 +2,15 @@
 
 工作区 `D:\Vibe Coding\Novel Studio`。2026-11-12初始化本地Git，0.1.19基线371be17保留；2026-11-13已合并至main并正式升级0.2.0。此前无Git仓库的记录属于历史。本文记录当前状态，早期施工及逐轮验收保存在 [项目历史](docs/project-history.md)。
 
+## 0.2.3 已上线：Flash超时诊断与容量错误处理（2026-11-13）
+
+- 当前main，源码/锁文件/正式安装版本0.2.3。本次以固定合成句对照Flash ACP、Carbon ACP及CLI直接print：Flash上游明确返回UNAVAILABLE(code 503): No capacity available for model gemini-3.8-flash-low on the server；本机CLI日志同时记录attempt failed/retrying。Carbon同路径正常。不是参考库缺失、API Key设置或单字分词导致；不能把服务端容量不足说成已由本地代码消除。
+- 本地问题：CLI状态警告混入agent_message_chunk，之前软件一直等到45/75/90秒通用截止，提示网络/代理；扩写还可能接收到混杂警告。现仅识别并分离明确CLI状态行，允许短暂恢复；首次503后约20秒无有效输出则AGY_CAPACITY，明确503与实际模型；额度限流AGY_RATE_LIMIT，其他超时AGY_TIMEOUT注明RPC阶段。已恢复并正常end_turn的请求返回干净结果；不完整输出拒绝，不把警告当正文或卡片。普通正文警告符号不剥除。
+- 检索故障仍返回本地结果并显示具体原因；扩写失败保留原稿；不延长无限等待、不改用户模型、不自动切账号/模型，不更新agy。上游容量波动仍存在，可稍后重试或由用户手选Carbon。
+- 83项自动测试通过。新增5项覆盖503恢复输出清理、持续容量不足提前终止、429及不完整输出拒绝、实际模型超时提示、普通警告正文保留。修复后真实Flash固定句约24.6秒返回干净JSON，Carbon也成功；一次完整合成快速检索遇持续503，约26.2秒明确容量原因并返回本地1条，未假称AI成功。安装版选模/重启/API字节保留与Flash真实固定句测试通过。所有外部请求仅固定或新建的虚构文本，无用户原创或真实小说外传。
+- 升级前完整备份`.local/flash-diagnosis-023/before-formal-20261113-185714`（data+旧0.2.2程序，254文件，摘要核验）；正式升级与既有资料核验见upgrade-receipt.json/formal-data-verification.json。86部库、原创、模型选择、凭证不改。
+- 本机证据`.local/flash-diagnosis-023`：修复前model-summary/trace、direct-print.json；修复后after/；synthetic-retrieval/result.json；tests.txt、ui/report.json及备份/升级/发布回执。CLI默认日志仅只读筛查No capacity等诊断行，未读取或导出凭证。网上同类报告仅旁证，根因以本机真实回执为准。
+
 ## 0.2.2 已上线：反重力账号扩写（2026-11-13）
 
 - 当前main，源码/锁文件/正式安装版本0.2.2。用户已授权把反重力账号模型接入AI扩写；现于“资料与设置 → AI扩写 → 扩写模型来源”刷新CLI模型，选择模型/思考强度并保存。参考库仍86部/657卷，本次不迁移、不重拆、不重建向量。

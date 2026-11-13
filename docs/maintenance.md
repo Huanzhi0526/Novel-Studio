@@ -292,3 +292,9 @@ AI辅助检索设置新增模型来源：auto（优先既有API，无配置时�
 ## 0.2.2 扩写模型来源
 
 扩写复用AgyRetrievalProvider的模型目录、选模与取消逻辑，但用purpose=expand、独立expansion-provider.json和agy-expansion-work；初始source=api，检索仍默认auto。ExpansionService仅对用户主动的generate/configTest路由到所选来源，保留现有上下文上限、资料勾选和原位预览/采纳协议。AgyFlashClient新增outputMode=text，移除检索专用JSON输出要求；检索客户端默认json不变。取消、空内容、超过12,000字符及来源切换结果被拒绝，API与账号配置相互独立，不进行自动改库或额度失败后换模型重写。IPC expand.provider.get/save/listModels/test适用于v1与v2资料环境，测试资料始终隔离。
+
+## 0.2.3 反重力容量错误与输出清理
+
+AgyFlashClient新增separateAgyStatus：仅识别CLI的API error(attempt n)与Your previous turn状态行，普通正文中的警告符号保留。503/No capacity进入20秒短暂恢复窗口，无有效模型文本时以AGY_CAPACITY及upstreamStatus=503结束；429/RESOURCE_EXHAUSTED以AGY_RATE_LIMIT提示。窗口内恢复且ACP end_turn完成，返回清理后的实际JSON/正文，不把警告写进卡片或原创预览。非end_turn的部分输出以AGY_INCOMPLETE拒绝。通用超时以实际modelId及RPC阶段报告，避免Carbon等模型也误称Flash。参数capacityGraceMs仅用于独立测试注入，默认20,000ms。
+
+本次本机CLI直接print与ACP均复现Flash-low的503，日志为No capacity available for model；Carbon同一路径成功。外部仓库类似报告仅作旁证，本机trace与CLI日志才是当前诊断依据。不更新CLI、不更换账号、不改正式模型选择、不自动重发整库或切模型。服务端容量波动仍由上游决定。

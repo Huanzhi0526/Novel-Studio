@@ -52,6 +52,26 @@ function cancellationError() {
   return err;
 }
 
+// CLI status notices travel in the same ACP text stream as model output.
+// Only strip recognized CLI lines, never arbitrary warning symbols in prose.
+export function separateAgyStatus(text) {
+  const statuses = [];
+  const clean = text.replace(/^[ \t]*⚠[ \t]*(API error \(attempt \d+\):[^\n]*(?:\n|$)|Your previous turn (?:was interrupted|failed)[^\n]*(?:\n|$))/gmu,
+    (_line, status) => { statuses.push(status.trim()); return '\n'; }).trim();
+  const capacity = statuses.some(line => /No capacity available|UNAVAILABLE\s*\(code 503\)/iu.test(line));
+  const quota = statuses.some(line => /RESOURCE_EXHAUSTED|code 429|quota.*exhaust|rate.?limit/iu.test(line));
+  return { text: clean, capacity, quota, interrupted: statuses.some(line => /^Your previous turn/u.test(line)) };
+}
+
+function upstreamError(model, kind) {
+  const error = new Error(kind === 'capacity'
+    ? `反重力 ${model} 服务端容量不足（503），短暂重试后仍未响应。请稍后重试或手动选择其他模型。`
+    : `反重力 ${model} 额度不足或限流（429），请检查账号额度后重试。`);
+  error.code = kind === 'capacity' ? 'AGY_CAPACITY' : 'AGY_RATE_LIMIT';
+  error.details = { provider: 'agy', modelId: model, upstreamStatus: kind === 'capacity' ? 503 : 429 };
+  return error;
+}
+
 /**
  * On Windows, users typically configure local proxies via System Proxy (WinINET Registry),
  * which PowerShell/CMD does not export to HTTP_PROXY/HTTPS_PROXY. Because `agy.exe` is a Go
@@ -123,7 +143,8 @@ export class AgyFlashClient {
     env = null,
     spawnImpl = spawn,
     initializeTimeoutMs = 45_000,
-    sessionNewTimeoutMs = 90_000
+    sessionNewTimeoutMs = 90_000,
+    capacityGraceMs = 20_000
   } = {}) {
     this.executable = executable || resolveAgyExecutable(env ?? process.env);
     this.cwd = cwd;
@@ -134,6 +155,8 @@ export class AgyFlashClient {
     this.spawnImpl = spawnImpl;
     this.initializeTimeoutMs = initializeTimeoutMs;
     this.sessionNewTimeoutMs = sessionNewTimeoutMs;
+    this.capacityGraceMs = capacityGraceMs;
+    this.sessionStatus = new Map();
     this.child = null;
     this.seq = 0;
     this.pending = new Map();
@@ -196,7 +219,24 @@ export class AgyFlashClient {
           const upd = msg.params?.update;
           if (sid && upd?.sessionUpdate === 'agent_message_chunk' && typeof upd?.content?.text === 'string') {
             const list = this.sessionChunks.get(sid);
-            if (list) list.push(upd.content.text);
+            if (list) {
+              list.push(upd.content.text);
+              const status = separateAgyStatus(list.join(''));
+              const state = this.sessionStatus.get(sid);
+              if (state) {
+                state.capacity ||= status.capacity;
+                state.recovered = Boolean(status.text);
+                if (status.quota && !status.text) this.#killCurrentChild(upstreamError(this.modelId, 'quota'));
+                else if (status.text) { clearTimeout(state.timer); state.timer = null; }
+                else if (status.capacity && !state.timer) {
+                  state.timer = setTimeout(() => {
+                    if (this.sessionStatus.get(sid) === state && this.child === child) {
+                      this.#killCurrentChild(upstreamError(this.modelId, 'capacity'));
+                    }
+                  }, this.capacityGraceMs);
+                }
+              }
+            }
           }
         } else if (msg.method && msg.id != null) {
           // Pure text generation client: never grant tool execution permissions
@@ -253,9 +293,10 @@ export class AgyFlashClient {
     this.readyPromise = null;
     this.warmupPromise = null;
     this.prewarmedSessionId = null;
+    for (const state of this.sessionStatus.values()) clearTimeout(state.timer);
     for (const [id, p] of this.pending.entries()) {
       this.#clearPending(id, p);
-      p.reject(new Error(resetReason));
+      p.reject(resetReason instanceof Error ? resetReason : new Error(resetReason));
     }
     if (child && !child.killed) {
       try { child.stdin.end(); } catch {}
@@ -276,9 +317,12 @@ export class AgyFlashClient {
       const id = ++this.seq;
       const entry = { resolve: resolvePromise, reject: rejectPromise, timer: null, signal, onAbort: null };
       entry.timer = setTimeout(() => {
+        const capacity = this.sessionStatus.get(params?.sessionId)?.capacity && !this.sessionStatus.get(params?.sessionId)?.recovered;
+        const failure = capacity ? upstreamError(this.modelId, 'capacity')
+          : Object.assign(new Error(`反重力 ${this.modelId} 请求超时（${method} 超过 ${Math.round(timeoutMs / 1000)}s）。请检查服务状态后重试。`), { code: 'AGY_TIMEOUT' });
         this.#clearPending(id, entry);
         if (resetOnTimeout) this.#killCurrentChild();
-        rejectPromise(new Error(`Gemini Flash 请求超时（${method} 超过 ${Math.round(timeoutMs / 1000)}s，请检查网络或代理设置）`));
+        rejectPromise(failure);
       }, timeoutMs);
       if (signal) {
         entry.onAbort = () => {
@@ -371,6 +415,7 @@ export class AgyFlashClient {
     }
 
     this.sessionChunks.set(sessionId, []);
+    this.sessionStatus.set(sessionId, { capacity: false, timer: null });
     try {
       const fullPrompt = [
         this.outputMode === 'text'
@@ -393,12 +438,20 @@ export class AgyFlashClient {
       this.usageTotals.thoughtTokens += u.thoughtTokens ?? 0;
       this.usageTotals.totalTokens += u.totalTokens ?? 0;
 
-      const text = (this.sessionChunks.get(sessionId) ?? []).join('').trim();
-      if (/(?:^|\n)\s*⚠\s*Your previous/i.test(text)) {
+      const status = separateAgyStatus((this.sessionChunks.get(sessionId) ?? []).join(''));
+      const text = status.text;
+      if (!text && status.capacity) throw upstreamError(this.modelId, 'capacity');
+      if (!text && status.quota) throw upstreamError(this.modelId, 'quota');
+      if (result?.stopReason && result.stopReason !== 'end_turn') {
+        throw Object.assign(new Error(`反重力 ${this.modelId} 未完成生成（${result.stopReason}），未采用不完整内容。`), { code: 'AGY_INCOMPLETE' });
+      }
+      if (status.interrupted) {
         this.#killCurrentChild();
       }
       return { text, usage: u, sessionId, stopReason: result?.stopReason };
     } finally {
+      clearTimeout(this.sessionStatus.get(sessionId)?.timer);
+      this.sessionStatus.delete(sessionId);
       this.sessionChunks.delete(sessionId);
     }
   }

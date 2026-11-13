@@ -66,8 +66,11 @@ try {
   if (report.realTest) {
     // Only the fixed connection-test JSON prompt is sent; no originals or reference excerpts.
     await page.getByRole('button', { name: '测试反重力连接', exact: true }).click();
-    await page.getByText('连接成功：gemini-3.8-flash-low。', { exact: true }).waitFor({ timeout: 120000 });
-    report.fixedPromptConnection = 'passed';
+    const outcome = flags.includes('--allow-capacity')
+      ? page.getByText(/连接成功：gemini-3.8-flash-low。|反重力 gemini-3.8-flash-low 服务端容量不足/).first()
+      : page.getByText('连接成功：gemini-3.8-flash-low。', { exact: true });
+    await outcome.waitFor({ timeout: 120000 });
+    report.fixedPromptConnection = (await outcome.innerText()).includes('503') ? 'capacity correctly reported' : 'passed';
     console.log('real fixed-prompt Flash connection passed');
   }
   await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].showInactive());

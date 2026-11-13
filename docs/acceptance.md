@@ -866,3 +866,14 @@ Automations工具已成功删除novel-studio，deleteStatus=deleted，不再自�
 - 审计`.local/agy-expansion-release-022`含tests.txt、ui-carbon/report.json与截图、expansion-regression.txt、备份和升级回执；ui.txt/ui-retry.txt保留Flash超时证据。旧发布件全部保留，0.2.2另交安装器/源码/SHA清单。
 
 实际命令：沙箱外npm test（78/78），npm run build、npm run package:windows（指定现有NSIS）；隔离安装/S /NOSHORTCUT /D=...；node scripts/qa-agy-expansion-settings.mjs <隔离EXE> .local/agy-expansion-release-022/ui-carbon --real-test --carbon（模型目录、选模重启、合成章节真实生成、不写原稿、API摘要保留）；node scripts/qa-expansion.mjs <隔离EXE>（模拟接口取消/预览/资料勾选/原稿保护/重启/多配置）；backup-formal.ps1完整备份校验；scripts/upgrade-windows.ps1 -Version 0.2.2 -IsolatedInstall ... -GracefulClose，随后逐文件SHA核对既有正式资料。真实模型验收仅用新建的虚构制服合成章节，Flash超时如实留档，Carbon成功后才升级。
+
+## 0.2.3 已上线：Flash超时诊断与容量错误处理（2026-11-13）
+
+- 当前main，源码/锁文件/正式安装版本0.2.3。本次以固定合成句对照Flash ACP、Carbon ACP及CLI直接print：Flash上游明确返回UNAVAILABLE(code 503): No capacity available for model gemini-3.8-flash-low on the server；本机CLI日志同时记录attempt failed/retrying。Carbon同路径正常。不是参考库缺失、API Key设置或单字分词导致；不能把服务端容量不足说成已由本地代码消除。
+- 本地问题：CLI状态警告混入agent_message_chunk，之前软件一直等到45/75/90秒通用截止，提示网络/代理；扩写还可能接收到混杂警告。现仅识别并分离明确CLI状态行，允许短暂恢复；首次503后约20秒无有效输出则AGY_CAPACITY，明确503与实际模型；额度限流AGY_RATE_LIMIT，其他超时AGY_TIMEOUT注明RPC阶段。已恢复并正常end_turn的请求返回干净结果；不完整输出拒绝，不把警告当正文或卡片。普通正文警告符号不剥除。
+- 检索故障仍返回本地结果并显示具体原因；扩写失败保留原稿；不延长无限等待、不改用户模型、不自动切账号/模型，不更新agy。上游容量波动仍存在，可稍后重试或由用户手选Carbon。
+- 83项自动测试通过。新增5项覆盖503恢复输出清理、持续容量不足提前终止、429及不完整输出拒绝、实际模型超时提示、普通警告正文保留。修复后真实Flash固定句约24.6秒返回干净JSON，Carbon也成功；一次完整合成快速检索遇持续503，约26.2秒明确容量原因并返回本地1条，未假称AI成功。安装版选模/重启/API字节保留与Flash真实固定句测试通过。所有外部请求仅固定或新建的虚构文本，无用户原创或真实小说外传。
+- 升级前完整备份`.local/flash-diagnosis-023/before-formal-20261113-185714`（data+旧0.2.2程序，254文件，摘要核验）；正式升级与既有资料核验见upgrade-receipt.json/formal-data-verification.json。86部库、原创、模型选择、凭证不改。
+- 本机证据`.local/flash-diagnosis-023`：修复前model-summary/trace、direct-print.json；修复后after/；synthetic-retrieval/result.json；tests.txt、ui/report.json及备份/升级/发布回执。CLI默认日志仅只读筛查No capacity等诊断行，未读取或导出凭证。网上同类报告仅旁证，根因以本机真实回执为准。
+
+实际命令：本轮probe.mjs对照两种ACP及CLI --print（固定合成JSON句），只读筛查本机CLI日志No capacity/attempt failed；node --test tests/agy-status.test.mjs（5/5）；沙箱外npm test（83/83）；probe-after.mjs复验；synthetic-retrieval.mjs内存虚构两段正文完整快速检索；npm run package:windows及/S /NOSHORTCUT隔离安装；scripts/qa-agy-model-settings.mjs <隔离EXE> .local/flash-diagnosis-023/ui --real-test；backup-formal.ps1完整备份、scripts/upgrade-windows.ps1 -Version 0.2.3 -IsolatedInstall ... -GracefulClose；逐文件SHA复核。仅修桥接和诊断，不重建向量，不改生产模型配置。
