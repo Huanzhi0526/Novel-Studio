@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { api, ErrorMessage, Icon } from './ui.jsx';
+import { RetrievalPreferences } from './RetrievalPreferences.jsx';
 import { Conversation, useConversation } from './Conversation.jsx';
 import { CardEditor, Reader, Reference } from './Reference.jsx';
 import { Writing, flushWriting } from './Writing.jsx';
@@ -80,7 +81,7 @@ function Settings({ info, restored, preferences, updatePreferences, settingsTarg
     <ExpansionPreferences />
     </div>
     <div className="settings-group" hidden={group !== 'retrieval'}>
-    <ExpansionPreferences purpose="retrieval" />
+    <RetrievalPreferences kbV2={info?.kbV2} />
     </div>
     <div className="settings-group" hidden={group !== 'data'}>
     <header className="settings-data-title"><h2>本机资料</h2><p>管理存储位置、备份与本地检索索引。</p></header>

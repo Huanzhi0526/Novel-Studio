@@ -2,6 +2,24 @@
 
 工作区 `D:\Vibe Coding\Novel Studio`。2026-11-12初始化本地Git，0.1.19基线371be17保留；2026-11-13已合并至main并正式升级0.2.0。此前无Git仓库的记录属于历史。本文记录当前状态，早期施工及逐轮验收保存在 [项目历史](docs/project-history.md)。
 
+## 0.2.1 已上线：反重力模型手选（2026-11-13）
+
+- 当前main，源码/锁文件/正式安装应用版本0.2.1，桌面“小说工作台”仍指向正式安装目录。参考库维持Gemini Batch 2成品86部/657卷/225,535向量，本次不重拆、不重算、不迁移数据库。
+- “资料与设置 → AI辅助检索 → 检索模型来源”提供自动、兼容API、反重力账号额度三种来源。先刷新反重力模型，再选择家族和思考强度并保存；当前本机agy目录返回15个Gemini选项（Flash、Argon、Carbon、Hydrogen及Orchestrator变体）。模型列表来自账号CLI，不承诺每个条目已逐个推理实测。
+- 来源选择独立保存在正式资料retrieval-provider.json，初次无文件时默认auto，保持原API优先/无API时反重力回退行为。手选agy可在API配置仍存在时直接使用CLI；手选api不会暗中消耗账号额度。现有API配置、Key及原创扩写不改。CLI复用本机登录，需Google账号登录；本应用移除子进程继承的API Key/ADC环境变量，不读取或导出CLI凭证、不改其持久登录设置、不另建HTTP反代。
+- 客户端透传所选modelId及对应thought_level，没有强度后缀的模型使用默认。目录刷新和固定JSON测试句支持取消；模型、来源或书库变更后旧检索结果失效；调用失败显示原因并回退本地。启动或打开设置不自动发推理请求。
+- 新增7项自动测试，总75项通过；构建、打包版动态目录刷新、Carbon/high选中后重启持久化、切回API时原配置/加密Key字节不变、Flash固定测试句真实连接及桌面截图通过。真实测试仅发固定合成句，无小说/原创外传。本次未逐一测试所有模型，也不重复进行全库内容审计。
+- 升级前完整备份`.local/agy-model-release-021/before-formal-20261113-164400`，含正式data与旧0.2.0程序，254个文件校验一致。正式升级脚本指纹新增独立参考库和来源配置保护；安装字节与隔离版一致，快捷方式目标隔离资料冒烟通过。现有正式资料逐文件摘要复核见`.local/agy-model-release-021/formal-data-verification.json`。
+- 审计`.local/agy-model-release-021`：tests-final.txt、ui-final/report.json、account-model-settings.png、backup-receipt.json、upgrade-receipt.json及发布校验。旧0.1.19/0.2.0发布件保留。用户升级后可直接打开桌面快捷方式自行选择，未代改其正式模型来源。
+
+## Batch 2 参考库全量扩展上线（2026-11-13，86 部 / 657 卷）
+
+- 正式参考库 `%LOCALAPPDATA%/Novel Studio/reference-v2.sqlite` 已增量扩展至 **86 部 / 657 卷 / 2,548,207 正文块 / 1,867 份档案 / 5,612 条独立切面 / 25,875 场顺序剧情场次 / 194,048 片原文滑窗切片 / 225,535 条 `Qwen3-Embedding-0.6B-Q8_0` 1024 维向量**（`4,057,067,520` 字节，SHA-256 `47F10CDA3E37CAC4713E12E60CAC9C701E17EE3D8FCC48273B43D3974D4C72E9`）。
+- 本轮 Batch 2 完成全部剩余 59 部未入库原档（`379` 卷、`16,798` 场次、`1,191` 份档案、`4,037` 切面、`113,131` 段落切片），使用 `Vulkan0` GPU 增量构建 `133,966` 条向量（模型 ID 与前 27 部一致：`Qwen3-Embedding-0.6B-Q8_0:639150592:1794235447360`）。
+- 隔离构建完成后已通过 `PRAGMA wal_checkpoint(TRUNCATE)`、`PRAGMA integrity_check`（`ok`）、`PRAGMA foreign_key_check`（`0` 异常）、三层向量 100% 数量对齐及 5 组本地混合检索 + 原文段落锚点读取冒烟测试。
+- 正式合入前已确认 `Novel Studio` 未在运行，完整备份原 27 部正式 `reference-v2.sqlite`（`1,709,752,320` 字节，SHA-256 `7975CE715AD91B3009F6BA4A1808986B233D7B8E9B8C7BF378ED193B4FEEB1B2`）至 `.local/kb-v2-batch2/backup-before-import/20261113-160657/` 并校验源/备份/目标一致；`%LOCALAPPDATA%/Novel Studio/library.sqlite` 操作前后 SHA-256 一致未改动（`432EF93C8C8F09188D6C3859AA115B6ED16206BFF80479C0E5CD4AF1500F1F15`）。
+- 详细入库台账与校验回执见 `.local/kb-v2-batch2/reports/batch2-progress.md` / `.json` 及 `.local/kb-v2-batch2/reports/batch2-sync-report.json`；应用源码、0.2.0 安装包与正式配置（`embedding.json`、`retrieval-api.json`、`expansion.json`）均保持原状未改动。
+
 ## 正式上线完成（2026-11-13，0.2.0）
 
 - 当前分支main；合并提交8eae11f，Gemini交付ac91913及上线修正42df224均已包含。源码、锁文件、正式安装resources/app/package.json均0.2.0；桌面“小说工作台”目标仍为真实Windows正式安装目录，不使用沙箱重定向的LOCALAPPDATA。

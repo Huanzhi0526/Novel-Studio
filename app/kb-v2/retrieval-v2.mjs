@@ -161,8 +161,9 @@ export class RetrievalEngineV2 {
    * @param {object} options
    * @param {Function} [options.customComplete] - Optional `(messages, opts, signal) => Promise<string>` for CLI / custom LLM backends
    */
-  constructor(searchV2, { store = null, filename = null, vault = null, transport = undefined, customComplete = null, fallbackComplete = null } = {}) {
+  constructor(searchV2, { store = null, filename = null, vault = null, transport = undefined, customComplete = null, fallbackComplete = null, sourceProvider = null } = {}) {
     this.search = searchV2;
+    this.sourceProvider = sourceProvider;
     this.customComplete = customComplete;
     this.fallbackComplete = fallbackComplete;
     this.config = store && filename && vault ? new ExpansionService(store, filename, vault, transport) : null;
@@ -182,6 +183,8 @@ export class RetrievalEngineV2 {
     if (this.customComplete) {
       return await this.customComplete(messages, options, signal);
     }
+    const source = this.sourceProvider?.read().source ?? 'auto';
+    if (source === 'agy') return this.#completeAccount(messages, options, signal);
     if (this.config) {
       await this.config.writes;
       const currentState = this.config.read();
@@ -195,6 +198,10 @@ export class RetrievalEngineV2 {
         }, signal, options);
       }
     }
+    if (source === 'api') fail('EXPAND_NOT_CONFIGURED', '当前选择兼容 API，请先保存 API 配置。');
+    if (this.sourceProvider && process.env.NOVEL_STUDIO_NO_AGY_FALLBACK !== '1') {
+      return this.#completeAccount(messages, options, signal);
+    }
     if (this.fallbackComplete) {
       const generation = this.search.reference.generation;
       const out = await this.fallbackComplete(messages, options, signal);
@@ -202,6 +209,15 @@ export class RetrievalEngineV2 {
       return out;
     }
     fail('EXPAND_NOT_CONFIGURED', '请先在资料与设置中配置 AI 辅助检索接口。');
+  }
+
+  async #completeAccount(messages, options, signal) {
+    const generation = this.search.reference.generation;
+    const snapshot = this.sourceProvider.snapshot();
+    const result = await this.sourceProvider.complete(messages, options, signal);
+    if (generation !== this.search.reference.generation) fail('SEARCH_STALE', '资料库已变更，请重新搜索');
+    if (snapshot !== this.sourceProvider.snapshot()) fail('SEARCH_CONFIG_CHANGED', '检索模型已切换，请重新搜索');
+    return result;
   }
 
   #compactCandidate(unitType, unitRow, index) {
@@ -275,14 +291,23 @@ export class RetrievalEngineV2 {
     }
 
     // Observe local failure immediately even if the AI path succeeds first.
+    await this.sourceProvider?.writes;
+    const generation = this.search.reference.generation;
+    const sourceSnapshot = this.sourceProvider?.snapshot();
+    const ensureSource = () => {
+      if (generation !== this.search.reference.generation) fail('SEARCH_STALE', '资料库已变更，请重新搜索');
+      if (sourceSnapshot !== this.sourceProvider?.snapshot()) fail('SEARCH_CONFIG_CHANGED', '检索模型来源或模型已切换，请重新检索。');
+    };
     const basePromise = this.search.query({ ...args, limit: args.limit ?? 12 }, { signal }).then(value => ({ value }), error => ({ error }));
     try {
-      if (mode === 'fast') {
-        return await this.#runFastMode(args, { signal });
-      }
-      return await this.#runDeepMode(args, { signal });
+      const result = mode === 'fast'
+        ? await this.#runFastMode(args, { signal })
+        : await this.#runDeepMode(args, { signal });
+      ensureSource();
+      return result;
     } catch (error) {
       signal?.throwIfAborted();
+      ensureSource();
       const local = await basePromise;
       if (local.error) throw local.error;
       const base = local.value;

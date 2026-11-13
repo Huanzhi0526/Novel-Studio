@@ -843,3 +843,15 @@ Automations工具已成功删除novel-studio，deleteStatus=deleted，不再自�
 实际命令与检查：npm test（沙箱外68/68）、npm run build、NOVEL_STUDIO_MAKENSIS指定现有NSIS后npm run package:windows；安装器 /S /NOSHORTCUT /D=<隔离路径>；node scripts/qa-installed-smoke.mjs <exe> 0.2.0；node scripts/kb-v2/qa-installed-v2.mjs <隔离安装exe> <资料副本> <报告目录> --ai；node scripts/qa-writing-workflow.mjs <exe>；node scripts/qa-expansion.mjs <exe>。保护资源先备份后逐文件核对，源库DatabaseSync readOnly运行quick_check/foreign_key_check/分层向量对齐检查；git merge --no-ff feat/kb-v2-mvp；scripts/upgrade-windows.ps1以真实用户LOCALAPPDATA执行并复核快捷方式、安装字节和正式资料；本轮migrate-formal.ps1复制成品库与运行库；verify-formal-installed.mjs验证正式程序、本地GPU、原创逐表摘要与配置摘要。授权真实Gemini测试前自动审批曾因参考摘录外传许可不明确拒绝，用户随后明确批准两项检索验收后才执行。
 
 应用内BackupService新增双库ZIP格式novel-studio-backup-2；支持恢复两库并保留恢复前快照，第二库重开失败时回退两库；旧格式备份仍只恢复原创/旧共库，不替换v2。三项新增回归覆盖双库恢复、故障回退及API检索预算透传。v2模式同时隐藏并后端拦截旧ZIP导入，避免向停用旧参考表写入。
+
+## 0.2.1 已上线：反重力模型手选（2026-11-13）
+
+- 当前main，源码/锁文件/正式安装应用版本0.2.1，桌面“小说工作台”仍指向正式安装目录。参考库维持Gemini Batch 2成品86部/657卷/225,535向量，本次不重拆、不重算、不迁移数据库。
+- “资料与设置 → AI辅助检索 → 检索模型来源”提供自动、兼容API、反重力账号额度三种来源。先刷新反重力模型，再选择家族和思考强度并保存；当前本机agy目录返回15个Gemini选项（Flash、Argon、Carbon、Hydrogen及Orchestrator变体）。模型列表来自账号CLI，不承诺每个条目已逐个推理实测。
+- 来源选择独立保存在正式资料retrieval-provider.json，初次无文件时默认auto，保持原API优先/无API时反重力回退行为。手选agy可在API配置仍存在时直接使用CLI；手选api不会暗中消耗账号额度。现有API配置、Key及原创扩写不改。CLI复用本机登录，需Google账号登录；本应用移除子进程继承的API Key/ADC环境变量，不读取或导出CLI凭证、不改其持久登录设置、不另建HTTP反代。
+- 客户端透传所选modelId及对应thought_level，没有强度后缀的模型使用默认。目录刷新和固定JSON测试句支持取消；模型、来源或书库变更后旧检索结果失效；调用失败显示原因并回退本地。启动或打开设置不自动发推理请求。
+- 新增7项自动测试，总75项通过；构建、打包版动态目录刷新、Carbon/high选中后重启持久化、切回API时原配置/加密Key字节不变、Flash固定测试句真实连接及桌面截图通过。真实测试仅发固定合成句，无小说/原创外传。本次未逐一测试所有模型，也不重复进行全库内容审计。
+- 升级前完整备份`.local/agy-model-release-021/before-formal-20261113-164400`，含正式data与旧0.2.0程序，254个文件校验一致。正式升级脚本指纹新增独立参考库和来源配置保护；安装字节与隔离版一致，快捷方式目标隔离资料冒烟通过。现有正式资料逐文件摘要复核见`.local/agy-model-release-021/formal-data-verification.json`。
+- 审计`.local/agy-model-release-021`：tests-final.txt、ui-final/report.json、account-model-settings.png、backup-receipt.json、upgrade-receipt.json及发布校验。旧0.1.19/0.2.0发布件保留。用户升级后可直接打开桌面快捷方式自行选择，未代改其正式模型来源。
+
+实际命令：node --test tests/agy-provider.test.mjs（7/7）；沙箱外npm test（75/75）及npm run build；NOVEL_STUDIO_MAKENSIS指定现有NSIS后npm run package:windows；安装器/S /NOSHORTCUT /D=<隔离目录>；node scripts/qa-agy-model-settings.mjs <隔离EXE> .local/agy-model-release-021/ui-final --real-test（15模型，保存Carbon/high，重启记忆，Flash固定句连接，原API字节保留）；全目录backup-formal.ps1及SHA核对；scripts/upgrade-windows.ps1 -Version 0.2.1 -IsolatedInstall <隔离目录>并核对实际版本、EXE/bundle/UI、桌面目标与资料指纹。初轮UI验收定位不到隐式label，补充明确aria-label后最终验收通过；完整测试初轮沙箱回环/子进程权限失败，沙箱外复验通过。未自动更新agy CLI。

@@ -280,3 +280,11 @@ Automations工具已成功删除novel-studio，deleteStatus=deleted，不再自�
 ## 2026-11-13 正式KB v2维护入口
 
 生产为main/0.2.0，参考使用正式资料reference-v2.sqlite，原创继续library.sqlite。迁移与回退证据见HANDOFF顶部。新增app/kb-v2下存储、检索、agy桥接；打包通过esbuild将这些模块捆入resources/app/app/main/index.mjs，并非必须按源目录逐文件复制。旧ZIP导入在v2隐藏且IPC拒绝；新书使用专用建库流程。BackupService支持双库备份恢复及失败回退，旧格式仅恢复旧共库。显卡配置指向正式runtime/llama-cpp-vulkan，CPU与权重仍复用原.local/model。检索API配置优先；未配置可回退本机agy，缺失或失败会降级本地。所有后续验收先使用隔离NOVEL_STUDIO_DATA_DIR，不因已授权本轮升级而自动覆盖正式库。
+
+## 0.2.1 反重力模型来源
+
+AI辅助检索设置新增模型来源：auto（优先既有API，无配置时使用反重力）、api（仅API）、agy（直接反重力账号）。选择保存在资料目录retrieval-provider.json，和现有retrieval-api.json/expansion.json凭证分离，不要求迁移旧配置。未保存新文件时保持旧版自动回退行为。app/kb-v2/agy-provider.mjs通过agy models动态枚举Gemini及Orchestrator变体，按家族和模型ID中的思考强度展示；不将未公布模型作为可选项。刷新只查模型目录，测试连接只发送固定JSON测试句，不访问小说库。
+
+请求经现有AgyFlashClient的ACP连接，复用本机CLI登录；本机需先完成Google账号登录。调用子进程移除继承的Gemini/Google API Key、ADC等环境变量，不读取/导出CLI凭证、不改CLI持久设置。CLI当前登录状态与账号权限仍由反重力维护；不提供Key转订阅或HTTP反代服务。模型ID和思考强度透传，未带强度的模型使用自身默认。CLI错误/额度不足按原检索策略显示原因并回退本地，API模式不会自动改用账号额度。切换来源/模型或库变更会作废旧检索结果。
+
+主进程IPC为retrieval.provider.get/save/listModels/test，模型目录与测试支持取消；UI为RetrievalPreferences.jsx。仅影响参考AI检索，原创扩写配置和行为不变。正式升级脚本指纹新增v2数据库和来源配置，不重拆或重建索引。

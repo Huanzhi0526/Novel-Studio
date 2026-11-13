@@ -15,7 +15,7 @@ import { WritingService } from './writing.mjs';
 import { ReferenceStoreV2 } from '../kb-v2/store-v2.mjs';
 import { SearchEngineV2 } from '../kb-v2/search-v2.mjs';
 import { RetrievalEngineV2 } from '../kb-v2/retrieval-v2.mjs';
-import { AgyFlashClient, resolveAgyExecutable } from '../kb-v2/agy-client.mjs';
+import { AgyRetrievalProvider } from '../kb-v2/agy-provider.mjs';
 
 const appUrl = 'novel://studio/index.html';
 const appDir = fileURLToPath(new URL('../../', import.meta.url));
@@ -142,6 +142,9 @@ function register(writing, reference, imports, search, backup, expansion, retrie
   })) {
     handlers.set('retrieval.config.' + name, (args, context) => retrieval.setting(method, args, context));
   }
+  if (retrieval.sourceProvider) {
+    expose('retrieval.provider', retrieval.sourceProvider, ['get', 'save', 'listModels', 'test']);
+  }
   expose('expand', expansion, ['generate']);
   handlers.set('expand.config.get', expansion.configGet.bind(expansion));
   handlers.set('expand.config.save', expansion.configSave.bind(expansion));
@@ -184,7 +187,7 @@ function register(writing, reference, imports, search, backup, expansion, retrie
   handlers.set('app.info', () => ({
     dataDir, model: embedding.id, modelConfigured: Boolean(embedding.modelPath),
     embeddingMode: embedding.activeBackendMode,
-    version: app.getVersion(), electron: process.versions.electron, kbV2: useKbV2, agyFallbackAvailable: Boolean(agyClient)
+    version: app.getVersion(), electron: process.versions.electron, kbV2: useKbV2, agyFallbackAvailable: Boolean(agyClient && existsSync(agyClient.executable))
   }));
   handlers.set('app.openDataDir', async () => {
     const message = await shell.openPath(dataDir);
@@ -231,7 +234,7 @@ function register(writing, reference, imports, search, backup, expansion, retrie
     return true;
   });
   const expansionRequests = new Set();
-  const cancellable = new Set(['import.inspect', 'search.query', 'search.prepare', 'expand.generate', 'expand.config.test', 'retrieval.config.test']);
+  const cancellable = new Set(['import.inspect', 'search.query', 'search.prepare', 'expand.generate', 'expand.config.test', 'retrieval.config.test', 'retrieval.provider.listModels', 'retrieval.provider.test']);
   ipcMain.handle('novel:invoke', async (event, method, args) => {
     if (event.sender !== window?.webContents || event.senderFrame?.url !== appUrl || !handlers.has(method)) {
       return { ok: false, error: { code: 'IPC_METHOD', message: '操作不可用' } };
@@ -290,17 +293,9 @@ async function launch() {
     storeV2 = new ReferenceStoreV2(v2DbPath);
     const searchV2 = new SearchEngineV2(storeV2, embedding);
     const retrievalConfigFile = join(dataDir, 'retrieval-api.json');
-    let customComplete = null;
-    let fallbackComplete = null;
-    if (process.env.NOVEL_STUDIO_AGY_RETRIEVAL === '1') {
-      agyClient = new AgyFlashClient({ cwd: join(dataDir, 'agy-retrieval-work') });
-      customComplete = (messages, opts, sig) => agyClient.complete(messages, opts, sig);
-    } else if (process.env.NOVEL_STUDIO_NO_AGY_FALLBACK !== '1' && existsSync(resolveAgyExecutable())) {
-      agyClient = new AgyFlashClient({ cwd: join(dataDir, 'agy-retrieval-work') });
-      fallbackComplete = (messages, opts, sig) => agyClient.complete(messages, opts, sig);
-    }
+    agyClient = new AgyRetrievalProvider(dataDir);
     const retrievalV2 = new RetrievalEngineV2(searchV2, {
-      store, filename: retrievalConfigFile, vault: safeStorage, customComplete, fallbackComplete
+      store, filename: retrievalConfigFile, vault: safeStorage, sourceProvider: agyClient
     });
     // Legacy ZIP imports must never write into the inactive v1 reference tables.
     register(new WritingService(store), storeV2, Object.fromEntries(['inspect', 'preview', 'commit', 'cancel'].map(name => [name, () => { if (name === 'cancel') return true; fail('IMPORT_V2_UNSUPPORTED', '新版参考库请使用专用建库流程导入。'); }])), searchV2,

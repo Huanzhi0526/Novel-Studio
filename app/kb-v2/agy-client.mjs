@@ -313,14 +313,15 @@ export class AgyFlashClient {
         { timeoutMs: this.sessionNewTimeoutMs, signal, resetOnTimeout: true }
       );
       await this.#rpc('session/set_model', { sessionId, modelId: this.modelId }, { timeoutMs: 15_000, signal, resetOnTimeout: true });
-      const cfg = await this.#rpc('session/set_config_option', {
-        sessionId,
-        configId: 'thought_level',
-        value: this.thoughtLevel
-      }, { timeoutMs: 15_000, signal, resetOnTimeout: true });
-      const actualThought = cfg.configOptions?.find(x => x.id === 'thought_level')?.currentValue;
-      if (actualThought !== this.thoughtLevel) {
-        throw new Error(`Expected thought_level=${this.thoughtLevel}, got ${actualThought}`);
+      // Some catalogue entries (e.g. Orchestrator) expose no effort suffix.
+      if (this.thoughtLevel) {
+        const cfg = await this.#rpc('session/set_config_option', {
+          sessionId, configId: 'thought_level', value: this.thoughtLevel
+        }, { timeoutMs: 15_000, signal, resetOnTimeout: true });
+        const actualThought = cfg.configOptions?.find(x => x.id === 'thought_level')?.currentValue;
+        if (actualThought !== this.thoughtLevel) {
+          throw new Error(`Expected thought_level=${this.thoughtLevel}, got ${actualThought}`);
+        }
       }
       return sessionId;
     } catch (err) {

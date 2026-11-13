@@ -159,6 +159,7 @@ export function Conversation({ state, works, openEvidence, openCard, sidebar = f
           <button type="submit" className="send-button" aria-label="检索" disabled={!draft.trim() || running}><Icon name="send" size={17} /></button>
         </div>
       </div>
+      {kbV2 && v2Mode !== 'local' && <small className="retrieval-disclosure">问题、候选摘录及深度翻书所需的参考原文会发送至所选模型。</small>}
       {(!kbV2 && useAi) && <small className="retrieval-disclosure">问题和候选卡摘录将发送到所配服务。</small>}
       {(kbV2 && v2Mode !== 'local') && <small className="retrieval-disclosure">
         {v2Mode === 'deep' ? '深度模式：AI 将多轮搜索场次/档案并翻阅原文段落核证细节（默认 Flash 桥接约 25–45 秒）。' : '快速模式：AI 自动展开具象情境线索并归纳创作看点（默认 Flash 桥接约 15–25 秒，直连 API 约 4–8 秒）。'}
