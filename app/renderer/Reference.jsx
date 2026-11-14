@@ -15,17 +15,24 @@ function revisionLabel(revision, index) {
   return `归档版本 ${index}${date ? ` · ${date}` : ''}`;
 }
 
-export function Reference({ works, refresh, conversation, openCard, openEvidence, openReader, onSettings, kbV2 = false }) {
-  const [mode, setMode] = useState('search');
-  const [archiveOpen, setArchiveOpen] = useState(false);
-  const [selected, setSelected] = useState('');
+export function Reference({
+  works, refresh, conversation, openCard, openEvidence, openReader, onSettings, kbV2 = false,
+  viewState, setViewState, shelfScroll
+}) {
+  const [localView, setLocalView] = useState({ mode: 'search', selected: '', archiveOpen: false, query: '' });
+  const currentView = viewState ?? localView;
+  const updateView = setViewState ?? setLocalView;
+  const { mode, selected, archiveOpen, query } = currentView;
+  const setMode = mode => updateView(current => ({ ...current, mode }));
+  const setSelected = selected => updateView(current => ({ ...current, selected }));
   const [listing, setListing] = useState(null);
   const [error, setError] = useState(null);
   const [importing, setImporting] = useState(false);
   const [confirmHide, setConfirmHide] = useState(false);
   const [notice, setNotice] = useState('');
-  const [query, setQuery] = useState('');
   const shelfBody = useRef(null);
+  const localShelfScroll = useRef(0);
+  const scrollRef = shelfScroll ?? localShelfScroll;
   const workHeading = useRef(null);
   const returnPosition = useRef(null);
   const work = works.find(item => item.work_id === selected);
@@ -39,14 +46,18 @@ export function Reference({ works, refresh, conversation, openCard, openEvidence
   useLayoutEffect(() => {
     if (mode !== 'shelf') return;
     const body = shelfBody.current;
+    if (!body) return;
     if (workId) {
       body.scrollTop = 0;
       workHeading.current?.focus({ preventScroll: true });
     } else if (returnPosition.current) {
       const { id, top } = returnPosition.current;
       returnPosition.current = null;
+      scrollRef.current = top;
       body.scrollTop = top;
       body.querySelector(`[data-reference-work="${CSS.escape(id)}"]`)?.focus({ preventScroll: true });
+    } else {
+      body.scrollTop = scrollRef.current;
     }
   }, [mode, workId]);
 
@@ -62,7 +73,9 @@ export function Reference({ works, refresh, conversation, openCard, openEvidence
   }, [work, mode]);
 
   function browseWork(id) {
-    returnPosition.current = { id, top: shelfBody.current.scrollTop };
+    const top = shelfBody.current?.scrollTop ?? 0;
+    scrollRef.current = top;
+    returnPosition.current = { id, top };
     setError(null);
     setSelected(id);
   }
@@ -111,7 +124,9 @@ export function Reference({ works, refresh, conversation, openCard, openEvidence
     {notice && <div className="notice success">{notice}<button className="quiet" onClick={() => setNotice('')}>关闭</button></div>}
     {mode === 'search'
       ? <Conversation state={conversation} works={works} openEvidence={openEvidence} openCard={openCard} onSettings={onSettings} kbV2={kbV2} />
-      : <div ref={shelfBody} className="reference-shelf-scroll">
+      : <div ref={shelfBody} className="reference-shelf-scroll" onScroll={event => {
+        if (!workId) scrollRef.current = event.currentTarget.scrollTop;
+      }}>
         {work ? <section className="reference-shelf-pane" aria-labelledby="reference-work-title">
           <button className="reference-shelf-back" type="button" onClick={returnToShelf}>
             <span aria-hidden="true">‹</span>返回书架
@@ -164,11 +179,14 @@ export function Reference({ works, refresh, conversation, openCard, openEvidence
               {shelfWorks.length > 0 && <label className="reference-shelf-filter">
                 <Icon name="search" size={16} />
                 <input type="search" aria-label="搜索参考作品" placeholder="搜索书名" value={query}
-                  onChange={event => setQuery(event.target.value)} />
+                  onChange={event => {
+                    const value = event.target.value;
+                    updateView(current => ({ ...current, query: value }));
+                  }} />
               </label>}
               {(archivedCount > 0 || archiveOpen) && <button type="button" className="quiet" onClick={() => {
-                setArchiveOpen(!archiveOpen);
-                setQuery('');
+                scrollRef.current = 0;
+                updateView(current => ({ ...current, archiveOpen: !current.archiveOpen, query: '' }));
               }}>{archiveOpen ? '返回参考书架' : `封存书目（${archivedCount}）`}</button>}
             </div>
           </header>
@@ -198,10 +216,9 @@ export function Reference({ works, refresh, conversation, openCard, openEvidence
       setNotice(`已入库。新增 ${stats.cardsAdded} 张，更新 ${stats.cardsUpdated} 张，保留 ${stats.cardsKept} 张，跳过 ${stats.cardsSkipped} 张。`);
       setImporting(false);
       returnPosition.current = null;
+      scrollRef.current = 0;
       if (shelfBody.current) shelfBody.current.scrollTop = 0;
-      setSelected('');
-      setQuery('');
-      setMode('shelf');
+      updateView(current => ({ ...current, selected: '', query: '', mode: 'shelf' }));
     }} />}
   </div>;
 }

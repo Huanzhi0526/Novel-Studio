@@ -111,6 +111,8 @@ function Settings({ info, restored, preferences, updatePreferences, settingsTarg
   </div>;
 }
 
+const INITIAL_REFERENCE_VIEW = { mode: 'search', selected: '', archiveOpen: false, query: '' };
+
 function App() {
   const [view, setView] = useState('writing');
   const [settingsTarget, setSettingsTarget] = useState(null);
@@ -125,6 +127,8 @@ function App() {
   const [error, setError] = useState(null);
   const [banner, setBanner] = useState('');
   const [preferences, setPreferences] = useState(loadPreferences);
+  const [referenceView, setReferenceView] = useState(INITIAL_REFERENCE_VIEW);
+  const referenceShelfScroll = useRef(0);
   const assistantController = useAssistantController();
   const writingChat = useConversation();
   const libraryChat = useConversation();
@@ -220,13 +224,16 @@ function App() {
       </main>
       {view === 'reference' && <main className="workspace-main">
         <Reference works={works} refresh={refresh} conversation={libraryChat} openCard={setCard} openEvidence={openEvidence} openReader={openReader}
-          kbV2={Boolean(info?.kbV2)} onSettings={() => changeView('settings', 'retrieval-settings')} />
+          kbV2={Boolean(info?.kbV2)} onSettings={() => changeView('settings', 'retrieval-settings')}
+          viewState={referenceView} setViewState={setReferenceView} shelfScroll={referenceShelfScroll} />
       </main>}
       <main className="workspace-main" hidden={view !== 'assistant'}><Assistant controller={assistantController} active={view === 'assistant'} openCard={setCard} openEvidence={openEvidence} /></main>
       {view === 'settings' && <main className="workspace-main settings-main">
         <Settings info={info} preferences={preferences} updatePreferences={updatePreferences} settingsTarget={settingsTarget} restored={async () => {
           writingChat.clear();
           libraryChat.clear();
+          setReferenceView(INITIAL_REFERENCE_VIEW);
+          referenceShelfScroll.current = 0;
           clearWritingSession();
           setEpoch(value => value + 1);
           await refresh();

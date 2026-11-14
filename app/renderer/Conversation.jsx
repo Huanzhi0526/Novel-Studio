@@ -6,7 +6,7 @@ export function useConversation() {
   const [draft, setDraft] = useState('');
   const [filters, setFilters] = useState({ workIds: [], categories: [] });
   const [useAi, setUseAi] = useState(false);
-  const [v2Mode, setV2Mode] = useState('fast');
+  const [v2Mode, setV2Mode] = useState('local');
   const [messages, setMessages] = useState([]);
   const current = useRef(new Map());
   const [running, setRunning] = useState(false);
