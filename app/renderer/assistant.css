@@ -1,11 +1,10 @@
 .assistant-workspace {
+  position: relative;
   display: flex;
   flex-direction: column;
   min-height: 0;
   height: 100%;
   width: 100%;
-  max-width: 1040px;
-  margin: auto;
   color: var(--ink);
   background: var(--panel);
 }
@@ -14,102 +13,205 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 36px 16px;
+  gap: 12px;
+  min-height: 48px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--chrome);
   flex-shrink: 0;
-}
-
-.assistant-eyebrow {
-  font-size: var(--fs-meta);
-  letter-spacing: .14em;
-  color: var(--muted);
 }
 
 .assistant-header h1 {
-  font-size: var(--fs-h1);
-  line-height: 1.3;
-  margin: 7px 0 0;
-  font-weight: 650;
+  font-size: var(--fs-h2);
+  line-height: 1.25;
+  margin: 0;
+  font-weight: 640;
+  color: var(--accent);
+  white-space: nowrap;
 }
 
-.assistant-context {
+.assistant-header-actions {
   display: flex;
-  align-items: start;
-  gap: 20px;
-  padding: 0 36px 16px;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 
-.assistant-context > label {
-  flex: 1;
-  max-width: 360px;
+.assistant-header-actions select {
+  width: min(260px, 42vw);
+  min-width: 0;
+  min-height: 31px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--fs-ui);
+}
+
+.assistant-menu {
+  position: relative;
+  flex: none;
+}
+
+.assistant-menu-list {
+  position: absolute;
+  z-index: 15;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 150px;
+  display: grid;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.assistant-menu-list button {
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 30px;
+  padding: 5px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font-size: var(--fs-ui);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.assistant-menu-list button:hover:not(:disabled) {
+  background: var(--hover);
 }
 
 .assistant-workspace label {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 6px;
   font-size: var(--fs-ui);
   color: var(--muted);
 }
 
-.assistant-workspace select {
+.assistant-memory-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 14;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.assistant-memory-backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--scrim);
+}
+
+.assistant-memory-panel {
+  position: relative;
+  z-index: 1;
+  width: min(460px, 92vw);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.assistant-memory-layer.is-compact .assistant-memory-panel {
+  width: 100%;
+  border-left: 0;
+  box-shadow: none;
+}
+
+.assistant-memory-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--chrome);
+  flex-shrink: 0;
+}
+
+.assistant-memory-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.assistant-memory-title h2 {
+  font-size: var(--fs-h3);
+  font-weight: 640;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.assistant-memory-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.assistant-memory-body select {
   width: 100%;
   min-width: 0;
-  padding: 9px 12px;
+  padding: 7px 10px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--panel);
-  color: inherit;
+  color: var(--ink);
   font: inherit;
   font-size: var(--fs-ui);
 }
 
-.assistant-workspace button {
-  cursor: pointer;
-}
-
-.assistant-options {
-  position: relative;
-  min-width: 170px;
+.assistant-refresh-models {
+  align-self: flex-start;
   font-size: var(--fs-ui);
 }
 
-.assistant-options > summary {
-  padding: 10px 0;
-  cursor: pointer;
-  color: var(--muted);
+.assistant-memory-field {
+  flex: 1;
+  min-height: 0;
 }
 
-.assistant-option-body {
-  position: absolute;
-  z-index: 9;
-  right: 0;
-  top: 34px;
-  width: min(440px, 75vw);
-  max-height: 65vh;
-  overflow: auto;
-  padding: 18px;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-  display: grid;
-  gap: 12px;
-}
-
-.assistant-option-body textarea {
-  min-height: 200px;
-  resize: vertical;
+.assistant-memory-field textarea {
+  flex: 1;
+  min-height: 180px;
+  resize: none;
   padding: 12px;
   line-height: var(--lh-body);
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: inherit;
-  color: inherit;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: var(--fs-body);
 }
 
-.assistant-option-body code {
+.assistant-memory-location {
+  font-size: var(--fs-meta);
+  color: var(--muted);
+}
+
+.assistant-memory-location summary {
+  cursor: pointer;
+  padding: 3px 0;
+}
+
+.assistant-memory-location code {
+  display: block;
+  margin-top: 6px;
   font-size: var(--fs-meta);
   overflow-wrap: anywhere;
 }
@@ -117,6 +219,7 @@
 .assistant-actions {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .assistant-scroll {
@@ -367,31 +470,26 @@
 }
 
 .assistant-compact .assistant-header {
-  padding: 18px 18px 12px;
+  min-height: 44px;
+  padding: 0 12px;
+  gap: 6px;
 }
 
-.assistant-compact .assistant-header h1 {
-  font-size: var(--fs-h2);
+.assistant-compact-title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-ui);
+  font-weight: 620;
+  color: var(--ink);
 }
 
-.assistant-compact .assistant-context {
-  padding: 0 18px 12px;
-  display: block;
-}
-
-.assistant-compact .assistant-context > label {
-  max-width: none;
-}
-
-.assistant-compact .assistant-options {
-  margin-top: 6px;
-}
-
-.assistant-compact .assistant-option-body {
-  left: 0;
-  right: auto;
-  width: min(340px, 75vw);
-  box-sizing: border-box;
+.assistant-compact .assistant-header-actions {
+  flex: none;
+  gap: 4px;
 }
 
 .assistant-compact .assistant-scroll {
@@ -434,12 +532,7 @@
 
 @media (max-width: 760px) {
   .assistant-header {
-    padding: 20px;
-  }
-
-  .assistant-context {
-    padding: 0 20px 12px;
-    gap: 12px;
+    padding: 0 14px;
   }
 
   .assistant-scroll {

@@ -74,6 +74,39 @@ export function Modal({ title, eyebrow, children, close, wide = false, className
   </div>;
 }
 
+export function ConfirmDialog({ open, title, message, confirmLabel = '确认', cancelLabel = '取消', danger = false, onConfirm, onCancel }) {
+  const dialog = useRef(null);
+  const cancelBtn = useRef(null);
+  useEffect(() => {
+    const node = dialog.current;
+    if (!open || !node) return;
+    const previous = document.activeElement;
+    if (!node.open) node.showModal();
+    cancelBtn.current?.focus({ preventScroll: true });
+    return () => {
+      if (node.open) node.close();
+      if (previous?.isConnected) previous.focus?.({ preventScroll: true });
+    };
+  }, [open]);
+  if (!open) return null;
+  return <dialog ref={dialog} className="modal confirm-dialog" aria-labelledby="confirm-dialog-title"
+    onCancel={event => {
+      event.preventDefault();
+      event.stopPropagation();
+      onCancel();
+    }}>
+    <header className="modal-head">
+      <h2 id="confirm-dialog-title">{title}</h2>
+      <button className="icon-button" type="button" onClick={onCancel} aria-label="关闭"><Icon name="close" /></button>
+    </header>
+    {message && <p className="confirm-dialog-message">{message}</p>}
+    <div className="button-row align-right confirm-dialog-actions">
+      <button ref={cancelBtn} type="button" onClick={onCancel}>{cancelLabel}</button>
+      <button type="button" className={danger ? 'danger-button' : 'primary'} onClick={onConfirm}>{confirmLabel}</button>
+    </div>
+  </dialog>;
+}
+
 export function PageHeader({ title, subtitle, actions, className = '' }) {
   return <header className={`topbar page-header ${className}`.trim()}>
     <div className="page-header-main">

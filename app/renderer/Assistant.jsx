@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { api, ErrorMessage, Card, Icon } from './ui.jsx';
+import { api, Card, ConfirmDialog, ErrorMessage, Icon } from './ui.jsx';
 import { sendIntent } from './input-keys.mjs';
 import './assistant.css';
 
@@ -125,14 +125,22 @@ export function useAssistantController() {
     setText: text => setDrafts(d => ({ ...d, [workId]: text })),
     refreshModels: () => api('assistant.models').then(setModels).catch(setError),
     stop: () => api('request.cancel', { id: request.current ?? state?.requestId }).catch(setError),
-    saveMemory: () => api('assistant.memory', { workId, text: memory }).catch(setError),
-    reset: () => {
-      if (window.confirm('重新开始讨论？本书记忆保留，当前讨论记录清空。')) {
-        api('assistant.reset', { workId }).then(v => {
-          syncEpoch.current++;
-          setState(v);
-        }).catch(setError);
+    saveMemory: async () => {
+      const savedText = memory;
+      try {
+        await api('assistant.memory', { workId, text: savedText });
+        if (current.current === workId) {
+          setState(s => (s ? { ...s, memory: savedText } : s));
+        }
+      } catch (e) {
+        setError(e);
       }
+    },
+    reset: () => {
+      api('assistant.reset', { workId }).then(v => {
+        syncEpoch.current++;
+        setState(v);
+      }).catch(setError);
     }
   };
 }
@@ -166,6 +174,12 @@ export function Assistant({ active, controller: c, openCard, openEvidence, compa
   const scroll = useRef(null);
   const follow = useRef(true);
   const wasActive = useRef(false);
+  const menuRef = useRef(null);
+  const menuTriggerRef = useRef(null);
+  const memoryCloseBtnRef = useRef(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [memoryOpen, setMemoryOpen] = useState(false);
+  const [pendingConfirm, setPendingConfirm] = useState(null);
 
   useEffect(() => {
     const prev = wasActive.current;
@@ -184,7 +198,21 @@ export function Assistant({ active, controller: c, openCard, openEvidence, compa
     if (follow.current && scroll.current) scroll.current.scrollTop = scroll.current.scrollHeight;
   }, [state?.messages?.length, state?.partial]);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+    function onPointerDown(event) {
+      if (!menuRef.current?.contains(event.target)) setMenuOpen(false);
+    }
+    window.addEventListener('pointerdown', onPointerDown);
+    return () => window.removeEventListener('pointerdown', onPointerDown);
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (memoryOpen) memoryCloseBtnRef.current?.focus({ preventScroll: true });
+  }, [memoryOpen]);
+
   const title = works.find(w => w.id === workId)?.title;
+  const memoryDirty = Boolean(state && memory !== state.memory);
   const rawActivity = state?.activity ?? '';
   const activity = rawActivity.startsWith('Run ')
     ? (rawActivity.includes('reference_result') ? '正在等待并领取检索结果'
@@ -195,35 +223,136 @@ export function Assistant({ active, controller: c, openCard, openEvidence, compa
       : '正在处理工具请求')
     : rawActivity;
 
-  return <section className={`assistant-workspace ${compact ? 'assistant-compact' : ''}`} aria-label="创作助手">
+  function requestCloseMemory() {
+    if (memoryDirty) {
+      setPendingConfirm('closeMemory');
+    } else {
+      setMemoryOpen(false);
+      menuTriggerRef.current?.focus({ preventScroll: true });
+    }
+  }
+
+  function requestReloadMemory() {
+    if (memoryDirty) {
+      setPendingConfirm('reloadMemory');
+    } else if (workId) {
+      void c.refreshState(workId, true);
+    }
+  }
+
+  function handleWorkspaceKeyDown(event) {
+    if (event.key !== 'Escape' || event.nativeEvent?.isComposing || event.isComposing || event.keyCode === 229) return;
+    if (pendingConfirm) return;
+    if (menuOpen) {
+      event.preventDefault();
+      event.stopPropagation();
+      setMenuOpen(false);
+      menuTriggerRef.current?.focus({ preventScroll: true });
+    } else if (memoryOpen) {
+      event.preventDefault();
+      event.stopPropagation();
+      requestCloseMemory();
+    }
+  }
+
+  const confirmConfig = pendingConfirm === 'reset'
+    ? {
+        title: '重新开始讨论？',
+        message: '本书记忆保留，当前讨论记录清空。',
+        confirmLabel: '重新开始',
+        danger: true,
+        onConfirm: () => {
+          setPendingConfirm(null);
+          c.reset();
+        }
+      }
+    : pendingConfirm === 'reloadMemory'
+      ? {
+          title: '载入最新记忆？',
+          message: '当前编辑框中有尚未保存的修改，载入最新记忆将覆盖这些未保存内容。',
+          confirmLabel: '覆盖并载入',
+          danger: true,
+          onConfirm: () => {
+            setPendingConfirm(null);
+            if (workId) void c.refreshState(workId, true);
+          }
+        }
+      : pendingConfirm === 'closeMemory'
+        ? {
+            title: '放弃未保存的修改？',
+            message: '你有尚未保存的本书记忆修改，关闭面板将丢弃这些改动。',
+            confirmLabel: '放弃并关闭',
+            danger: true,
+            onConfirm: () => {
+              setPendingConfirm(null);
+              if (state) c.setMemory(state.memory);
+              setMemoryOpen(false);
+              menuTriggerRef.current?.focus({ preventScroll: true });
+            }
+          }
+        : null;
+
+  const menuBlock = <div ref={menuRef} className="assistant-menu">
+    <button ref={menuTriggerRef} type="button" className="icon-button assistant-menu-trigger"
+      aria-label="更多助手操作" title="模型与记忆、重新开始讨论"
+      aria-expanded={menuOpen} aria-haspopup="menu"
+      onClick={() => setMenuOpen(open => !open)}>⋯</button>
+    {menuOpen && <div className="assistant-menu-list" role="menu" aria-label="助手菜单">
+      <button type="button" role="menuitem" onClick={() => {
+        setMenuOpen(false);
+        setMemoryOpen(true);
+      }}>模型与记忆</button>
+      <button type="button" role="menuitem" disabled={busy || !workId} onClick={() => {
+        setMenuOpen(false);
+        setPendingConfirm('reset');
+      }}>重新开始讨论</button>
+    </div>}
+  </div>;
+
+  return <section className={`assistant-workspace ${compact ? 'assistant-compact' : ''}`} aria-label="创作助手" onKeyDown={handleWorkspaceKeyDown}>
     <header className="assistant-header">
-      <div><span className="assistant-eyebrow">构思 · 推敲 · 参考</span><h1>创作助手</h1></div>
-      {onClose && <button className="icon-button" aria-label="关闭助手侧栏" onClick={onClose}>×</button>}
+      {compact
+        ? <h2 className="assistant-compact-title" title={title || '创作助手'}>{title || '创作助手'}</h2>
+        : <h1>创作助手</h1>}
+      <div className="assistant-header-actions">
+        {!compact && <select aria-label="助手作品" value={workId} disabled={busy || Boolean(boundWorkId)} onChange={e => c.setWorkId(e.target.value)}>
+          <option value="">选择一本原创作品</option>
+          {works.map(w => <option key={w.id} value={w.id}>{w.title}</option>)}
+        </select>}
+        {menuBlock}
+        {onClose && <button type="button" className="icon-button" aria-label="关闭助手侧栏" onClick={onClose}><Icon name="close" size={16} /></button>}
+      </div>
     </header>
-    <div className="assistant-context">
-      <label>当前作品<select aria-label="助手作品" value={workId} disabled={busy || Boolean(boundWorkId)} onChange={e => c.setWorkId(e.target.value)}>
-        <option value="">选择一本原创作品</option>
-        {works.map(w => <option key={w.id} value={w.id}>{w.title}</option>)}
-      </select></label>
-      <details className="assistant-options">
-        <summary>模型与本书记忆</summary>
-        <div className="assistant-option-body">
+    {memoryOpen && <div className={`assistant-memory-layer ${compact ? 'is-compact' : 'is-drawer'}`}>
+      {!compact && <div className="assistant-memory-backdrop" aria-hidden="true" onClick={requestCloseMemory} />}
+      <section className="assistant-memory-panel" aria-label="模型与本书记忆">
+        <header className="assistant-memory-head">
+          <div className="assistant-memory-title">
+            <h2>模型与本书记忆</h2>
+            {memoryDirty && <span className="pill amber">未保存的修改</span>}
+          </div>
+          <button ref={memoryCloseBtnRef} type="button" className="icon-button" aria-label="关闭记忆面板" onClick={requestCloseMemory}><Icon name="close" size={16} /></button>
+        </header>
+        <div className="assistant-memory-body">
           <label>反重力模型<select aria-label="助手模型" value={modelId} disabled={busy} onChange={e => c.setModelId(e.target.value)}>
-            {!models.length && <option value={modelId}>{modelId}</option>}
+            {!models.length && <option value={modelId}>当前：{modelId}（刷新列表确认）</option>}
+            {models.length > 0 && !models.some(m => m.id === modelId) && <option value={modelId}>当前：{modelId}（刷新列表确认）</option>}
             {models.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
           </select></label>
-          <button className="quiet" disabled={busy} onClick={c.refreshModels}>刷新反重力模型</button>
+          <button type="button" className="quiet assistant-refresh-models" disabled={busy} onClick={c.refreshModels}>刷新反重力模型</button>
           {state && <>
-            <label>本书任务与记忆<textarea aria-label="本书助手记忆" value={memory} disabled={busy} onChange={e => c.setMemory(e.target.value)} /></label>
+            <label className="assistant-memory-field"><span>本书任务与记忆</span>
+              <textarea aria-label="本书助手记忆" value={memory} disabled={busy} onChange={e => c.setMemory(e.target.value)} />
+            </label>
             <div className="assistant-actions">
-              <button disabled={busy} onClick={c.saveMemory}>保存记忆</button>
-              <button disabled={busy} onClick={() => c.setMemory(state.memory)}>载入最新记忆</button>
+              <button type="button" className="primary" disabled={busy} onClick={c.saveMemory}>保存记忆</button>
+              <button type="button" disabled={busy} onClick={requestReloadMemory}>载入最新记忆</button>
             </div>
-            <details><summary>记忆文件位置</summary><code>{state.workspace}</code></details>
+            <details className="assistant-memory-location"><summary>记忆文件位置</summary><code>{state.workspace}</code></details>
           </>}
         </div>
-      </details>
-    </div>
+      </section>
+    </div>}
     <ErrorMessage error={error} />
     {boundWorkId && workId && boundWorkId !== workId && <p className="assistant-notice">正在处理《{title}》的讨论。停止或完成后会切换到当前作品。</p>}
     <div className="assistant-scroll" ref={scroll} onScroll={e => {
@@ -275,12 +404,20 @@ export function Assistant({ active, controller: c, openCard, openEvidence, compa
       />
       <div className="assistant-composer-actions">
         <span>Enter 发送 · Shift+Enter 换行</span>
-        <button className="quiet" disabled={busy || !workId} onClick={c.reset}>重新开始讨论</button>
         {busy
-          ? <button onClick={c.stop}>停止</button>
-          : <button className="primary-button" disabled={!workId || !text.trim()} onClick={c.run}>发送 <Icon name="send" size={15} /></button>}
+          ? <button type="button" onClick={c.stop}>停止</button>
+          : <button type="button" className="primary" disabled={!workId || !text.trim()} onClick={c.run}>发送 <Icon name="send" size={15} /></button>}
       </div>
       <small className="assistant-privacy">主动发送后，相关创作资料交给所选模型；按需联网仅发送搜索词。</small>
     </footer>
+    <ConfirmDialog
+      open={Boolean(confirmConfig)}
+      title={confirmConfig?.title ?? ''}
+      message={confirmConfig?.message}
+      confirmLabel={confirmConfig?.confirmLabel}
+      danger={confirmConfig?.danger}
+      onConfirm={() => confirmConfig?.onConfirm()}
+      onCancel={() => setPendingConfirm(null)}
+    />
   </section>;
 }

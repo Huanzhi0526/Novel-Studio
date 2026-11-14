@@ -182,8 +182,48 @@ try {
     }).catch(() => {});
   }
 
+  // B9: 验证记忆抽屉面板、未保存提示、ConfirmDialog 交互与模型未刷新提示
+  await main.getByRole('button', { name: '更多助手操作', exact: true }).click();
+  await main.getByRole('menuitem', { name: '模型与记忆', exact: true }).click();
+  const memPanel = main.getByRole('region', { name: '模型与本书记忆', exact: true });
+  await memPanel.waitFor();
+  assert.match(await memPanel.getByLabel('助手模型').locator('option').first().textContent(), /^当前：.+（刷新列表确认）$/);
+  const memInput = memPanel.getByLabel('本书助手记忆');
+  const originalMem = await memInput.inputValue();
+  await memInput.fill(originalMem + '\n- 临时未保存条目');
+  await memPanel.getByText('未保存的修改', { exact: true }).waitFor();
+
+  await memPanel.getByRole('button', { name: '载入最新记忆', exact: true }).click();
+  let confirmDlg = page.locator('dialog.confirm-dialog[open]');
+  await confirmDlg.waitFor();
+  assert.equal(await page.evaluate(() => document.activeElement?.textContent?.trim()), '取消');
+  await page.keyboard.press('Escape');
+  await confirmDlg.waitFor({ state: 'hidden' });
+  assert.match(await memInput.inputValue(), /临时未保存条目/);
+
+  await memPanel.getByRole('button', { name: '关闭记忆面板', exact: true }).click();
+  confirmDlg = page.locator('dialog.confirm-dialog[open]');
+  await confirmDlg.waitFor();
+  await confirmDlg.getByRole('button', { name: '取消', exact: true }).click();
+  await confirmDlg.waitFor({ state: 'hidden' });
+  await memPanel.waitFor();
+
+  await memPanel.getByRole('button', { name: '保存记忆', exact: true }).click();
+  await memPanel.getByText('未保存的修改', { exact: true }).waitFor({ state: 'hidden' });
+  await memPanel.getByRole('button', { name: '关闭记忆面板', exact: true }).click();
+  await memPanel.waitFor({ state: 'hidden' });
+
+  await main.getByRole('button', { name: '更多助手操作', exact: true }).click();
+  await main.getByRole('menuitem', { name: '重新开始讨论', exact: true }).click();
+  confirmDlg = page.locator('dialog.confirm-dialog[open]');
+  await confirmDlg.waitFor();
+  assert.equal(await page.evaluate(() => document.activeElement?.textContent?.trim()), '取消');
+  await confirmDlg.getByRole('button', { name: '取消', exact: true }).click();
+  await confirmDlg.waitFor({ state: 'hidden' });
+  await main.getByText('先把两条成长线放进同一个选择', { exact: true }).waitFor();
+
   assert.deepEqual(errors, []);
-  await writeFile(join(root, 'report.json'), JSON.stringify({ passed: true, sharedDraft: true, b2Verified: true, pageErrors: errors }, null, 2));
+  await writeFile(join(root, 'report.json'), JSON.stringify({ passed: true, sharedDraft: true, b2Verified: true, b9Verified: true, pageErrors: errors }, null, 2));
   console.log(root);
 } finally {
   await app.close();

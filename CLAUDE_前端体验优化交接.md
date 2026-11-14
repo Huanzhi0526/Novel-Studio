@@ -200,13 +200,13 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | P2-2 | 写作工具栏两端分散、开关抽屉时按钮位移、缺少按下态与分组收纳 | 肌肉记忆受干扰、窄窗拥挤 | 工具栏左对齐固定顺序，合并“更多”分组菜单，标记/历史补 `aria-pressed`，窄容器收纳次要项 | 已完成（`e906e26`） |
 | P2-3 | 左侧栏不可折叠；窄窗下普通抽屉无遮罩且 Esc 需焦点在抽屉内才生效 | 窄窗正文空间局促，关闭抽屉手势不一致 | 左侧栏支持折叠为 56px 图标条（持久于 `writingSession.layout.railCollapsed`）；非停靠抽屉统一遮罩与全局 Esc 优先级 | 已完成（`56019d2`） |
 | P2-4 | 设置页模型来源与兼容 API 混排、两个保存按钮易混、缺少当前生效摘要、顶栏标题重复 | 不易判断当前实际生效的模型来源 | 顶部增加生效摘要，拆分为“模型来源”与“兼容 API 配置”卡片，去重顶栏，补创作助手跳转说明 | 未开始 |
-| P2-5 | 助手记忆在狭小下拉浮层编辑，“载入最新记忆”无未保存保护，“重新开始讨论”用原生 confirm 且紧挨发送 | 长记忆难编辑、易误覆盖或误清空讨论 | 改为右侧抽屉/面板并检测未保存修改；新增原生 `<dialog>` 确认框 `ConfirmDialog`；重开讨论移入 `⋯` 菜单 | 未开始 |
+| P2-5 | 助手记忆在狭小下拉浮层编辑，“载入最新记忆”无未保存保护，“重新开始讨论”用原生 confirm 且紧挨发送 | 长记忆难编辑、易误覆盖或误清空讨论 | 改为右侧抽屉/面板并检测未保存修改；新增原生 `<dialog>` 确认框 `ConfirmDialog`；重开讨论移入 `⋯` 菜单 | 已完成（B9，见 §9.3） |
 | P2-6 | 写作右侧大纲/角色/设定速查预览直接显示 Markdown 源码 | 标题与列表符号干扰对照阅读 | 使用受限白名单 `react-markdown`（`skipHtml`）渲染资料预览，章节对照保持纯文本 | 已完成（B6，见 §9.3） |
 | P2-7 | 卡片弹窗标题写“知识卡”重复层级、证据全折叠、紧凑卡“查看完整卡片”像小标题且易被遮罩压住 | 查卡与核证原文多一步操作 | 弹窗直接以卡名为标题、眉题写作品与类别，默认展开前 3 条证据；紧凑卡底部右侧改为“展开全文 →” | 已完成（B8，见 §9.3） |
 | P2-8 | 写作 364px 侧栏中 KB v2 模式按钮与“接口设置”挤压换行，两条外传说明占高 | 侧栏检索视野局促 | 侧栏模式按钮显示短名（保留完整可访问名称/title），接口设置改图标按钮，合并外传提示 | 已完成（B8，见 §9.3） |
 | P2-9（D2） | 参考检索 Enter 发送，创作助手 Ctrl+Enter 发送 | 跨面板输入习惯割裂 | 统一 `sendIntent`：Enter 发送、Shift+Enter 换行、Ctrl/⌘+Enter 兼容发送、IME 组字保护 | 已完成（`8bebfa8`） |
 | P2-10（D3） | 参考检索默认 `fast`（AI），且切页后参考库模式与已选作品重置 | 每次打开默认指向外传模式，跨页对照丢失位置 | v2 默认 `local`（会话内保留切换，重启回 `local`）；App 层保持参考库视图状态与书架滚动位置 | 已完成（`afbe4fe`） |
-| P2-11 | 参考库、创作助手、设置页顶栏高度与标题层级不一致 | 跨页切换跳跃感明显 | 提取 `PageHeader` 统一 48px 页头，压缩助手页头，去除设置页重复顶栏 | 进行中（B8 已完成 `PageHeader` 与参考库接入，B9/B10 接续） |
+| P2-11 | 参考库、创作助手、设置页顶栏高度与标题层级不一致 | 跨页切换跳跃感明显 | 提取 `PageHeader` 统一 48px 页头，压缩助手页头，去除设置页重复顶栏 | 进行中（B8 参考库与 B9 助手页头已完成，B10 设置页接续） |
 | P2-12 | CodeMirror 查找替换面板 12px 紧凑排布 | 查找框输入局促 | `.cm-search` 控件统一 `--fs-ui`、30px 最小高度与语义色变量 | 已完成（B5，见 §9.3） |
 | P2-13 | 光标在括号提示内未全选时“AI 扩写”直接禁用，弹窗“生成预览”无主按钮样式 | 扩写触发门槛不直观 | 新增只读辅助函数 `enclosingExpansionPair`，提供“选中提示”快捷选中按钮；“生成预览”补主按钮样式 | 已完成（B6，见 §9.3） |
 | P2-14（D5） | 夜写纸张时周边栏位仍为亮色，缺少独立整站深色模式 | 夜间写作眩光对比强烈 | 新增 `appearance`（`light`/`dark`/`system`）与全套语义色变量，五主题适配深色且与纸张独立 | 已完成（B7，见 §9.3） |
@@ -403,7 +403,7 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 - 行为差异：卡片弹窗直接显示卡名与前 3 条原文证据；紧凑卡“展开全文 →”位于右侧遮罩外；写作侧栏检索模式按钮与图标设置单行排布；参考库页头统一为 48px。
 - 组件旧→新映射：`app/renderer/ui.jsx` 新增 `PageHeader`；`Card` 新增可选参数 `headless`。
 - 依赖、IPC、偏好存储键、权限变化：无。
-- 提交：B8 提交（`feat(ui): clearer card dialog, compact card actions and sidebar search controls`，具体 hash 于 B9 开头补录）。
+- 提交：`c1ef246`（`feat(ui): clearer card dialog, compact card actions and sidebar search controls`）。
 - 验证：
   - `npm run build && npm test`（2026-11-15 05:10）：PASS（113 / 113 通过）。
   - `node --disable-warning=ExperimentalWarning scripts/qa-card-viewer.mjs`（2026-11-15 05:10）：PASS（`.local/card-viewer-qa-VsP2yk`）。
@@ -413,6 +413,30 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
   - `node --disable-warning=ExperimentalWarning scripts/qa-visual.mjs`（2026-11-15 05:11）：PASS（`.local/visual-qa-VvHAAv`）。
   - `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B8`（2026-11-15 05:12）：PASS（0 页面错误，`sub12=[]`，3 窗口无溢出，364px 侧栏短名/单条披露/弹窗去重与前 3 条证据可见断言全过，截图 `.local/claude-frontend-ux/B8-1794690737490/`）。
 - 仍有问题与下一步：进入 B9（创作助手页头压缩、记忆抽屉面板与未保存保护、原生 `ConfirmDialog`）。
+
+#### B9：助手页与记忆、应用内确认框（P2-5、P2-11 助手部分）
+
+- 时间与目标：2026-11-15 05:14–05:19；压缩创作助手独立页与写作侧栏页头，将“模型与本书记忆”改造为带未保存修改检测的右侧抽屉/覆盖面板，并在 `ui.jsx` 新增基于原生 `<dialog>` 的 `ConfirmDialog` 替换 `window.confirm`。
+- 发现/决定与取舍：
+  1. 去掉 `.assistant-eyebrow` 眉题；独立页采用 48px 页头（左 `<h1>创作助手</h1>`，右作品下拉 `<select aria-label="助手作品">` 与 `⋯` 菜单 `aria-label="更多助手操作"`，含 `模型与记忆`、`重新开始讨论`）；紧凑侧栏页头改为单行展示当前书名（截断+`title`）、`⋯` 菜单与关闭按钮（保留 `aria-label="关闭助手侧栏"`）。
+  2. “模型与本书记忆”改为独立页带遮罩右侧抽屉（`.assistant-memory-layer.is-drawer`）与紧凑侧栏全覆盖面板（`.assistant-memory-layer.is-compact`），记忆文本框随面板高度伸展；保留 `助手模型`、`刷新反重力模型`、`本书助手记忆`、`保存记忆`、`载入最新记忆`、`记忆文件位置` 等可访问名称；未刷新模型列表时（`!models.length`）下拉显示 `当前：${modelId}（刷新列表确认）`。
+  3. 发现原 `useAssistantController.saveMemory` 未同步更新 `state.memory`，本次在 `assistant.memory` 保存成功后同步更新 `state.memory`，确保 `memoryDirty`（`memory !== state.memory`）准确反映未保存状态；有未保存修改时显示 `未保存的修改` 标签，点 `载入最新记忆` 或通过关闭按钮/遮罩/Esc 关闭面板均弹出 `ConfirmDialog` 确认（Esc 由内层菜单/面板优先处理并阻止外层写作抽屉同时关闭；`Writing.jsx` 全局 Esc 增加 `dialog[open]` 保护）。
+  4. `ui.jsx` 新增 `ConfirmDialog`（原生 `<dialog>`，`onCancel` 阻止默认并调用 `onCancel`，`useEffect` 中将初始焦点落到 `取消` 按钮并在关闭后归还先前焦点），替换 `Assistant.jsx` 的 `window.confirm`；“重新开始讨论”从底部发送区移入页头 `⋯` 菜单，发送按钮统一使用 `.primary`。
+  5. QA 同步说明：
+     - `scripts/qa-assistant.mjs` L12：原 L12 点击旧浮层摘要 `getByText('模型与本书记忆', { exact: true })`；因入口改为页头 `⋯` 菜单，同步调整为先点击 `更多助手操作` 再点击菜单项 `模型与记忆`，其余记忆填写、保存与 `assistant.get` 持久化断言原样保留。
+     - `scripts/qa-assistant-experience.mjs` L185–224：新增 B9 验证，覆盖未刷新模型文案、`未保存的修改` 提示、`载入最新记忆` 与关闭面板时的 `ConfirmDialog`（初始焦点落在 `取消`、Esc 取消保留手写内容）、`保存记忆` 清除提示以及 `⋯ → 重新开始讨论` 的 `ConfirmDialog` 取消保护。
+- 实际变更：修改 `app/renderer/ui.jsx`、`app/renderer/app.css`、`app/renderer/Assistant.jsx`、`app/renderer/assistant.css`、`app/renderer/Writing.jsx`、`scripts/qa-assistant.mjs`、`scripts/qa-assistant-experience.mjs` 与 `.local/claude-frontend-ux/audit-screens.mjs`。
+- 行为差异：助手页头统一紧凑；模型与记忆在独立抽屉/面板编辑并受未保存确认保护；重开讨论移入 `⋯` 菜单并使用应用内 `<dialog>` 确认框。
+- 组件旧→新映射：`app/renderer/ui.jsx` 新增 `ConfirmDialog`。
+- 依赖、IPC、偏好存储键、权限变化：无。
+- 提交：B9 提交（`feat(ui): compact assistant header, dedicated memory panel and in-app confirmations`，具体 hash 于 B10 开头补录）。
+- 验证：
+  - `npm run build && npm test`（2026-11-15 05:17）：PASS（113 / 113 通过）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-assistant.mjs`（2026-11-15 05:17）：PASS（`.local/assistant-v024/ui`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-assistant-experience.mjs`（2026-11-15 05:18）：PASS（`.local/assistant-027/experience-1794691073044`）。
+  - `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B9`（2026-11-15 05:18）：PASS（0 页面错误，`sub12=[]`，3 窗口无溢出，48px 助手页头与记忆抽屉检查全过，截图 `.local/claude-frontend-ux/B9-1794691093735/`）。
+  - `node scripts/qa-assistant-responsiveness.mjs`：`NOT_RUN`（需已打包安装版 EXE 与 `reference-v2.sqlite`）。
+- 仍有问题与下一步：进入 B10（设置页重组：生效摘要、来源与兼容 API 双卡片拆分、去重顶栏与创作助手分组）。
 
 ### 9.4 验证与截图台账
 
@@ -429,6 +453,7 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | B6 写作页结构、可收起侧栏、历史/资料预览与选中提示 | `npm test` (112/112) + `qa-writing-workflow` + `qa-writing-regressions` + `qa-expansion` + `qa-desktop` + `qa-visual` + `audit-screens.mjs B6` | PASS | `.local/writing-workflow-1Bp77A`、`.local/writing-regressions-eLvgDX`、`.local/expansion-qa-p50yJF`、`.local/desktop-qa-FlTCQt`、`.local/visual-qa-5S4Koo`、`.local/claude-frontend-ux/B6-1794689626584/` | 仅合成资料与本地模拟扩写服务；`sub12=[]`、3 种尺寸及折叠侧栏均无横向溢出 |
 | B7 整站深色界面、5 主题适配与 WCAG 对比度 | `npm test` (113/113) + `qa-desktop` + `qa-visual` + `audit-screens.mjs B7` | PASS | `.local/desktop-qa-R8DSBV`、`.local/visual-qa-nevIpS`、`.local/claude-frontend-ux/B7-1794690142065/` | 仅合成资料；`app/main` 未改致冷启动首帧前存在短暂白闪；5 主题深色 WCAG 抽检全部达标 |
 | B8 参考检索与卡片、页头统一 | `npm test` (113/113) + `qa-card-viewer` + `qa-card-markdown` + `qa-retrieval` + `qa-workspace-ui` + `qa-visual` + `audit-screens.mjs B8` | PASS | `.local/card-viewer-qa-VsP2yk`、`.local/card-markdown-qa-DEFEq4`、`.local/retrieval-qa-Ch8cOG`、`.local/workspace-ui-drSMbu`、`.local/visual-qa-VvHAAv`、`.local/claude-frontend-ux/B8-1794690737490/` | 仅合成/fixture 资料；`sub12=[]` 且 3 种窗口尺寸均无横向溢出 |
+| B9 助手页头、记忆抽屉与 `ConfirmDialog` | `npm test` (113/113) + `qa-assistant` + `qa-assistant-experience` + `audit-screens.mjs B9` | PASS | `.local/assistant-v024/ui`、`.local/assistant-027/experience-1794691073044`、`.local/claude-frontend-ux/B9-1794691093735/` | `qa-assistant-responsiveness.mjs` 为 `NOT_RUN`（需安装版 EXE 与正式库）；`sub12=[]` 且 3 种窗口尺寸均无横向溢出 |
 
 ### 9.5 最终合并交接（停写时填写）
 

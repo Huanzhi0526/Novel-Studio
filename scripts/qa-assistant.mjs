@@ -9,7 +9,9 @@ try{const page=await app.firstWindow();await page.waitForLoadState('domcontentlo
 const call=(method,args={})=>page.evaluate(async({method,args})=>{const r=await window.studio.invoke(method,args);if(!r.ok)throw new Error(r.error.message);return r.value;},{method,args});
 const {id}=await call('writing.createWork',{title:'纸桥计划（合成验收）'});
 await page.getByRole('button',{name:'创作助手',exact:true}).click();await page.getByLabel('助手作品').selectOption(id);
-await page.getByText('模型与本书记忆',{exact:true}).click();await page.getByLabel('本书助手记忆').fill('# 创作助手\n\n主旨：合作带来的成长。\n偏好：人物行动有动机；拒绝机械加好感。');
+await page.getByRole('button',{name:'更多助手操作',exact:true}).click();
+await page.getByRole('menuitem',{name:'模型与记忆',exact:true}).click();
+await page.getByLabel('本书助手记忆').fill('# 创作助手\n\n主旨：合作带来的成长。\n偏好：人物行动有动机；拒绝机械加好感。');
 await page.getByRole('button',{name:'保存记忆',exact:true}).click();await page.waitForTimeout(1000);
 assert.match((await call('assistant.get',{workId:id})).memory,/合作带来的成长/);
 await page.getByLabel('助手问题').fill('这里想给男主设置一个困境，同时推动他与女主的关系。');

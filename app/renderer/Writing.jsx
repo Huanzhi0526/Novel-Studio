@@ -273,7 +273,7 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
     function handleWindowEscape(event) {
       if (event.key !== 'Escape' || event.defaultPrevented || event.isComposing || event.keyCode === 229 || viewRef.current?.composing) return;
       if (inBookshelf || !shellRef.current || shellRef.current.closest('[hidden]')) return;
-      if (document.querySelector('.modal-shade, .reader-backdrop')) return;
+      if (document.querySelector('.modal-shade, .reader-backdrop, dialog[open]')) return;
       const openMenus = [
         ...shellRef.current.querySelectorAll('details.rail-menu[open]'),
         ...(railTarget ? railTarget.querySelectorAll('details.rail-menu[open]') : [])
