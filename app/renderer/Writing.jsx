@@ -190,6 +190,8 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
   const isPreviewing = Boolean(expansionReview);
   const [markType, setMarkType] = useState('foreshadow');
   const [markNote, setMarkNote] = useState('');
+  const [deletedMarkUndo, setDeletedMarkUndo] = useState(null);
+  const markUndoTimer = useRef(null);
   const [preview, setPreview] = useState(null);
   const [transitioning, setTransitioning] = useState(true);
   const [liveWordCount, setLiveWordCount] = useState(0);
@@ -248,6 +250,14 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
     return () => { active = false; };
   }, [api]);
   useEffect(() => { const media=window.matchMedia('(min-width: 1120px)');const update=()=>setWideWindow(media.matches);update();media.addEventListener('change',update);return()=>media.removeEventListener('change',update); }, []);
+  useEffect(() => () => {
+    clearTimeout(markUndoTimer.current);
+  }, []);
+  useEffect(() => {
+    clearTimeout(markUndoTimer.current);
+    markUndoTimer.current = null;
+    setDeletedMarkUndo(null);
+  }, [activeId]);
   useEffect(() => { setFocused?.(focusMode && !inBookshelf); }, [focusMode, inBookshelf, setFocused]);
   const dialogOpen = Boolean(dialog);
   useEffect(() => {
@@ -798,10 +808,38 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
     }, '标记失败');
   }
   async function deleteMark(markId) {
+    const removed = marks.find(mark => mark.id === markId);
     await withEditorLocked(async () => {
       await doSave(false);
       setMarks(await api('writing.deleteMark', { id: activeId, markId }));
+      if (removed && !removed.invalid && typeof removed.start === 'number' && typeof removed.end === 'number' && removed.start < removed.end) {
+        clearTimeout(markUndoTimer.current);
+        setDeletedMarkUndo({ docId: activeId, mark: removed });
+        markUndoTimer.current = setTimeout(() => {
+          markUndoTimer.current = null;
+          setDeletedMarkUndo(null);
+        }, 5000);
+      }
     });
+  }
+  async function undoDeleteMark() {
+    const item = deletedMarkUndo;
+    if (!item || item.docId !== activeId) return;
+    clearTimeout(markUndoTimer.current);
+    markUndoTimer.current = null;
+    setDeletedMarkUndo(null);
+    await withEditorLocked(async () => {
+      await doSave(true);
+      const next = await api('writing.addMark', {
+        id: activeId,
+        expectedRevision: baseRevision.current,
+        start: item.mark.start,
+        end: item.mark.end,
+        type: item.mark.type,
+        note: item.mark.note ?? ''
+      });
+      setMarks(next || []);
+    }, '撤销删除标记失败');
   }
   async function jumpToMark(id) {
     await withEditorLocked(async () => {
@@ -980,7 +1018,7 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
       </>}
     </section>
     : toolPanel === 'marks'
-    ? <section className="mark-panel"><div className="mark-create"><label>标记类型<select value={markType} onChange={e=>setMarkType(e.target.value)}>{MARK_TYPES.map(x=><option key={x.value} value={x.value}>{x.label}</option>)}</select></label><input aria-label="标记备注" placeholder="备注（可选）" value={markNote} onChange={e=>setMarkNote(e.target.value)}/><button className="primary-button" disabled={!selectedText} onClick={()=>addMark()}>标记所选文字</button><small>{selectedText?'已选中文字可创建标记':'在正文中选中文字后创建标记'}</small></div><ul className="mark-list">{marks.map(m=><li key={m.id} className={m.invalid?'invalid':''}><button className="mark-jump" disabled={m.invalid} title={m.invalid?'标记已失效，请重新选择定位':'跳转到标记位置'} onClick={()=>jumpToMark(m.id)}><b>{MARK_TYPES.find(x=>x.value===m.type)?.label||m.type}{m.invalid?' · 失效':''}</b><span>{m.quote||m.note||'定位标记'}</span></button>{m.invalid&&<button className="quiet-button" onClick={()=>{const v=viewRef.current;if(v){const sel=v.state.selection.main;if(!sel.empty)addMark(m.id);else{setError('请先在正文中重新选中这条标记对应的文字。');v.focus();}}}}>重选</button>}<button className="quiet-button" aria-label="删除标记" onClick={()=>deleteMark(m.id)}>×</button></li>)}</ul></section>
+    ? <section className="mark-panel">{deletedMarkUndo && deletedMarkUndo.docId === activeId && <div className="mark-undo-banner" role="status"><span>已删除标记</span><button type="button" className="quiet-button" onClick={undoDeleteMark}>撤销</button></div>}<div className="mark-create"><label>标记类型<select value={markType} onChange={e=>setMarkType(e.target.value)}>{MARK_TYPES.map(x=><option key={x.value} value={x.value}>{x.label}</option>)}</select></label><input aria-label="标记备注" placeholder="备注（可选）" value={markNote} onChange={e=>setMarkNote(e.target.value)}/><button className="primary-button" disabled={!selectedText} onClick={()=>addMark()}>标记所选文字</button><small>{selectedText?'已选中文字可创建标记':'在正文中选中文字后创建标记'}</small></div><ul className="mark-list">{marks.map(m=><li key={m.id} className={m.invalid?'invalid':''}><button className="mark-jump" disabled={m.invalid} title={m.invalid?'标记已失效，请重新选择定位':'跳转到标记位置'} onClick={()=>jumpToMark(m.id)}><b>{MARK_TYPES.find(x=>x.value===m.type)?.label||m.type}{m.invalid?' · 失效':''}</b><span>{m.quote||m.note||'定位标记'}</span></button>{m.invalid&&<button className="quiet-button" onClick={()=>{const v=viewRef.current;if(v){const sel=v.state.selection.main;if(!sel.empty)addMark(m.id);else{setError('请先在正文中重新选中这条标记对应的文字。');v.focus();}}}}>重选</button>}<button className="quiet-button" aria-label="删除标记" onClick={()=>deleteMark(m.id)}>×</button></li>)}</ul></section>
     : <section className="history-panel">
       {historyPreview ? <div className="history-preview-view">
         <div className="history-preview-bar">
@@ -1023,7 +1061,7 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
       className={canExpand ? 'writing-expand-button is-ready' : 'writing-expand-button'}
       disabled={!canExpand || transitioning || isPreviewing}
       title={canExpand ? '预览所选括号提示的扩写' : '先选中一对括号中的提示'}
-      onMouseDown={event => event.preventDefault()} onClick={openExpansion}>AI 扩写</button>
+      onMouseDown={event => event.preventDefault()} onClick={openExpansion}><Icon name="sparkPen" size={14} />AI 扩写</button>
     {!canExpand && !isPreviewing && enclosingPrompt && <button type="button"
       className="writing-select-prompt-button"
       disabled={transitioning}

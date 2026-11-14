@@ -359,7 +359,7 @@ export function Assistant({ active, controller: c, openCard, openEvidence, compa
       follow.current = e.currentTarget.scrollHeight - e.currentTarget.scrollTop - e.currentTarget.clientHeight < 100;
     }}>
       {!state?.messages?.length && <div className="assistant-empty">
-        <Icon name="book" size={28} />
+        <Icon name="chat" size={28} />
         <h2>{workId ? '从一个情节问题开始' : '先选一本正在创作的书'}</h2>
         <p>结合本书大纲与设定，先找参考，再一起推敲人物的选择和情节的因果。</p>
         {workId && <button onClick={() => c.setText('这里想给男主设置一个困境，同时推进他与女主的关系。请结合本书设定给我几个方案，并说明参考依据。')}>试试：设计一个推动关系的困境</button>}

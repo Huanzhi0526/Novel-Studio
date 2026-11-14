@@ -183,7 +183,7 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | 实际基线commit / 版本 | `main@76e6f98`（功能基线 `ccb1120`，`package.json` 版本 `0.2.7`） |
 | 本轮目标与明确不涉及项 | 按已确认的 [CLAUDE_前端体验优化执行方案.md](CLAUDE_前端体验优化执行方案.md) 分批实施 B0–B11（D1–D6、P1–P3）；仅涉及 `app/renderer/**`、必要 `app/shared/` 纯函数、测试、QA定位器与说明文档；**不涉及** `app/main/**`、`app/kb-v2/**`、IPC名称与参数、数据库、检索策略、提示词、CLI调度、权限、依赖升级、正式资料与正式安装版 |
 | 隔离资料与证据目录 | `D:\Vibe Coding\Novel Studio\.local\worktrees\claude-frontend-ux\.local\claude-frontend-ux\`（每批独立时间戳子目录，内含 `profile/` 与 `shots/`） |
-| 当前HEAD / 开发是否停写 | 开发进行中（B0 提交后继续按 B1–B11 推进） |
+| 当前HEAD / 开发是否停写 | B11 收官提交见分支 `HEAD`（已停止写入，等待 Codex 独立验收与合并） |
 
 ### 9.2 审查发现与取舍
 
@@ -210,7 +210,7 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | P2-12 | CodeMirror 查找替换面板 12px 紧凑排布 | 查找框输入局促 | `.cm-search` 控件统一 `--fs-ui`、30px 最小高度与语义色变量 | 已完成（B5，见 §9.3） |
 | P2-13 | 光标在括号提示内未全选时“AI 扩写”直接禁用，弹窗“生成预览”无主按钮样式 | 扩写触发门槛不直观 | 新增只读辅助函数 `enclosingExpansionPair`，提供“选中提示”快捷选中按钮；“生成预览”补主按钮样式 | 已完成（B6，见 §9.3） |
 | P2-14（D5） | 夜写纸张时周边栏位仍为亮色，缺少独立整站深色模式 | 夜间写作眩光对比强烈 | 新增 `appearance`（`light`/`dark`/`system`）与全套语义色变量，五主题适配深色且与纸张独立 | 已完成（B7，见 §9.3） |
-| P3 | `Modal` 缺 Tab 焦点圈闭、导航/扩写图标重复、章节菜单带框拥挤、删标记无撤销、助手样式写死色值 | 键盘可访问性与细节一致性不足 | `Modal` 补焦点圈闭、区分助手与扩写图标、菜单无框化、删除标记 5 秒内可撤销、清理残余硬编码色值 | 未开始 |
+| P3 | `Modal` 缺 Tab 焦点圈闭、导航/扩写图标重复、章节菜单带框拥挤、删标记无撤销、助手样式写死色值 | 键盘可访问性与细节一致性不足 | `Modal` 补焦点圈闭、区分助手与扩写图标、菜单无框化、删除标记 5 秒内可撤销、清理残余硬编码色值 | 已完成（B11，见 §9.3） |
 | D4 | 启动始终停在书架，需再次点选上次正在写的书 | 日常续写多一步点击 | 启动读取书架后若 `recent.workId` 仍存在则自动进入并恢复章节与光标，失败或恢复备份后停在书架 | 已完成（`54b977e`） |
 
 ### 9.3 每批实施记录（复制此模板追加）
@@ -450,7 +450,7 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 - 行为差异：设置页顶部不再重复出现“资料与设置”顶栏；AI 设置组顶部常显当前生效摘要；来源与 API 配置分卡展示，检索 `auto` 模式下 API 表单默认折叠以减少视觉干扰；新增“创作助手”引导分组。
 - 组件旧→新映射：`ExpansionPreferences` 新增可选受控 props `collapsible` 与 `onConfigChange`，组件名与公开行为兼容旧调用。
 - 依赖、IPC、偏好存储键、权限变化：无。
-- 提交：B10 提交（`feat(ui): settings show effective model and separate source from API profile`，具体 hash 于 B11 开头补录）。
+- 提交：`b56b97a`（`feat(ui): settings show effective model and separate source from API profile`）。
 - 验证：
   - `npm run build && npm test`（2026-11-15 05:23）：PASS（113 / 113 通过）。
   - `node --disable-warning=ExperimentalWarning scripts/qa-agy-model-settings.mjs`（2026-11-15 05:24）：PASS（15 个模型选项，API 文件字节未变，未传 `--real-test`）。
@@ -460,6 +460,39 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
   - `node --disable-warning=ExperimentalWarning scripts/qa-expansion.mjs`（2026-11-15 05:29）：PASS（未修改脚本，`.local/expansion-qa-ff9Os2`）。
   - `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B10`（2026-11-15 05:29）：PASS（0 页面错误，`sub12=[]`，3 窗口无溢出，含 `26b-settings-assistant.png`，截图 `.local/claude-frontend-ux/B10-1794691738297/`）。
 - 仍有问题与下一步：进入收官批 B11（P3 5 项润色、全量回归矩阵验收与交接闭环）。
+
+#### B11：P3 润色、全量回归复核与交接文档闭环（P3）
+
+- 时间与目标：2026-11-15 05:30–05:43；完成 P3 五项细节润色，执行全量单测、13 项桌面 QA 与 `B11-final` 多窗口/多主题/键盘综合审计，并完成交接文档 §9.1–§9.5 停写交回。
+- 发现/决定与取舍：
+  1. `ui.jsx` `Modal` 补全 `Tab` / `Shift+Tab` 焦点圈闭（过滤隐藏或未展开 `<details>` 内部元素）、IME 组字安全 `Escape`（`isComposing || keyCode === 229` 不关闭）以及卸载时安全归还焦点（仅当 `previous?.isConnected` 时 `focus({ preventScroll: true })`）。
+  2. `ui.jsx` 新增 `chat` 与 `sparkPen` 图标；`App.jsx`（主导航 `创作助手` 与设置 `创作助手` 分组改为 `chat`，设置 `AI 扩写` 分组改为 `sparkPen`）、`Assistant.jsx`（空状态图标改为 `chat`）、`Writing.jsx`（`AI 扩写` 工具按钮前置 `<Icon name="sparkPen" size={14} />`，因 `aria-hidden="true"` 保持精确可访问名称 `AI 扩写`）；`book` 图标仅保留给“小说工作台”品牌与书架相关入口。
+  3. `writing.css` 将 `.rail-menu-items button` 设为无边框（`border: 0; background: transparent; border-radius: 5px`）、保留 `--fs-ui`（13px）并统一悬浮与禁用反馈；触发按钮保留 `title` 与 `aria-label`。
+  4. `Writing.jsx` + `writing.css` 实现删除标记后 5 秒可撤销（抽屉顶部 `.mark-undo-banner` 显示“已删除标记”+“撤销”按钮，点击复用既有 `writing.addMark` 恢复起止范围、类型与备注，不新增 IPC）；因 `writing.addMark` 后端按设计校验有效字符范围（失效标记无法按原失效偏移重插），故仅对可恢复的有效标记展示 5 秒撤销条，切换章节或组件卸载时自动清理定时器与状态。
+  5. 扫描全部 `app/renderer/*.css` 确认无残余非令牌硬编码色值（仅保留 `app.css` 主题/稿纸定义、`card-content.css` 分类浅/深双套色标与 `expansion-dialog.css` 预览强调色变量）。
+- 实际变更：修改 `app/renderer/ui.jsx`、`app/renderer/App.jsx`、`app/renderer/Assistant.jsx`、`app/renderer/Writing.jsx`、`app/renderer/writing.css`、`CLAUDE_前端体验优化交接.md` 与 `.local/claude-frontend-ux/audit-screens.mjs`。
+- 行为差异：`Modal` 具备完整焦点圈闭与 IME 保护；助手与 AI 扩写拥有独立语义图标；`⋯` 下拉菜单为无边框列表；删除有效标记后可在 5 秒内点击“撤销”恢复。
+- 组件旧→新映射：`ui.jsx` `Icon` 新增 `'chat'`、`'sparkPen'` 图标名；其余公共组件签名与旧版兼容。
+- 依赖、IPC、偏好存储键、权限变化：无（整轮累计新增/变化汇总见 §9.5）。
+- 提交：B11 本次收官提交见分支 `HEAD`（`chore(ui): polish and record frontend UX handoff`）。
+- 验证：
+  - `npm run build && npm test`（2026-11-15 05:32）：PASS（113 / 113 通过，`dist/app.js` 786.8kb、`dist/app.css` 81.4kb）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-writing-workflow.mjs`（2026-11-15 05:33）：PASS（`.local/writing-workflow-ZLLXsU`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-writing-regressions.mjs`（2026-11-15 05:33）：PASS（`.local/writing-regressions-Ldaod1`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-workspace-ui.mjs`（2026-11-15 05:33）：PASS（`.local/workspace-ui-NSK9AD`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-card-viewer.mjs`（2026-11-15 05:33）：PASS（`.local/card-viewer-qa-NwzgQw`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-card-markdown.mjs`（2026-11-15 05:33）：PASS（`.local/card-markdown-qa-soYYHz`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-assistant.mjs`（2026-11-15 05:34）：PASS（退出码 0，`.local/assistant-v024/ui`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-assistant-experience.mjs`（2026-11-15 05:35）：PASS（`.local/assistant-027/experience-1794692051583`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-expansion.mjs`（2026-11-15 05:36）：PASS（`.local/expansion-qa-DuQpLG`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-retrieval.mjs`（2026-11-15 05:36）：PASS（`.local/retrieval-qa-197LbU`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-desktop.mjs`（2026-11-15 05:39）：PASS（`.local/desktop-qa-tqxXt0`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-visual.mjs`（2026-11-15 05:39）：PASS（`.local/visual-qa-WagJuw`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-agy-model-settings.mjs`（2026-11-15 05:40）：PASS（15 个模型选项，API 字节不变，未传 `--real-test`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-agy-expansion-settings.mjs`（2026-11-15 05:40）：PASS（15 个模型选项，API 字节不变，未传 `--real-test`）。
+  - `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B11-final`（2026-11-15 05:41）：PASS（0 页面错误，`sub12=[]`，1460×930 / 980×760 / 880×600 与折叠侧栏均无横向溢出；5 主题浅/深双模式 WCAG 对比度全达标；`Modal` Tab/Shift+Tab 焦点圈闭 + IME Esc + 焦点归还、`ActionMenu` 无边框 13px、删标记 5 秒撤销与 `sparkPen`/`chat` 图标全过，截图 `.local/claude-frontend-ux/B11-final-1794692463938/`）。
+  - `node scripts/qa-assistant-responsiveness.mjs`、`node scripts/qa-installed-smoke.mjs`、各脚本 `--real-test`：`NOT_RUN`（需已打包正式安装版 EXE、真实参考库 `reference-v2.sqlite` 或外部实时模型调用，按本轮红线不触发）。
+- 仍有问题与下一步：本轮 B0–B11 全部完成并停止写入，等待 Codex 独立验收与合并。
 
 ### 9.4 验证与截图台账
 
@@ -478,15 +511,55 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | B8 参考检索与卡片、页头统一 | `npm test` (113/113) + `qa-card-viewer` + `qa-card-markdown` + `qa-retrieval` + `qa-workspace-ui` + `qa-visual` + `audit-screens.mjs B8` | PASS | `.local/card-viewer-qa-VsP2yk`、`.local/card-markdown-qa-DEFEq4`、`.local/retrieval-qa-Ch8cOG`、`.local/workspace-ui-drSMbu`、`.local/visual-qa-VvHAAv`、`.local/claude-frontend-ux/B8-1794690737490/` | 仅合成/fixture 资料；`sub12=[]` 且 3 种窗口尺寸均无横向溢出 |
 | B9 助手页头、记忆抽屉与 `ConfirmDialog` | `npm test` + `qa-assistant` + `qa-assistant-experience` + `audit-screens.mjs B9` | PASS | `.local/assistant-v024/ui`、`.local/assistant-027/experience-1794691073044`、`.local/claude-frontend-ux/B9-1794691093735/` | `qa-assistant-responsiveness.mjs` 为 `NOT_RUN`（需安装版 EXE 与正式库）；`sub12=[]` 且 3 种窗口尺寸均无横向溢出 |
 | B10 设置页重组与双卡片拆分 | `npm test` (113/113) + `qa-agy-model-settings` + `qa-agy-expansion-settings` + `qa-workspace-ui` + `qa-expansion` + `qa-retrieval` + `audit-screens.mjs B10` | PASS | `.local/workspace-ui-yRegjR`、`.local/retrieval-qa-P7j8gc`、`.local/expansion-qa-ff9Os2`、`.local/claude-frontend-ux/B10-1794691738297/` | 未传 `--real-test`；6 个既有设置/检索/扩写 QA 脚本零修改全过；`sub12=[]` 且无溢出 |
+| B11 P3 润色与全量 13 项 QA + 全视口/全主题矩阵 | `npm run build` + `npm test` (113/113) + 全部 13 项桌面 QA 脚本 + `audit-screens.mjs B11-final` | PASS | `.local/writing-workflow-ZLLXsU`、`.local/writing-regressions-Ldaod1`、`.local/workspace-ui-NSK9AD`、`.local/card-viewer-qa-NwzgQw`、`.local/card-markdown-qa-soYYHz`、`.local/assistant-v024/ui`、`.local/assistant-027/experience-1794692051583`、`.local/expansion-qa-DuQpLG`、`.local/retrieval-qa-197LbU`、`.local/desktop-qa-tqxXt0`、`.local/visual-qa-WagJuw`、`.local/claude-frontend-ux/B11-final-1794692463938/` | 5 主题浅/深 WCAG、3 窗口、键盘焦点圈闭/IME/Esc 与删标记撤销全过；`qa-assistant-responsiveness.mjs`、`qa-installed-smoke.mjs` 与 `--real-test` 为 `NOT_RUN` |
 
 ### 9.5 最终合并交接（停写时填写）
 
-- 分支、worktree、基线、HEAD：待填写。
-- 本轮实现概述与commit顺序：待填写。
-- 未完成项、风险与后续建议：待填写。
-- 测试通过/失败/NOT_RUN汇总：待填写。
-- 需要Codex重点独立复验的操作：待填写。
-- main是否前进/已知冲突/依赖变更：待填写。
-- 确认保护边界：正式数据/程序/快捷方式是否改动（预期无），私有信息是否进入Git（预期无）；有例外如实列出。
-- 运行中的测试程序/CLI/临时服务及关闭状态：待填写。
-- 开发已停止写入：待填写时间；等待Codex接手。
+- 分支、worktree、基线、HEAD：
+  - 分支：`feat/claude-frontend-ux`
+  - Worktree：`D:\Vibe Coding\Novel Studio\.local\worktrees\claude-frontend-ux`
+  - 基线：`main@76e6f98`（`package.json` `0.2.7`）
+  - 当前 HEAD：B11 本次收官提交见分支 `HEAD`（`chore(ui): polish and record frontend UX handoff`；B10 提交为 `b56b97a`）
+- 本轮实现概述与commit顺序（建议按 B0 → B11 顺序审查，44 文件变动全部限定于渲染层、共享纯函数、单测、QA 同步与文档）：
+  1. `5e9b4d1`（B0）：执行方案入分支与工作区/基线台账准备
+  2. `bd99363`（B1）：KB v2 只读卡片去编辑死路、按卷顺序首开（`orderedChapters`）、v2 “侧重”筛选与说明同步
+  3. `8bebfa8`（B2）：统一 Enter 发送/Shift+Enter 换行与 IME 保护（`sendIntent`）、助手忙碌期可草拟与仅忙碌轮询 + `MessageList` `React.memo`
+  4. `afbe4fe`（B3）：KB v2 默认本地混合检索（`local`）、参考库视图状态与书架滚动提升至 `App` 层保持
+  5. `54b977e`（B4）：启动自动回到上次正在写的作品（恢复章节/光标/滚动，崩溃后停在书架或恢复暂存）
+  6. `4839d1e`、`1d9d64c`、`9df2359`（B5）：排版字号标尺（`--fs-meta` 12px 起）、全局默认限制宽度 680px（`preferences-model.mjs`）、专注模式居中列宽（`--writing-focus-measure`）、CodeMirror 查找面板统一
+  7. `e906e26`、`56019d2`、`13f0926`（B6）：左侧栏可收起至 56px（`layout.railCollapsed`）、统一非停靠抽屉遮罩与 Esc 优先级、写作工具栏左对齐固定顺序与“更多”分组收纳、历史版本字数预览、受限白名单 Markdown 速查预览（`react-markdown`）与括号内“选中提示”快捷按钮（`enclosingExpansionPair`）
+  8. `32b197b`（B7）：独立 `appearance`（`light`/`dark`/`system`）整站深色模式、语义色变量与 5 主题深/浅双套适配（与写作稿纸独立）
+  9. `c1ef246`（B8）：`PageHeader` 48px 页头统一（参考库）、KB v2 检索标题精简、卡片弹窗以卡名为标题并默认展开前 3 条证据（`Card` `headless` 参数）、紧凑卡“展开全文 →”外置遮罩外、364px 侧栏短模式名/图标按钮设置/单条外传提示
+  10. `4d7b2e1`（B9）：创作助手 48px 单行页头与 `⋯` 菜单、右侧抽屉/侧栏覆盖记忆面板（含未保存修改提示与离开确认）、`ui.jsx` 原生 `<dialog>` `ConfirmDialog` 替换 `window.confirm`
+  11. `b56b97a`（B10）：设置页去重 `.topbar`、顶部生效模型摘要、双卡片拆分（`模型来源` 与 `兼容 API 配置` 且 `auto` 折叠）、只读引导性“创作助手”分组
+  12. B11（本次收官提交见分支 `HEAD`）：`Modal` Tab/Shift+Tab 焦点圈闭与 IME 安全 Esc、`chat`/`sparkPen` 语义图标、章节 `⋯` 无边框 13px 列表、删除有效标记后 5 秒“撤销”恢复条（复用 `writing.addMark`）、残余色值核查与全量回归闭环
+- 依赖、IPC、偏好存储键、快捷键变化：
+  - **依赖变化**：无（`package.json`、`package-lock.json` 未改；复用已有 `react-markdown`）。
+  - **IPC 变化**：无（`app/main/**`、`app/kb-v2/**` 与所有 IPC 通道及参数未改）。
+  - **偏好存储键与会话字段变化**：新增可选偏好字段 `appearance`（`'light' | 'dark' | 'system'`，默认 `'light'`）与写入已有 `writingSession` JSON 的可选字段 `layout.railCollapsed`（`boolean`，默认 `false`）；旧代码可安全忽略。
+  - **快捷键变化**：创作助手输入框发送键由 `Ctrl/⌘+Enter` 统一为 `Enter`（保留 `Ctrl/⌘+Enter` 兼容发送，`Shift+Enter` 换行，IME 组字与忙碌期间按 `Enter` 抑制）；抽屉/面板/弹窗均补齐全局/局部 `Escape` 分层响应与 `Modal` `Tab`/`Shift+Tab` 焦点圈闭。
+- 旧→新组件与纯函数映射：
+  - 新增纯函数模块：`app/renderer/writing-order.mjs`（`orderedChapters`）、`app/renderer/input-keys.mjs`（`sendIntent`）、`app/renderer/preferences-model.mjs`（`loadPreferences`、`normalizePreferences`、`writingSurface`）、`app/shared/expansion-selection.mjs`（`enclosingExpansionPair`）。
+  - `app/renderer/ui.jsx` 新增：`PageHeader`、`ConfirmDialog`、`Icon` 新增 `'chat'` / `'sparkPen'`、`Card` 新增 `headless` 参数、`Modal` 补全焦点圈闭。
+  - `app/renderer/Assistant.jsx` 抽离：`MessageList = React.memo(...)`。
+- 未完成项、风险与后续建议：
+  - **已知限制**：`app/main/index.mjs`（L322）窗口初始 `backgroundColor` 仍为 `#ffffff`（受限于本轮严禁修改 `app/main/**` 的红线），在“深色”模式冷启动首帧加载前可能短暂闪白；建议 Codex 合并后按需在主进程跟进。
+  - **失效标记删除**：因既有 `writing.addMark` 后端按设计校验有效字符范围，已失效标记删除后不展示自动撤销恢复条，仅对可完整重定位的有效标记提供 5 秒 `writing.addMark` 撤销恢复。
+  - **全量未跑项**：`qa-assistant-responsiveness.mjs`（需已打包安装版 + 真实 `reference-v2.sqlite`）、`qa-installed-smoke.mjs`（需已打包安装版 EXE）及各脚本 `--real-test`（外部实时模型）均为 `NOT_RUN`。
+- 测试通过/失败/NOT_RUN汇总：
+  - 单元测试 `npm test`：**113 / 113 PASS**（0 fail / 0 skipped）。
+  - 桌面 QA 脚本（13 项，全在隔离资料目录无外部模型调用）：`qa-writing-workflow`、`qa-writing-regressions`、`qa-workspace-ui`、`qa-card-viewer`、`qa-card-markdown`、`qa-assistant`、`qa-assistant-experience`、`qa-expansion`、`qa-retrieval`、`qa-desktop`、`qa-visual`、`qa-agy-model-settings`（无 `--real-test`）、`qa-agy-expansion-settings`（无 `--real-test`）**13 / 13 PASS**。
+  - 全页面自动化截图与结构/可访问性审计 `.local/claude-frontend-ux/audit-screens.mjs B11-final`：**PASS**（0 错误、`sub12=[]`、1460×930 / 980×760 / 880×600 及折叠侧栏零横向溢出、5 主题深/浅 WCAG 对比度全过）。
+  - `NOT_RUN`：`qa-assistant-responsiveness.mjs`、`qa-installed-smoke.mjs`、`--real-test`。
+- 需要Codex重点独立复验的操作：
+  1. 逐批检查 `git diff main...HEAD` 确认零主进程/后端/依赖/IPC 修改，尤其核查 QA 同步改动点（§6 清单及 B8 `qa-card-viewer` L44–46、`qa-card-markdown` L125、B9 `qa-assistant` L12、`qa-assistant-experience` L185–224 均为结构/新增覆盖同步且未削弱行为断言）。
+  2. 独立重跑 `npm test` 与关键桌面 QA（`qa-writing-workflow`、`qa-assistant-experience`、`qa-expansion`、`qa-retrieval`、`qa-agy-model-settings`、`qa-agy-expansion-settings`、`qa-desktop`）。
+  3. 合并到 `main` 并打包后，重点运行 `qa-installed-smoke.mjs` 与 `qa-assistant-responsiveness.mjs`（验证打包环境与设置页 `AI 扩写` 标题无损兼容），并决定是否补齐主进程冷启动深色底色以消除首帧白闪。
+- main是否前进/已知冲突/依赖变更：
+  - 主工作区 `D:\Vibe Coding\Novel Studio` 仍在 `main@76e6f98`，工作树完全干净，**main 未前进、无已知合并冲突、无依赖变更**。
+- 确认保护边界：
+  - 正式用户资料目录 `%LOCALAPPDATA%\Novel Studio`、正式安装程序 `%LOCALAPPDATA%\Programs\Novel Studio`、桌面快捷方式、`.local/model`、`原文保留/`、`拆书工作区/`、`release/`：**均未修改**。
+  - 私有信息、`.local/` 截图、隔离数据库或测试包：**均未进入 Git**（全在 `.gitignore` 忽略目录中）。
+- 运行中的测试程序/CLI/临时服务及关闭状态：
+  - 已执行 `Get-Process electron -ErrorAction SilentlyContinue` 核实，**无任何残留 `electron.exe`、后台测试服务或 CLI 进程运行**。
+- 开发已停止写入：2026-11-15 05:43（UTC+8）；已停止全部代码与文档写入，等待 Codex 独立验收与合并。

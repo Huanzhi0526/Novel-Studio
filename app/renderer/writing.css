@@ -73,7 +73,9 @@
 .rail-menu-group { display: grid; gap: 1px; }
 .rail-menu-group + .rail-menu-group { margin-top: 3px; padding-top: 3px; border-top: 1px solid var(--border); }
 .rail-menu-heading { padding: 3px 8px 2px; color: var(--muted); font-size: var(--fs-meta); font-weight: 600; }
-.rail-menu-items button { min-height: 28px; justify-content: flex-start; padding: 4px 8px; text-align: left; color: var(--ink); font-size: var(--fs-ui); white-space: nowrap; }
+.rail-menu-items button { min-height: 28px; justify-content: flex-start; padding: 4px 8px; border: 0; border-radius: 5px; background: transparent; text-align: left; color: var(--ink); font-size: var(--fs-ui); white-space: nowrap; }
+.rail-menu-items button:hover:not(:disabled) { background: var(--accent-soft); color: var(--ink); }
+.rail-menu-items button:disabled { opacity: 0.45; }
 .toolbar-overflow-only { display: none; }
 .doc-row { margin: 1px 0 1px 6px; }
 .doc-row.active { background: var(--accent-soft); color: var(--ink); }
@@ -102,6 +104,8 @@
 .toolbar-buttons button:hover:not(:disabled) { color: var(--ink); }
 .toolbar-buttons button i { display: inline-grid; min-width: 18px; height: 18px; place-items: center; margin-left: 4px; border-radius: 50%; background: var(--accent-soft); color: var(--ink); font-size: var(--fs-meta); font-style: normal; }
 .toolbar-buttons button[aria-pressed=true] { background: var(--accent-soft); color: var(--accent); }
+.toolbar-buttons .writing-expand-button,
+.writing-focus-actions .writing-expand-button { display: inline-flex; align-items: center; gap: 5px; }
 .toolbar-buttons .writing-expand-button.is-ready,
 .writing-focus-actions .writing-expand-button.is-ready,
 .toolbar-buttons .writing-select-prompt-button,
@@ -193,6 +197,7 @@
 .body-search-result small { color: var(--muted); }
 .body-search-result span { color: var(--muted); overflow-wrap: anywhere; white-space: pre-wrap; }
 .mark-panel { padding: 13px; }
+.mark-undo-banner { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--accent-soft); color: var(--ink); font-size: var(--fs-ui); }
 .mark-create { display: grid; grid-template-columns: 1fr 1.2fr; align-items: center; gap: 7px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
 .mark-create label { display: grid; gap: 3px; color: var(--muted); font-size: var(--fs-meta); }
 .mark-create select { width: 100%; font-size: var(--fs-ui); }

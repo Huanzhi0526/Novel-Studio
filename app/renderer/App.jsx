@@ -23,9 +23,9 @@ function Settings({ info, restored, preferences, updatePreferences, settingsTarg
     ['appearance', '外观与阅读', 'settings'],
     ['writing', '写作偏好', 'edit'],
     ['retrieval', 'AI 辅助检索', 'search'],
-    ['expansion', 'AI 扩写', 'book'],
+    ['expansion', 'AI 扩写', 'sparkPen'],
     ['data', '本机资料', 'library'],
-    ['assistant', '创作助手', 'book']
+    ['assistant', '创作助手', 'chat']
   ];
 
   useEffect(() => {
@@ -229,7 +229,7 @@ function App() {
   const tabs = [
     ['writing', '原创写作', 'edit'],
     ['reference', '参考库', 'library'],
-    ['assistant', '创作助手', 'book'],
+    ['assistant', '创作助手', 'chat'],
     ['settings', '资料与设置', 'settings']
   ];
   const reading = Boolean(reader);
