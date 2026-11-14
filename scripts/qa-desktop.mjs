@@ -242,13 +242,13 @@ try {
   await editor.press('Delete');
   await page.locator('.mark-list .invalid').waitFor();
   assert.equal(dbValue('SELECT invalid FROM original_marks').invalid, 1);
-  await page.getByTitle('更多编辑操作').click();
+  await page.getByLabel('更多', { exact: true }).click();
   await page.getByRole('button', { name: '导出本章', exact: true }).click();
   await eventually(() => dbValue("SELECT body FROM original_docs WHERE kind='chapter'").body, '雨夜密门🙂绛星原稿隔离探针');
   await delay(300);
   assert.equal(await readFile(exportPath, 'utf8'), '雨夜密门🙂绛星原稿隔离探针');
   record('标记范围随插入移动，删字后标失效，TXT 导出一致');
-  await page.getByTitle('更多作品操作').click();
+  await page.getByLabel('更多', { exact: true }).click();
   await page.getByRole('button', { name: '导入 TXT', exact: true }).click();
   await page.locator('.doc-title').filter({ hasText: 'sample' }).waitFor();
   const importedRow = page.locator('.doc-title').filter({ hasText: 'sample' }).locator('..');

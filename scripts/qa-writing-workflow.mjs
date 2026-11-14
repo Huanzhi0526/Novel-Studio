@@ -382,7 +382,7 @@ try {
   const formatted = `${prefix}${secondBody}\n\n尾段`;
   await editor().press('Control+End');
   await page.keyboard.insertText('\t  \n\n\n\n尾段  \t');
-  await page.getByLabel('更多编辑操作', { exact: true }).click();
+  await page.getByLabel('更多', { exact: true }).click();
   await page.getByRole('button', { name: '一键整理', exact: true }).click();
   await eventually(() => readEditor(true), state => state?.text === formatted, '一键整理后的正文不符合预期');
   await page.getByRole('button', { name: '撤销', exact: true }).click();

@@ -58,7 +58,7 @@ function tidyParagraphs(view) {
   view.dispatch({ changes, userEvent: 'input.format', annotations: isolateHistory.of('full') });
   return true;
 }
-function ActionMenu({ label, actions, caption }) {
+function ActionMenu({ label, actions, groups, caption, summaryLabel }) {
   const menu = useRef(null);
   useEffect(() => {
     function dismiss(event) {
@@ -75,13 +75,30 @@ function ActionMenu({ label, actions, caption }) {
       document.removeEventListener('pointerdown', dismiss);
     };
   }, []);
+  const accessible = summaryLabel ?? `更多${label}操作`;
+  const renderItem = ([title, action, menuTitle, disabled]) => (
+    <button key={title} type="button" disabled={disabled} title={menuTitle || title} onClick={event => {
+      event.currentTarget.closest('details').open = false;
+      action();
+    }}>{title}</button>
+  );
   return <details ref={menu} className={caption ? 'rail-menu has-caption' : 'rail-menu'} onKeyDown={event => {
     if (event.key === 'Escape' && menu.current.open) {
       event.stopPropagation();
       menu.current.open = false;
       menu.current.querySelector('summary').focus();
     }
-  }}><summary title={`更多${label}操作`} aria-label={`更多${label}操作`}>{caption ?? '⋯'}</summary><div className="rail-menu-items">{actions.map(([title, action, menuTitle])=><button key={title} title={menuTitle||title} onClick={event=>{event.currentTarget.closest('details').open=false;action();}}>{title}</button>)}</div></details>;
+  }}>
+    <summary title={accessible} aria-label={accessible}>{caption ?? '⋯'}</summary>
+    <div className="rail-menu-items">
+      {groups ? groups.filter(group => group.items?.length).map(group => (
+        <div key={group.key ?? group.heading} className={group.className ? `rail-menu-group ${group.className}` : 'rail-menu-group'}>
+          {group.heading && <div className="rail-menu-heading">{group.heading}</div>}
+          {group.items.map(renderItem)}
+        </div>
+      )) : actions.map(renderItem)}
+    </div>
+  </details>;
 }
 const markDecorations = (marks, pending = []) => StateField.define({
   create: state => decorationsFor(state, marks, pending),
@@ -907,17 +924,55 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
       <><header className="drawer-head"><strong>{panelTitle}</strong><button className="icon-button" aria-label="关闭侧栏" onClick={() => closeToolPanel(true)}>×</button></header><div className="drawer-content">{panelContent}</div></>}
   </aside>;
   const inlineRail = railTarget ? null : rail;
-  const expandButton = doc?.kind === 'chapter' && <button type="button" disabled={!canExpand || transitioning || isPreviewing}
+  const expandButton = doc?.kind === 'chapter' && <button type="button"
+    className={canExpand ? 'writing-expand-button is-ready' : 'writing-expand-button'}
+    disabled={!canExpand || transitioning || isPreviewing}
     title={canExpand ? '预览所选括号提示的扩写' : '先选中一对括号中的提示'}
     onMouseDown={event => event.preventDefault()} onClick={openExpansion}>AI 扩写</button>;
+  const breadcrumbText = focusMode
+    ? '专注写作'
+    : `${activeWork?.title ?? ''}${doc ? ` / ${activeVolume?.title ?? WORK_SECTIONS[doc.kind].label}` : ''}`;
+  const moreGroups = [
+    ...(doc ? [{
+      key: 'doc',
+      heading: '本章',
+      items: [
+        ...(!isPreviewing ? [['一键整理', () => formatBody(viewRef.current), '清理行尾空格和连续空行，可撤销（Ctrl+K）']] : []),
+        ['重命名', () => rename('doc', doc.id, liveTitle)],
+        [doc.kind === 'chapter' ? '导出本章' : '导出文档', () => exportTxt(activeId)]
+      ]
+    }] : []),
+    ...(activeWork ? [{
+      key: 'work',
+      heading: '作品',
+      items: [
+        ['导入 TXT', importTxt],
+        ['导出整书 TXT', () => exportTxt(null)],
+        ['重命名作品', () => rename('work', activeWork.id, activeWork.title)]
+      ]
+    }] : []),
+    {
+      key: 'view',
+      heading: '视图与工具',
+      className: 'toolbar-overflow-only',
+      items: [
+        ['查找替换', find, '查找替换', !doc || isPreviewing],
+        ['写作设置', () => openToolPanel('preferences')],
+        ['专注', () => {
+          if (viewRef.current) closeSearchPanel(viewRef.current);
+          setFocusMode(true);
+        }]
+      ]
+    }
+  ];
   const canvas = <div hidden={inBookshelf} className={`writing-shell ${focusMode?'is-focused':''} ${dockPanel?'has-docked-panel':''} ${toolPanel && !isReference ? 'has-work-panel' : ''} ${inlineRail?'has-inline-rail':''} ${showResourceTools?'has-resource-tools':''}`}>
     {inlineRail}
     <section className="writing-main">
       <header className="writing-toolbar"><div className="toolbar-inner">
         <div className="doc-heading">
-          {!focusMode && <button className="writing-back-to-shelf" type="button" disabled={transitioning}
-            onClick={returnToBookshelf}><span aria-hidden="true">‹</span>返回书架</button>}
-          <span title={activeWork?.title}>{focusMode ? '专注写作' : activeWork?.title}{!focusMode && doc ? ` / ${activeVolume?.title ?? WORK_SECTIONS[doc.kind].label}` : ''}</span>
+          {!focusMode && <button className="writing-back-to-shelf" type="button" aria-label="返回书架" disabled={transitioning}
+            onClick={returnToBookshelf}><span aria-hidden="true">‹</span>书架</button>}
+          <span className="writing-breadcrumb" title={breadcrumbText}>{breadcrumbText}</span>
           {doc?.recovered && <em>已恢复草稿</em>}
         </div>
         {focusMode ? <div className="writing-focus-actions">
@@ -935,25 +990,16 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 6 5 5-5 5m5-5H10a5 5 0 0 0-5 5v2" /></svg>
             </button>
           </div>
-          <button disabled={!doc || isPreviewing} aria-label="标记" onClick={() => openToolPanel('marks')}>标记{marks.some(mark => mark.invalid) && <i>{marks.filter(mark => mark.invalid).length}</i>}</button>
-          <button disabled={!doc} onClick={() => openToolPanel('history')}>历史</button>
-          <button disabled={!doc || isPreviewing} onClick={find}>查找替换</button>
           {expandButton}
-          <button className="writing-settings-button" aria-pressed={toolPanel === 'preferences'} onClick={() => openToolPanel('preferences')}>写作设置</button>
-          <button className="writing-focus-button" onClick={() => {
+          <button disabled={!doc || isPreviewing} aria-label="标记" aria-pressed={toolPanel === 'marks'} onClick={() => openToolPanel('marks')}>标记{marks.some(mark => mark.invalid) && <i>{marks.filter(mark => mark.invalid).length}</i>}</button>
+          <button disabled={!doc} aria-pressed={toolPanel === 'history'} onClick={() => openToolPanel('history')}>历史</button>
+          <button className="toolbar-secondary" disabled={!doc || isPreviewing} onClick={find}>查找替换</button>
+          <button className="toolbar-secondary writing-settings-button" aria-pressed={toolPanel === 'preferences'} onClick={() => openToolPanel('preferences')}>写作设置</button>
+          <button className="toolbar-secondary writing-focus-button" onClick={() => {
             if (viewRef.current) closeSearchPanel(viewRef.current);
             setFocusMode(true);
           }}>专注</button>
-          {activeWork && <ActionMenu label="作品" caption="作品" actions={[
-            ['导入 TXT', importTxt],
-            ['导出整书 TXT', () => exportTxt(null)],
-            ['重命名作品', () => rename('work', activeWork.id, activeWork.title)]
-          ]} />}
-          {doc && <ActionMenu label="编辑" actions={[
-            ...(!isPreviewing ? [['一键整理', () => formatBody(viewRef.current), '清理行尾空格和连续空行，可撤销（Ctrl+K）']] : []),
-            ['重命名', () => rename('doc', doc.id, liveTitle)],
-            [doc.kind === 'chapter' ? '导出本章' : '导出文档', () => exportTxt(activeId)]
-          ]} />}
+          {(activeWork || doc) && <ActionMenu label="更多" summaryLabel="更多" caption="更多" groups={moreGroups} />}
         </div>}
       </div></header>
       {error&&<div className="writing-error"><span>{error}</span>{dirty.current&&<button onClick={()=>{void doSave(true).catch(()=>{});}}>重试保存</button>}<button onClick={() => exportTxt(activeId)}>导出当前 TXT</button><button onClick={()=>setError('')}>关闭</button></div>}

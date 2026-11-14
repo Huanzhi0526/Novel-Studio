@@ -70,7 +70,11 @@
 .rail-menu > summary::-webkit-details-marker { display: none; }
 .rail-menu > summary:hover, .rail-menu[open] > summary { background: var(--accent-soft); color: var(--ink); }
 .rail-menu-items { position: absolute; z-index: 10; top: 25px; right: 0; width: max-content; min-width: 150px; display: grid; gap: 1px; padding: 4px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel); box-shadow: 0 7px 24px color-mix(in srgb, var(--ink) 12%, transparent); }
+.rail-menu-group { display: grid; gap: 1px; }
+.rail-menu-group + .rail-menu-group { margin-top: 3px; padding-top: 3px; border-top: 1px solid var(--border); }
+.rail-menu-heading { padding: 3px 8px 2px; color: var(--muted); font-size: var(--fs-meta); font-weight: 600; }
 .rail-menu-items button { min-height: 28px; justify-content: flex-start; padding: 4px 8px; text-align: left; color: var(--ink); font-size: var(--fs-ui); white-space: nowrap; }
+.toolbar-overflow-only { display: none; }
 .doc-row { margin: 1px 0 1px 6px; }
 .doc-row.active { background: var(--accent-soft); color: var(--ink); }
 .doc-title { display: block !important; flex: 1; min-width: 0; overflow: hidden; border: 0 !important; padding: 4px 4px !important; background: transparent !important; text-align: left; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-ui) !important; }
@@ -83,22 +87,24 @@
 .trash-list button { min-height: 25px; color: var(--muted); font-size: var(--fs-meta); }
 .writing-main { --editor-gutter: clamp(16px, 3vw, 58px); position: relative; flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; background: var(--panel); container: writing-workspace / inline-size; }
 .writing-toolbar { z-index: 1; flex: 0 0 auto; min-height: 54px; border-bottom: 1px solid var(--border); background: var(--panel); }
-.toolbar-inner { width: min(100%, 930px); min-height: 54px; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 auto; padding: 7px 22px; }
-.doc-heading { display: flex; min-width: 0; align-items: center; gap: 8px; font-size: var(--fs-ui); font-weight: 600; }
-.doc-heading span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.toolbar-inner { width: 100%; min-height: 54px; display: flex; align-items: center; justify-content: flex-start; gap: 12px; margin: 0; padding: 7px 14px; }
+.doc-heading { display: flex; flex: 0 1 auto; min-width: 0; align-items: center; gap: 8px; font-size: var(--fs-ui); font-weight: 600; }
+.doc-heading .writing-breadcrumb { max-width: 36ch; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .writing-shell .writing-back-to-shelf { flex: none; padding: 3px 7px; color: var(--accent); font-size: var(--fs-ui); white-space: nowrap; }
 .writing-back-to-shelf span { font-size: 19px; line-height: 1; }
 .doc-heading em { flex: none; border-radius: 99px; padding: 2px 7px; background: var(--accent-soft); color: var(--muted); font-size: var(--fs-meta); font-style: normal; font-weight: 500; }
 .toolbar-buttons { display: flex; flex: none; align-items: center; gap: 2px; }
-.edit-history-buttons { display: flex; margin-right: 5px; padding-right: 5px; border-right: 1px solid var(--border); }
+.edit-history-buttons { display: flex; margin-right: 4px; padding-right: 4px; border-right: 1px solid var(--border); }
 .edit-history-buttons button { width: 29px; display: grid; place-items: center; }
 .toolbar-buttons > .rail-menu > summary { width: 30px; height: 30px; }
-.toolbar-buttons > .rail-menu.has-caption > summary { width: auto; padding: 0 7px; font-size: var(--fs-ui); }
+.toolbar-buttons > .rail-menu.has-caption > summary { width: auto; padding: 0 8px; font-size: var(--fs-ui); min-height: 30px; display: inline-flex; align-items: center; }
 .toolbar-buttons button { min-height: 30px; padding: 4px 8px; color: var(--muted); font-size: var(--fs-ui); white-space: nowrap; }
 .toolbar-buttons button:hover:not(:disabled) { color: var(--ink); }
 .toolbar-buttons button i { display: inline-grid; min-width: 18px; height: 18px; place-items: center; margin-left: 4px; border-radius: 50%; background: var(--accent-soft); color: var(--ink); font-size: var(--fs-meta); font-style: normal; }
 .toolbar-buttons button[aria-pressed=true] { background: var(--accent-soft); color: var(--accent); }
-.toolbar-buttons .writing-settings-button { margin-left: 4px; font-weight: 600; color: var(--ink); }
+.toolbar-buttons .writing-expand-button.is-ready,
+.writing-focus-actions .writing-expand-button.is-ready { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); color: var(--accent); font-weight: 600; }
+.toolbar-buttons .writing-settings-button { font-weight: 600; color: var(--ink); }
 .toolbar-buttons .writing-focus-button { border-color: var(--border); color: var(--ink); }
 .editor-host .cm-panels { background: var(--panel); color: var(--ink); }
 .editor-host .cm-search { padding: 8px 30px 8px 8px; font-family: "Segoe UI Variable", "Microsoft YaHei UI", sans-serif; font-size: var(--fs-ui); line-height: var(--lh-ui); }
@@ -206,6 +212,8 @@
 .is-focused .writing-toolbar { border: 0; }
 .is-focused .toolbar-inner {
   width: min(var(--writing-focus-measure, calc(var(--writing-font-size, 16px) * 42)), calc(100% - var(--editor-gutter) * 2));
+  margin: 0 auto;
+  justify-content: space-between;
   padding: 7px 0;
 }
 .writing-toolbar .focus-exit { border-color: var(--border); background: var(--panel); color: var(--accent); font-weight: 600; white-space: nowrap; }
@@ -218,6 +226,10 @@
 .writing-dialog p.dialog-error { color: #a0353c; }
 .writing-dialog > div { display: flex; justify-content: flex-end; gap: 5px; }
 .writing-dialog .dialog-primary { background: var(--accent); color: var(--panel); }
+@container writing-workspace (max-width: 740px) {
+  .toolbar-buttons > .toolbar-secondary { display: none; }
+  .toolbar-overflow-only { display: grid; gap: 1px; }
+}
 @container writing-workspace (max-width: 515px) {
   .toolbar-inner { flex-wrap: wrap; gap: 3px; padding: 5px 12px; }
   .is-focused .toolbar-inner { padding: 5px 0; }
