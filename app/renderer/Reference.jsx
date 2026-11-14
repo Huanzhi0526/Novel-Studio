@@ -274,7 +274,7 @@ function CardForm({ initial, volumes, submit, button = '保存知识卡', cancel
   </form>;
 }
 
-export function CardEditor({ card, works, close, openEvidence, onSaved }) {
+export function CardEditor({ card, works, close, openEvidence, onSaved, editable = true }) {
   const [live, setLive] = useState(null);
   const [error, setError] = useState(null);
   const [editing, setEditing] = useState(false);
@@ -291,14 +291,17 @@ export function CardEditor({ card, works, close, openEvidence, onSaved }) {
   }, [card]);
   return <Modal title={editing ? '编辑知识卡' : '知识卡'} eyebrow={card.work_title} close={close} wide
     className={editing ? '' : 'card-reader'}
-    actions={!editing && live && <button type="button" className="quiet" onClick={() => setEditing(true)}><Icon name="edit" size={15} />编辑</button>}>
+    actions={editable && !editing && live && <button type="button" className="quiet" onClick={() => setEditing(true)}><Icon name="edit" size={15} />编辑</button>}>
     <ErrorMessage error={error} />
-    {live ? editing
+    {live ? editing && editable
       ? <CardForm key={live.revision} initial={live} volumes={volumes} cancel={() => setEditing(false)} submit={async edited => {
         const value = await api('reference.editCard', { workId: live.work_id, expectedRevision: live.revision, card: edited });
         onSaved(value.warnings);
       }} />
-      : <Card card={live} openEvidence={openEvidence} collapseEvidence />
+      : <>
+        <Card card={live} openEvidence={openEvidence} collapseEvidence />
+        {!editable && <p className="muted card-readonly-note">此卡由参考库建库流程维护，在此只读。</p>}
+      </>
       : !error && <p className="inline-status"><span className="spinner" />正在读取</p>}
   </Modal>;
 }

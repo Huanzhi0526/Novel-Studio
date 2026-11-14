@@ -234,7 +234,7 @@ function App() {
       </main>}
     </div>
     {card && <div hidden={reading}>
-      <CardEditor card={card} works={works} close={() => setCard(null)} openEvidence={openEvidence} onSaved={warnings => {
+      <CardEditor card={card} works={works} editable={!info?.kbV2} close={() => setCard(null)} openEvidence={openEvidence} onSaved={warnings => {
         setCard(null);
         setBanner(warnings.join(' '));
         refresh().catch(setError);

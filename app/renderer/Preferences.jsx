@@ -160,7 +160,7 @@ function expansionKeyStatus(hasKey, { addressChanged, apiKey, removeKey, reuseKe
   return ['未保存', '服务需要鉴权时，请填写 Key 并保存配置。'];
 }
 
-export function ExpansionPreferences({ purpose = 'expand' }) {
+export function ExpansionPreferences({ purpose = 'expand', kbV2 = false }) {
   const title = purpose === 'retrieval' ? 'AI 辅助检索' : 'AI 扩写';
   const sectionId = purpose === 'retrieval' ? 'retrieval-settings' : 'expansion-settings';
   const [saved, setSaved] = useState(null);
@@ -305,7 +305,9 @@ export function ExpansionPreferences({ purpose = 'expand' }) {
   return <section className="settings-preferences expansion-preferences" aria-labelledby={sectionId}>
     <h2 id={sectionId}>{title}</h2>
     <p className="expansion-preferences-description">{purpose === 'retrieval'
-      ? '用外部模型理解问题并筛选知识卡。启用「外部 AI 辅助」时，会发送问题和候选卡摘录，结果可回到原文核对。'
+      ? (kbV2
+        ? '用外部模型理解问题并筛选参考条目。选择「AI 快速」或「AI 深度翻书」时，会发送问题、候选摘录及深度核证所需的参考原文，结果可回到原文核对。'
+        : '用外部模型理解问题并筛选知识卡。启用「外部 AI 辅助」时，会发送问题和候选卡摘录，结果可回到原文核对。')
       : '根据选中的提示补写正文。请求会包含当前章所需片段，可选择附上本书的大纲、角色和设定。'}</p>
     {!saved && feedback}
     {!saved && (busy

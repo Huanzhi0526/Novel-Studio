@@ -240,6 +240,7 @@ ul { padding-left: 22px; }
 .card-evidence { border-top: 1px solid var(--border); padding-top: 12px; }
 .card-evidence > summary { color: var(--muted); font-size: 12px; cursor: pointer; width: fit-content; }
 .card-evidence .evidence-links { margin-top: 9px; }
+.card-readonly-note { margin: 12px 0 0; padding-top: 10px; border-top: 1px solid var(--border); font-size: 12px; }
 
 .settings-main { overflow-y: auto; }
 .settings-page { max-width: 780px; width: 100%; margin: 0 auto; padding: 38px 26px 28px; }

@@ -10,6 +10,7 @@ import { WritingPreferences } from './Preferences.jsx';
 import { WritingResources, WritingResourceTools } from './WritingResources.jsx';
 import { ExpansionDialog } from './ExpansionDialog.jsx';
 import { expansionSelection } from '../shared/expansion-selection.mjs';
+import { orderedChapters } from './writing-order.mjs';
 import { matchingPosition, readWritingSession, rememberPosition, toggleCollapsedVolume, writeWritingSession } from './writing-session.mjs';
 import { Icon } from './ui.jsx';
 import './writing.css';
@@ -544,8 +545,7 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
 
   const volumes = listing.volumes;
   const liveDocs = listing.docs.filter(item => !item.deleted);
-  const docsInVolume = volumeId => liveDocs.filter(item => item.kind === 'chapter' && item.volume_id === volumeId);
-  const chapters = volumes.flatMap(volume => docsInVolume(volume.id));
+  const chapters = orderedChapters(volumes, listing.docs);
   const chapterIndex = chapters.findIndex(item => item.id === activeId);
   const previousChapter = chapterIndex > 0 ? chapters[chapterIndex - 1] : null;
   const nextChapter = chapterIndex >= 0 ? chapters[chapterIndex + 1] : null;
@@ -570,7 +570,7 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
     await withEditorLocked(async () => {
       const next = await api('writing.list', { workId: id });
       const available = next.docs.filter(item => !item.deleted);
-      const chapters = available.filter(item => item.kind === 'chapter');
+      const chapters = orderedChapters(next.volumes, next.docs);
       const recent = session.current.recent;
       const lastDocument = recent?.workId === id && available.some(item => item.id === recent.docId) ? recent.docId : null;
       const lastChapter = Object.keys(session.current.positions).reverse().find(id => chapters.some(item => item.id === id));
@@ -626,7 +626,7 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
         await doSave(true);
         const { id } = await api('writing.createWork', { title: value });
         const next = await api('writing.list', { workId: id });
-        const first = next.docs.find(item => item.kind === 'chapter' && !item.deleted);
+        const first = orderedChapters(next.volumes, next.docs)[0];
         const opened = first ? await api('writing.open', { id: first.id }) : null;
         focusNewDocument.current = Boolean(opened);
         installDocument(opened);

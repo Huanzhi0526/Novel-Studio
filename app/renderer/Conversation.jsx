@@ -99,10 +99,15 @@ export function Conversation({ state, works, openEvidence, openCard, sidebar = f
         <option value="">全部作品</option>
         {works.filter(work => work.deleted == null).map(work => <option key={work.work_id} value={work.work_id}>{work.title}</option>)}
       </select></label>
-      <label><span>类别</span><select aria-label="筛选卡片类别" value={filters.categories[0] ?? ''}
+      <label><span>{kbV2 ? '侧重' : '类别'}</span><select aria-label={kbV2 ? '检索侧重' : '筛选卡片类别'} value={filters.categories[0] ?? ''}
         onChange={event => setFilters({ ...filters, categories: event.target.value ? [event.target.value] : [] })}>
-        <option value="">全部类别</option>
-        {Object.entries(categories).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+        {kbV2
+          ? [['', '不限'], ['character', '人物与设定'], ['event', '剧情场次'], ['technique', '原文描写']].map(([key, label]) =>
+            <option key={key} value={key}>{label}</option>)
+          : <>
+            <option value="">全部类别</option>
+            {Object.entries(categories).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+          </>}
       </select></label>
     </div>
     <div className="messages" ref={list} aria-live="polite">

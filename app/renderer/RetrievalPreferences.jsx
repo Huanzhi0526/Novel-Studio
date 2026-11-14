@@ -110,6 +110,6 @@ export function RetrievalPreferences({ kbV2, purpose = 'retrieval' }) {
       {busy && <p role="status">{busy === 'listModels' ? '正在读取账号可用模型…' : busy === 'test' ? '正在测试所选模型…' : '正在保存…'}</p>}
       {notice && <p className={`notice ${notice.error ? 'danger' : 'success'}`} role={notice.error ? 'alert' : 'status'}>{notice.text}</p>}
     </section>}
-    <div hidden={enabled && draft?.source === 'agy'}><ExpansionPreferences purpose={purpose === 'expand' ? 'expand' : 'retrieval'} /></div>
+    <div hidden={enabled && draft?.source === 'agy'}><ExpansionPreferences purpose={purpose === 'expand' ? 'expand' : 'retrieval'} kbV2={kbV2} /></div>
   </>;
 }

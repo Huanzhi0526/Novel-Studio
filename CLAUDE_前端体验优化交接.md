@@ -189,13 +189,13 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 
 | 编号/优先级 | 页面与复现步骤 | 对作者的影响 | 拟改方案与理由 | 状态/实际commit |
 | --- | --- | --- | --- | --- |
-| P1-1 | 参考库（KB v2）打开知识卡弹窗 → 点击“编辑” → 保存时报 `KB_V2_READONLY` | 误以为卡片可改，填写后保存失败形成死路 | `CardEditor` 增加 `editable`（`!info?.kbV2`），v2 隐藏“编辑”并说明只读，v1 保留 | 未开始 |
-| P1-2 | 多卷原创作品首次从书架进入写作页，按跨卷 `position` 落到后续卷开头（实测落到“第10章 灯塔”） | 初次打开书目跳卷，打乱阅读与续写定位 | 新增 `orderedChapters(volumes, docs)` 按卷顺序展开章节，`chooseWork` 与页脚导航统一复用 | 未开始 |
+| P1-1 | 参考库（KB v2）打开知识卡弹窗 → 点击“编辑” → 保存时报 `KB_V2_READONLY` | 误以为卡片可改，填写后保存失败形成死路 | `CardEditor` 增加 `editable`（`!info?.kbV2`），v2 隐藏“编辑”并说明只读，v1 保留 | 已完成（B1） |
+| P1-2 | 多卷原创作品首次从书架进入写作页，按跨卷 `position` 落到后续卷开头（实测落到“第10章 灯塔”） | 初次打开书目跳卷，打乱阅读与续写定位 | 新增 `orderedChapters(volumes, docs)` 按卷顺序展开章节，`chooseWork` 与页脚导航统一复用 | 已完成（B1） |
 | P1-3（D1） | 写作页默认“跟随窗口”每行约 66 字，专注模式约 85 字 | 中文长行扫视疲劳 | 保留已有偏好；全新本机默认“限制宽度 680px”；专注模式始终居中可读列宽（`--writing-focus-measure`） | 未开始 |
 | P1-4 | 全局根字号 13px，大量 9–11px 界面与菜单文字 | 阅读费力、层级混乱 | 建立 `--fs-meta(12px)` 至 `--fs-h1(22px)` 标尺，根字号升至 14px，消除 `<12px` 可见文字 | 未开始 |
 | P1-5 | 创作助手忙碌时禁用输入框，回合完成后无条件清空草稿 | 等待期间无法记录下一句构思，或写了一半被清空 | 忙碌时仅禁用发送按钮并忽略 Enter；仅当草稿仍等于本轮已发文本时清空，失败保留草稿 | 未开始 |
 | P1-6 | 助手 controller 常驻每秒轮询 `assistant.get` | 空闲时持续 IPC 与重渲染开销 | 仅在 `pending \|\| state?.busy` 时轮询，切换作品/进入视图/发送结束时单次刷新，消息列表 `React.memo` | 未开始 |
-| P1-7 | KB v2 检索区显示九类“类别”下拉，实际仅作 3 组侧重加权且名称与卡片标签不一致 | 筛选预期偏差 | v2 改为“侧重”（不限 / 人物与设定 / 剧情场次 / 原文描写），同步设置页 v2 说明文案 | 未开始 |
+| P1-7 | KB v2 检索区显示九类“类别”下拉，实际仅作 3 组侧重加权且名称与卡片标签不一致 | 筛选预期偏差 | v2 改为“侧重”（不限 / 人物与设定 / 剧情场次 / 原文描写），同步设置页 v2 说明文案 | 已完成（B1） |
 | P2-1 | 章节历史仅显示保存时间，点击即弹恢复确认 | 无法先核对版本内容与字数差异 | 列表展示字数与差值，点击先在抽屉内只读预览正文，再决定恢复或返回列表 | 未开始 |
 | P2-2 | 写作工具栏两端分散、开关抽屉时按钮位移、缺少按下态与分组收纳 | 肌肉记忆受干扰、窄窗拥挤 | 工具栏左对齐固定顺序，合并“更多”分组菜单，标记/历史补 `aria-pressed`，窄容器收纳次要项 | 未开始 |
 | P2-3 | 左侧栏不可折叠；窄窗下普通抽屉无遮罩且 Esc 需焦点在抽屉内才生效 | 窄窗正文空间局促，关闭抽屉手势不一致 | 左侧栏支持折叠为 56px 图标条（持久于 `writingSession.layout.railCollapsed`）；非停靠抽屉统一遮罩与全局 Esc 优先级 | 未开始 |
@@ -225,12 +225,33 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 - 行为差异：无（纯文档与隔离工作区准备）。
 - 组件旧→新映射：无。
 - 依赖、IPC、偏好存储键、权限变化：无。
-- 提交：见本批提交（`docs: add confirmed frontend UX execution plan`）。
+- 提交：`5e9b4d1`（`docs: add confirmed frontend UX execution plan`）。
 - 验证：
   - `npm run build`（2026-11-15 03:39）：PASS（`dist/app.js` 766.9kb，`dist/app.css` 68.2kb）。
   - `npm test`（2026-11-15 03:41）：PASS（100 / 100 通过，耗时 4394.56ms）。
   - `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B0-baseline`（2026-11-15 03:46）：PASS（0 页面错误，33 张基线截图与指标写入 `.local/worktrees/claude-frontend-ux/.local/claude-frontend-ux/B0-baseline-1794685557053/`）。
 - 仍有问题与下一步：进入 B1，修正 KB v2 只读卡片编辑死路、多卷作品首次打开章节顺序与 v2 侧重筛选标签。
+
+#### B1：修正死路与误导控件（P1-1、P1-2、P1-7）
+
+- 时间与目标：2026-11-15 03:49–03:54；消除 KB v2 卡片“编辑→保存报错”死路、修复首次打开多卷作品落到后卷的问题、将 v2 检索九类筛选更名为与实际三层权重一致的“侧重”，并同步设置页 v2 说明文案。
+- 发现/决定与取舍：
+  1. `writing.list` 的 `docs` 按单卷内 `position` 排序而未联结卷序，导致第 2 卷第 1 章（`position=0`）可能排在第 1 卷章节之前；抽离纯函数 `orderedChapters(volumes, docs)` 按卷序展开，`chooseWork`、`createWork` 与页脚章节序列共用同一计算。
+  2. `CardEditor` 新增默认 `editable = true` 参数，由 `App.jsx` 传入 `!info?.kbV2`，保证 v1 验收脚本（`qa-card-viewer`、`qa-card-markdown`）编辑流不受影响，v2 下隐藏编辑按钮并在底部说明只读维护来源。
+  3. `Conversation.jsx` 在 `kbV2` 下将“类别”改为“侧重”（`aria-label="检索侧重"`），4 个选项直接对应 `search-v2.mjs` 的 `weightsFromLegacyCategories` 分支，不改后端契约。
+- 实际变更：新建 `app/renderer/writing-order.mjs`、`tests/writing-order.test.mjs`；修改 `app/renderer/App.jsx`、`app/renderer/Reference.jsx`、`app/renderer/Writing.jsx`、`app/renderer/Conversation.jsx`、`app/renderer/RetrievalPreferences.jsx`、`app/renderer/Preferences.jsx`、`app/renderer/app.css`。
+- 行为差异：KB v2 卡片弹窗不再显示“编辑”按钮并新增只读说明；KB v2 检索筛选标签由“类别（9类）”改为“侧重（不限 / 人物与设定 / 剧情场次 / 原文描写）”；无历史记录的多卷原创作品首次打开固定进入第一卷第一章。
+- 组件旧→新映射：新增辅助纯函数模块 `app/renderer/writing-order.mjs`（`orderedChapters`）；组件名未变。
+- 依赖、IPC、偏好存储键、权限变化：无。
+- 提交：见本批提交（`fix(ui): hide read-only v2 card edit, open first chapter in volume order, relabel v2 focus filter`）。
+- 验证：
+  - `npm run build && npm test`（2026-11-15 03:52）：PASS（102 / 102 通过）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-writing-workflow.mjs`（2026-11-15 03:52）：PASS（`.local/writing-workflow-yoEkPE`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-writing-regressions.mjs`（2026-11-15 03:52）：PASS（`.local/writing-regressions-p0ATX9`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-card-viewer.mjs`（2026-11-15 03:53）：PASS（`.local/card-viewer-qa-0kwihP`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-card-markdown.mjs`（2026-11-15 03:53）：PASS（`.local/card-markdown-qa-YIkcxS`）。
+  - `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B1`（2026-11-15 03:53）：PASS（断言 `firstOpenedTitle==="第一章 熄灭的信号灯"`、`cardModalHasEditButton===false`、`categoryLabel==="侧重"` 全部通过，截图位于 `.local/claude-frontend-ux/B1-1794685986461/`）。
+- 仍有问题与下一步：进入 B2，统一 Enter 发送键、支持助手运行期间继续草拟输入、优化助手空闲轮询并进行长对话测量。
 
 ### 9.4 验证与截图台账
 
@@ -238,6 +259,7 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | --- | --- | --- | --- | --- |
 | B0 基线单测（100 项） | `npm run build && npm test` | PASS | 终端日志（100 pass / 0 fail） | 改动前基线核验 |
 | B0 改动前全页面基线截图（1460×930 / 980×760 / 880×600） | `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B0-baseline` | PASS | `.local/worktrees/claude-frontend-ux/.local/claude-frontend-ux/B0-baseline-1794685557053/` | 仅合成资料与本地无模型模式 |
+| B1 写作顺序、v1/v2 卡片只读与侧重筛选 | `npm test` + `qa-writing-workflow` + `qa-writing-regressions` + `qa-card-viewer` + `qa-card-markdown` + `audit-screens.mjs B1` | PASS | `.local/worktrees/claude-frontend-ux/.local/claude-frontend-ux/B1-1794685986461/` | v1 编辑流与 v2 只读态分别覆盖 |
 
 ### 9.5 最终合并交接（停写时填写）
 
