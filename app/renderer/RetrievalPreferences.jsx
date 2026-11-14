@@ -2,6 +2,24 @@ import React, { useEffect, useRef, useState } from 'react';
 import { api } from './ui.jsx';
 import { ExpansionPreferences } from './Preferences.jsx';
 
+function effectiveSummary({ expand, enabled, saved, apiConfig }) {
+  const apiConfigured = Boolean(apiConfig?.endpoint && apiConfig?.model);
+  const apiModel = apiConfig?.model || '';
+  const agyModel = saved?.modelId || '';
+  if (!enabled) {
+    return apiConfigured ? `当前生效：兼容 API · ${apiModel}` : '当前生效：未配置（检索将仅用本地）';
+  }
+  if (!saved) return '当前生效：正在读取配置…';
+  if (saved.source === 'agy') return `当前生效：反重力 · ${agyModel || '未选模型'}`;
+  if (saved.source === 'api') {
+    if (apiConfigured) return `当前生效：兼容 API · ${apiModel}`;
+    return expand ? '当前生效：兼容 API（未配置）' : '当前生效：未配置（检索将仅用本地）';
+  }
+  if (apiConfigured) return `当前生效：自动（优先兼容 API · ${apiModel}）`;
+  if (agyModel) return `当前生效：自动（当前使用反重力 · ${agyModel}）`;
+  return expand ? '当前生效：自动（未配置）' : '当前生效：未配置（检索将仅用本地）';
+}
+
 export function RetrievalPreferences({ kbV2, purpose = 'retrieval' }) {
   const expand = purpose === 'expand';
   const enabled = expand || kbV2;
@@ -9,6 +27,7 @@ export function RetrievalPreferences({ kbV2, purpose = 'retrieval' }) {
   const [saved, setSaved] = useState(null);
   const [draft, setDraft] = useState(null);
   const [models, setModels] = useState([]);
+  const [apiConfig, setApiConfig] = useState(null);
   const [busy, setBusy] = useState('');
   const [notice, setNotice] = useState(null);
   const [reload, setReload] = useState(0);
@@ -64,9 +83,13 @@ export function RetrievalPreferences({ kbV2, purpose = 'retrieval' }) {
   const dirty = saved && draft && (saved.source !== draft.source || saved.modelId !== draft.modelId);
   const change = patch => { setDraft(value => ({ ...value, ...patch })); setNotice(null); };
 
+  const summaryText = effectiveSummary({ expand, enabled, saved, apiConfig });
+  const collapsibleApi = Boolean(enabled && draft?.source === 'auto');
+
   return <>
-    {enabled && <section className="settings-preferences expansion-preferences" aria-labelledby={purpose + '-provider-heading'}>
-      <h2 id={purpose + '-provider-heading'}>{label}模型来源</h2>
+    <div className="settings-effective-summary" role="status" aria-live="polite">{summaryText}</div>
+    {enabled && <section className="settings-preferences settings-subcard expansion-preferences" aria-label={`${label}模型来源`}>
+      <h2 aria-label={`${label}模型来源`}>模型来源</h2>
       <p>{expand ? '选择主动AI扩写使用的模型。扩写与检索各自保存选模，互不影响。' : '选择用于 AI 快速和 AI 深度翻书的模型。本地混合检索始终在本机运行。'}</p>
       {draft ? <div className="expansion-preferences-form">
         <label><span>模型来源</span>
@@ -110,6 +133,9 @@ export function RetrievalPreferences({ kbV2, purpose = 'retrieval' }) {
       {busy && <p role="status">{busy === 'listModels' ? '正在读取账号可用模型…' : busy === 'test' ? '正在测试所选模型…' : '正在保存…'}</p>}
       {notice && <p className={`notice ${notice.error ? 'danger' : 'success'}`} role={notice.error ? 'alert' : 'status'}>{notice.text}</p>}
     </section>}
-    <div hidden={enabled && draft?.source === 'agy'}><ExpansionPreferences purpose={purpose === 'expand' ? 'expand' : 'retrieval'} kbV2={kbV2} /></div>
+    <div hidden={enabled && draft?.source === 'agy'}>
+      <ExpansionPreferences purpose={purpose === 'expand' ? 'expand' : 'retrieval'} kbV2={kbV2}
+        collapsible={collapsibleApi} onConfigChange={setApiConfig} />
+    </div>
   </>;
 }

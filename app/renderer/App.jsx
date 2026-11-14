@@ -14,7 +14,7 @@ import {
 import './app.css';
 import './workspace-settings.css';
 
-function Settings({ info, restored, preferences, updatePreferences, settingsTarget }) {
+function Settings({ info, restored, preferences, updatePreferences, settingsTarget, onOpenAssistant }) {
   const [busy, setBusy] = useState('');
   const [error, setError] = useState(null);
   const [message, setMessage] = useState('');
@@ -24,7 +24,8 @@ function Settings({ info, restored, preferences, updatePreferences, settingsTarg
     ['writing', '写作偏好', 'edit'],
     ['retrieval', 'AI 辅助检索', 'search'],
     ['expansion', 'AI 扩写', 'book'],
-    ['data', '本机资料', 'library']
+    ['data', '本机资料', 'library'],
+    ['assistant', '创作助手', 'book']
   ];
 
   useEffect(() => {
@@ -102,6 +103,15 @@ function Settings({ info, restored, preferences, updatePreferences, settingsTarg
       <div className="button-row">
         <button onClick={() => run('search.prepare', crypto.randomUUID())} disabled={Boolean(busy) || !info?.modelConfigured}>构建索引</button>
         {busy.length === 36 && <button onClick={() => api('request.cancel', { id: busy })}>取消</button>}
+      </div>
+    </section>
+    </div>
+    <div className="settings-group" hidden={group !== 'assistant'}>
+    <section className="settings-preferences" aria-labelledby="assistant-settings-heading">
+      <h2 id="assistant-settings-heading">创作助手</h2>
+      <p className="settings-assistant-note">助手模型按每本书在创作助手页选择，本机记忆与对话记录也按作品各自保存。</p>
+      <div className="button-row">
+        <button type="button" className="primary" onClick={onOpenAssistant}>打开创作助手</button>
       </div>
     </section>
     </div>
@@ -249,9 +259,6 @@ function App() {
       </footer>
     </aside>
     <div className="studio-content" hidden={reading}>
-      {view === 'settings' && <header className="topbar">
-        <span className="topbar-title">{tabs.find(([key]) => key === view)[1]}</span>
-      </header>}
       <ErrorMessage error={error} />
       {banner && <div className="notice"><span>{banner}</span><button className="quiet" onClick={() => setBanner('')}>关闭</button></div>}
       <main className="workspace-main" hidden={view !== 'writing'} {...writingSurface(preferences)}>
@@ -269,7 +276,8 @@ function App() {
       </main>}
       <main className="workspace-main" hidden={view !== 'assistant'}><Assistant controller={assistantController} active={view === 'assistant'} openCard={setCard} openEvidence={openEvidence} /></main>
       {view === 'settings' && <main className="workspace-main settings-main">
-        <Settings info={info} preferences={preferences} updatePreferences={updatePreferences} settingsTarget={settingsTarget} restored={async () => {
+        <Settings info={info} preferences={preferences} updatePreferences={updatePreferences} settingsTarget={settingsTarget}
+          onOpenAssistant={() => changeView('assistant')} restored={async () => {
           writingChat.clear();
           libraryChat.clear();
           setReferenceView(INITIAL_REFERENCE_VIEW);

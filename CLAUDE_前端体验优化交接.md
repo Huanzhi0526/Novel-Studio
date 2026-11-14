@@ -199,14 +199,14 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | P2-1 | 章节历史仅显示保存时间，点击即弹恢复确认 | 无法先核对版本内容与字数差异 | 列表展示字数与差值，点击先在抽屉内只读预览正文，再决定恢复或返回列表 | 已完成（B6，见 §9.3） |
 | P2-2 | 写作工具栏两端分散、开关抽屉时按钮位移、缺少按下态与分组收纳 | 肌肉记忆受干扰、窄窗拥挤 | 工具栏左对齐固定顺序，合并“更多”分组菜单，标记/历史补 `aria-pressed`，窄容器收纳次要项 | 已完成（`e906e26`） |
 | P2-3 | 左侧栏不可折叠；窄窗下普通抽屉无遮罩且 Esc 需焦点在抽屉内才生效 | 窄窗正文空间局促，关闭抽屉手势不一致 | 左侧栏支持折叠为 56px 图标条（持久于 `writingSession.layout.railCollapsed`）；非停靠抽屉统一遮罩与全局 Esc 优先级 | 已完成（`56019d2`） |
-| P2-4 | 设置页模型来源与兼容 API 混排、两个保存按钮易混、缺少当前生效摘要、顶栏标题重复 | 不易判断当前实际生效的模型来源 | 顶部增加生效摘要，拆分为“模型来源”与“兼容 API 配置”卡片，去重顶栏，补创作助手跳转说明 | 未开始 |
+| P2-4 | 设置页模型来源与兼容 API 混排、两个保存按钮易混、缺少当前生效摘要、顶栏标题重复 | 不易判断当前实际生效的模型来源 | 顶部增加生效摘要，拆分为“模型来源”与“兼容 API 配置”卡片，去重顶栏，补创作助手跳转说明 | 已完成（B10，见 §9.3） |
 | P2-5 | 助手记忆在狭小下拉浮层编辑，“载入最新记忆”无未保存保护，“重新开始讨论”用原生 confirm 且紧挨发送 | 长记忆难编辑、易误覆盖或误清空讨论 | 改为右侧抽屉/面板并检测未保存修改；新增原生 `<dialog>` 确认框 `ConfirmDialog`；重开讨论移入 `⋯` 菜单 | 已完成（B9，见 §9.3） |
 | P2-6 | 写作右侧大纲/角色/设定速查预览直接显示 Markdown 源码 | 标题与列表符号干扰对照阅读 | 使用受限白名单 `react-markdown`（`skipHtml`）渲染资料预览，章节对照保持纯文本 | 已完成（B6，见 §9.3） |
 | P2-7 | 卡片弹窗标题写“知识卡”重复层级、证据全折叠、紧凑卡“查看完整卡片”像小标题且易被遮罩压住 | 查卡与核证原文多一步操作 | 弹窗直接以卡名为标题、眉题写作品与类别，默认展开前 3 条证据；紧凑卡底部右侧改为“展开全文 →” | 已完成（B8，见 §9.3） |
 | P2-8 | 写作 364px 侧栏中 KB v2 模式按钮与“接口设置”挤压换行，两条外传说明占高 | 侧栏检索视野局促 | 侧栏模式按钮显示短名（保留完整可访问名称/title），接口设置改图标按钮，合并外传提示 | 已完成（B8，见 §9.3） |
 | P2-9（D2） | 参考检索 Enter 发送，创作助手 Ctrl+Enter 发送 | 跨面板输入习惯割裂 | 统一 `sendIntent`：Enter 发送、Shift+Enter 换行、Ctrl/⌘+Enter 兼容发送、IME 组字保护 | 已完成（`8bebfa8`） |
 | P2-10（D3） | 参考检索默认 `fast`（AI），且切页后参考库模式与已选作品重置 | 每次打开默认指向外传模式，跨页对照丢失位置 | v2 默认 `local`（会话内保留切换，重启回 `local`）；App 层保持参考库视图状态与书架滚动位置 | 已完成（`afbe4fe`） |
-| P2-11 | 参考库、创作助手、设置页顶栏高度与标题层级不一致 | 跨页切换跳跃感明显 | 提取 `PageHeader` 统一 48px 页头，压缩助手页头，去除设置页重复顶栏 | 进行中（B8 参考库与 B9 助手页头已完成，B10 设置页接续） |
+| P2-11 | 参考库、创作助手、设置页顶栏高度与标题层级不一致 | 跨页切换跳跃感明显 | 提取 `PageHeader` 统一 48px 页头，压缩助手页头，去除设置页重复顶栏 | 已完成（B8–B10，见 §9.3） |
 | P2-12 | CodeMirror 查找替换面板 12px 紧凑排布 | 查找框输入局促 | `.cm-search` 控件统一 `--fs-ui`、30px 最小高度与语义色变量 | 已完成（B5，见 §9.3） |
 | P2-13 | 光标在括号提示内未全选时“AI 扩写”直接禁用，弹窗“生成预览”无主按钮样式 | 扩写触发门槛不直观 | 新增只读辅助函数 `enclosingExpansionPair`，提供“选中提示”快捷选中按钮；“生成预览”补主按钮样式 | 已完成（B6，见 §9.3） |
 | P2-14（D5） | 夜写纸张时周边栏位仍为亮色，缺少独立整站深色模式 | 夜间写作眩光对比强烈 | 新增 `appearance`（`light`/`dark`/`system`）与全套语义色变量，五主题适配深色且与纸张独立 | 已完成（B7，见 §9.3） |
@@ -429,7 +429,7 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 - 行为差异：助手页头统一紧凑；模型与记忆在独立抽屉/面板编辑并受未保存确认保护；重开讨论移入 `⋯` 菜单并使用应用内 `<dialog>` 确认框。
 - 组件旧→新映射：`app/renderer/ui.jsx` 新增 `ConfirmDialog`。
 - 依赖、IPC、偏好存储键、权限变化：无。
-- 提交：B9 提交（`feat(ui): compact assistant header, dedicated memory panel and in-app confirmations`，具体 hash 于 B10 开头补录）。
+- 提交：B9 提交 `4d7b2e1`（`feat(ui): compact assistant header, dedicated memory panel and in-app confirmations`）。
 - 验证：
   - `npm run build && npm test`（2026-11-15 05:17）：PASS（113 / 113 通过）。
   - `node --disable-warning=ExperimentalWarning scripts/qa-assistant.mjs`（2026-11-15 05:17）：PASS（`.local/assistant-v024/ui`）。
@@ -437,6 +437,29 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
   - `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B9`（2026-11-15 05:18）：PASS（0 页面错误，`sub12=[]`，3 窗口无溢出，48px 助手页头与记忆抽屉检查全过，截图 `.local/claude-frontend-ux/B9-1794691093735/`）。
   - `node scripts/qa-assistant-responsiveness.mjs`：`NOT_RUN`（需已打包安装版 EXE 与 `reference-v2.sqlite`）。
 - 仍有问题与下一步：进入 B10（设置页重组：生效摘要、来源与兼容 API 双卡片拆分、去重顶栏与创作助手分组）。
+
+#### B10：设置页重组（P2-4、P2-11 设置页部分）
+
+- 时间与目标：2026-11-15 05:22–05:30；去除设置页重复顶栏，新增只读引导性的“创作助手”分组，在 AI 分组顶部显示当前生效模型摘要，并将模型来源与兼容 API 拆分为两张独立标题卡片。
+- 发现/决定与取舍：
+  1. `App.jsx`：移除 `view === 'settings'` 外层重复的 `<header className="topbar">`；在 `Settings` 导航末新增 `创作助手` 分组（展示说明“助手模型按每本书在创作助手页选择，本机记忆与对话记录也按作品各自保存。”与“打开创作助手”按钮，不读写任何助手配置或 IPC）。
+  2. `RetrievalPreferences.jsx` & `Preferences.jsx`：新增前端推算 `effectiveSummary`（由 `provider.get` 与 `ExpansionPreferences` 的 `onConfigChange` 回调同步，不新增 IPC），覆盖 `反重力 · <model>`、`兼容 API · <model>`、`自动（优先兼容 API · <model>）`、`自动（当前使用反重力 · <model>）`、`未配置（检索将仅用本地）` 等全部状态。
+  3. 严格按 `b6-b10-qa-map.md` §4 无损命名方案重构卡片结构：来源卡 `<section aria-label={`${label}模型来源`}>` + `<h2 aria-label={`${label}模型来源`}>模型来源</h2>`；API 卡 `<section aria-label={title}>`，在 `enabled && draft.source === 'auto'` 时用 `.settings-api-details` 折叠并展示 `<summary>兼容 API 配置（已配置 / 未配置）</summary>`（内配 `.sr-only` `<h2 aria-label={title}>{title}</h2>` 保证无障碍标题存在且可见性兼容 `qa-installed-smoke` 与 `qa-workspace-ui`），在 `!enabled`（v1）或 `source === 'api'` 时直接展开 `<h2 aria-label={title}>兼容 API 配置</h2>`，在 `enabled && source === 'agy'` 时保持隐藏。
+  4. 实测确认：检索初始来源为 `auto`（折叠），扩写初始来源为 `api`（直接展开），因此全部 6 个既有设置/检索/扩写 QA 脚本（含 `qa-expansion.mjs`、`qa-workspace-ui.mjs`、`qa-retrieval.mjs`、`qa-agy-model-settings.mjs`、`qa-agy-expansion-settings.mjs`）**零修改** 100% 通过。
+- 实际变更：修改 `app/renderer/App.jsx`、`app/renderer/RetrievalPreferences.jsx`、`app/renderer/Preferences.jsx`、`app/renderer/workspace-settings.css` 与 `.local/claude-frontend-ux/audit-screens.mjs`。
+- 行为差异：设置页顶部不再重复出现“资料与设置”顶栏；AI 设置组顶部常显当前生效摘要；来源与 API 配置分卡展示，检索 `auto` 模式下 API 表单默认折叠以减少视觉干扰；新增“创作助手”引导分组。
+- 组件旧→新映射：`ExpansionPreferences` 新增可选受控 props `collapsible` 与 `onConfigChange`，组件名与公开行为兼容旧调用。
+- 依赖、IPC、偏好存储键、权限变化：无。
+- 提交：B10 提交（`feat(ui): settings show effective model and separate source from API profile`，具体 hash 于 B11 开头补录）。
+- 验证：
+  - `npm run build && npm test`（2026-11-15 05:23）：PASS（113 / 113 通过）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-agy-model-settings.mjs`（2026-11-15 05:24）：PASS（15 个模型选项，API 文件字节未变，未传 `--real-test`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-agy-expansion-settings.mjs`（2026-11-15 05:24）：PASS（15 个模型选项，API 文件字节未变，未传 `--real-test`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-workspace-ui.mjs`（2026-11-15 05:24）：PASS（`.local/workspace-ui-yRegjR`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-retrieval.mjs`（2026-11-15 05:26）：PASS（`.local/retrieval-qa-P7j8gc`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-expansion.mjs`（2026-11-15 05:29）：PASS（未修改脚本，`.local/expansion-qa-ff9Os2`）。
+  - `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B10`（2026-11-15 05:29）：PASS（0 页面错误，`sub12=[]`，3 窗口无溢出，含 `26b-settings-assistant.png`，截图 `.local/claude-frontend-ux/B10-1794691738297/`）。
+- 仍有问题与下一步：进入收官批 B11（P3 5 项润色、全量回归矩阵验收与交接闭环）。
 
 ### 9.4 验证与截图台账
 
@@ -453,7 +476,8 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | B6 写作页结构、可收起侧栏、历史/资料预览与选中提示 | `npm test` (112/112) + `qa-writing-workflow` + `qa-writing-regressions` + `qa-expansion` + `qa-desktop` + `qa-visual` + `audit-screens.mjs B6` | PASS | `.local/writing-workflow-1Bp77A`、`.local/writing-regressions-eLvgDX`、`.local/expansion-qa-p50yJF`、`.local/desktop-qa-FlTCQt`、`.local/visual-qa-5S4Koo`、`.local/claude-frontend-ux/B6-1794689626584/` | 仅合成资料与本地模拟扩写服务；`sub12=[]`、3 种尺寸及折叠侧栏均无横向溢出 |
 | B7 整站深色界面、5 主题适配与 WCAG 对比度 | `npm test` (113/113) + `qa-desktop` + `qa-visual` + `audit-screens.mjs B7` | PASS | `.local/desktop-qa-R8DSBV`、`.local/visual-qa-nevIpS`、`.local/claude-frontend-ux/B7-1794690142065/` | 仅合成资料；`app/main` 未改致冷启动首帧前存在短暂白闪；5 主题深色 WCAG 抽检全部达标 |
 | B8 参考检索与卡片、页头统一 | `npm test` (113/113) + `qa-card-viewer` + `qa-card-markdown` + `qa-retrieval` + `qa-workspace-ui` + `qa-visual` + `audit-screens.mjs B8` | PASS | `.local/card-viewer-qa-VsP2yk`、`.local/card-markdown-qa-DEFEq4`、`.local/retrieval-qa-Ch8cOG`、`.local/workspace-ui-drSMbu`、`.local/visual-qa-VvHAAv`、`.local/claude-frontend-ux/B8-1794690737490/` | 仅合成/fixture 资料；`sub12=[]` 且 3 种窗口尺寸均无横向溢出 |
-| B9 助手页头、记忆抽屉与 `ConfirmDialog` | `npm test` (113/113) + `qa-assistant` + `qa-assistant-experience` + `audit-screens.mjs B9` | PASS | `.local/assistant-v024/ui`、`.local/assistant-027/experience-1794691073044`、`.local/claude-frontend-ux/B9-1794691093735/` | `qa-assistant-responsiveness.mjs` 为 `NOT_RUN`（需安装版 EXE 与正式库）；`sub12=[]` 且 3 种窗口尺寸均无横向溢出 |
+| B9 助手页头、记忆抽屉与 `ConfirmDialog` | `npm test` + `qa-assistant` + `qa-assistant-experience` + `audit-screens.mjs B9` | PASS | `.local/assistant-v024/ui`、`.local/assistant-027/experience-1794691073044`、`.local/claude-frontend-ux/B9-1794691093735/` | `qa-assistant-responsiveness.mjs` 为 `NOT_RUN`（需安装版 EXE 与正式库）；`sub12=[]` 且 3 种窗口尺寸均无横向溢出 |
+| B10 设置页重组与双卡片拆分 | `npm test` (113/113) + `qa-agy-model-settings` + `qa-agy-expansion-settings` + `qa-workspace-ui` + `qa-expansion` + `qa-retrieval` + `audit-screens.mjs B10` | PASS | `.local/workspace-ui-yRegjR`、`.local/retrieval-qa-P7j8gc`、`.local/expansion-qa-ff9Os2`、`.local/claude-frontend-ux/B10-1794691738297/` | 未传 `--real-test`；6 个既有设置/检索/扩写 QA 脚本零修改全过；`sub12=[]` 且无溢出 |
 
 ### 9.5 最终合并交接（停写时填写）
 

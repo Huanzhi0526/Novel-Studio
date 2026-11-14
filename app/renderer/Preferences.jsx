@@ -92,7 +92,7 @@ function expansionKeyStatus(hasKey, { addressChanged, apiKey, removeKey, reuseKe
   return ['未保存', '服务需要鉴权时，请填写 Key 并保存配置。'];
 }
 
-export function ExpansionPreferences({ purpose = 'expand', kbV2 = false }) {
+export function ExpansionPreferences({ purpose = 'expand', kbV2 = false, collapsible = false, onConfigChange = null }) {
   const title = purpose === 'retrieval' ? 'AI 辅助检索' : 'AI 扩写';
   const sectionId = purpose === 'retrieval' ? 'retrieval-settings' : 'expansion-settings';
   const [saved, setSaved] = useState(null);
@@ -110,6 +110,7 @@ export function ExpansionPreferences({ purpose = 'expand', kbV2 = false }) {
     api(`${purpose}.config.get`).then(config => {
       if (!mounted) return;
       setSaved(config);
+      onConfigChange?.(config);
       setFields(expansionFields(config));
       setStatus('idle');
     }).catch(error => {
@@ -140,6 +141,7 @@ export function ExpansionPreferences({ purpose = 'expand', kbV2 = false }) {
     try {
       const config = await api(`${purpose}.config.${action}`, values);
       setSaved(config);
+      onConfigChange?.(config);
       setFields(expansionFields(config));
       setAdding(false);
       setConfirmRemove(false);
@@ -234,8 +236,7 @@ export function ExpansionPreferences({ purpose = 'expand', kbV2 = false }) {
     <span>{notice.message}</span>
     {notice.detail && <span className="expansion-preferences-feedback-detail">{notice.detail}</span>}
   </p>;
-  return <section className="settings-preferences expansion-preferences" aria-labelledby={sectionId}>
-    <h2 id={sectionId}>{title}</h2>
+  const body = <>
     <p className="expansion-preferences-description">{purpose === 'retrieval'
       ? (kbV2
         ? '用外部模型理解问题并筛选参考条目。选择「AI 快速」或「AI 深度翻书」时，会发送问题、候选摘录及深度核证所需的参考原文，结果可回到原文核对。'
@@ -346,6 +347,21 @@ export function ExpansionPreferences({ purpose = 'expand', kbV2 = false }) {
         ? <div className="inline-status" role="status"><span className="spinner" />{expansionProgress[status]}</div>
         : <small>{changed ? '保存或取消修改后，可以测试连接或切换配置。' : '连接测试只发送固定测试句。'}</small>}
     </form>}
+  </>;
+  if (collapsible) {
+    return <section className="settings-preferences settings-subcard expansion-preferences is-collapsible" aria-label={title}>
+      <h2 className="sr-only" aria-label={title}>{title}</h2>
+      <details className="settings-api-details">
+        <summary className="settings-api-summary">
+          <span>兼容 API 配置（{configured ? '已配置' : '未配置'}）</span>
+        </summary>
+        <div className="settings-api-details-body">{body}</div>
+      </details>
+    </section>;
+  }
+  return <section className="settings-preferences settings-subcard expansion-preferences" aria-label={title}>
+    <h2 aria-label={title}>兼容 API 配置</h2>
+    {body}
   </section>;
 }
 

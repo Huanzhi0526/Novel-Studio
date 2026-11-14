@@ -9,6 +9,17 @@
 .settings-group[hidden] { display: none; }
 .settings-group > .settings-preferences:first-child { border-top: 0; padding-top: 0; }
 .settings-group > :last-child { padding-bottom: 0; }
+.settings-effective-summary { margin-bottom: 16px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-soft); font-size: var(--fs-ui); font-weight: 600; color: var(--ink); }
+.settings-subcard { margin-top: 14px; padding: 18px 20px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.settings-group > .settings-subcard:first-of-type { margin-top: 0; }
+.settings-subcard.is-collapsible { padding: 0; overflow: hidden; }
+.settings-api-summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 20px; cursor: pointer; font-size: var(--fs-h2); font-weight: 600; color: var(--ink); list-style: none; user-select: none; }
+.settings-api-summary::-webkit-details-marker { display: none; }
+.settings-api-summary::after { content: '展开'; font-size: var(--fs-meta); font-weight: 400; color: var(--muted); }
+.settings-api-details[open] > .settings-api-summary { border-bottom: 1px solid var(--border); }
+.settings-api-details[open] > .settings-api-summary::after { content: '收起'; }
+.settings-api-details-body { padding: 16px 20px 20px; }
+.settings-assistant-note { margin: 8px 0 18px; color: var(--muted); font-size: var(--fs-body); line-height: 1.65; }
 .settings-data-title h2 { font-size: var(--fs-h2); }
 .settings-data-title p { margin: 6px 0 18px; color: var(--muted); }
 .settings-panel .settings-preferences h2 { font-size: var(--fs-h2); }
