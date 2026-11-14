@@ -191,7 +191,7 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
   const [dialog, setDialog] = useState(null);
   const dialogRef = useRef(null), dialogTrigger = useRef(null), drawerRef = useRef(null), drawerTrigger = useRef(null);
   const focusDrawer = useRef(false);
-  const viewHost = useRef(null), viewRef = useRef(null), timer = useRef(null), stageTimer = useRef(null), markCompartment = useRef(new Compartment());
+  const viewHost = useRef(null), viewRef = useRef(null), shellRef = useRef(null), timer = useRef(null), stageTimer = useRef(null), markCompartment = useRef(new Compartment());
   const textRef = useRef(''), baseRevision = useRef(null), dirty = useRef(false), edits = useRef([]), saveQueue = useRef(Promise.resolve());
   const currentId = useRef(null), transition = useRef(true), editLock = useRef(new Compartment());
   const positionTimer = useRef(null), initializingView = useRef(null), queuedJump = useRef(null);
@@ -255,26 +255,62 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
     (drawer?.querySelector('#sidebar-query, input') ?? drawer?.querySelector('button'))?.focus();
   }, [toolPanel, resourceKind]);
   useEffect(() => {
-    if (!focusMode) return;
-    function exitOnEscape(event) {
-      if (event.key !== 'Escape' || event.defaultPrevented || event.isComposing || viewRef.current?.composing || dialog || expansion) return;
-      if (viewHost.current?.closest('[hidden]')) return;
-      setFocusMode(false);
+    function handleWindowEscape(event) {
+      if (event.key !== 'Escape' || event.defaultPrevented || event.isComposing || event.keyCode === 229 || viewRef.current?.composing) return;
+      if (inBookshelf || !shellRef.current || shellRef.current.closest('[hidden]')) return;
+      if (document.querySelector('.modal-shade, .reader-backdrop')) return;
+      const openMenus = [
+        ...shellRef.current.querySelectorAll('details.rail-menu[open]'),
+        ...(railTarget ? railTarget.querySelectorAll('details.rail-menu[open]') : [])
+      ];
+      if (openMenus.length) {
+        event.preventDefault();
+        for (const menu of openMenus) menu.open = false;
+        openMenus[openMenus.length - 1].querySelector('summary')?.focus();
+        return;
+      }
+      if (dialog) {
+        if (!transition.current) {
+          event.preventDefault();
+          setDialog(null);
+        }
+        return;
+      }
+      if (expansion && !expansionReview) {
+        event.preventDefault();
+        closeExpansion();
+        return;
+      }
+      if (shellRef.current.querySelector('.cm-search')) {
+        event.preventDefault();
+        if (viewRef.current) {
+          closeSearchPanel(viewRef.current);
+          viewRef.current.focus();
+        }
+        return;
+      }
+      if (expansionReview) {
+        event.preventDefault();
+        closeExpansion();
+        return;
+      }
+      if (toolPanel) {
+        event.preventDefault();
+        closeToolPanel(true);
+        return;
+      }
+      if (focusMode) {
+        event.preventDefault();
+        setFocusMode(false);
+      }
     }
-    window.addEventListener('keydown', exitOnEscape);
-    return () => window.removeEventListener('keydown', exitOnEscape);
-  }, [focusMode, dialog, expansion]);
-  useEffect(() => {
-    if (!expansionReview) return;
-    function restoreOnEscape(event) {
-      if (event.key !== 'Escape' || event.defaultPrevented || event.isComposing || dialog) return;
-      if (viewHost.current?.closest('[hidden]')) return;
-      event.preventDefault();
-      closeExpansion();
-    }
-    window.addEventListener('keydown', restoreOnEscape);
-    return () => window.removeEventListener('keydown', restoreOnEscape);
-  }, [expansionReview, dialog]);
+    window.addEventListener('keydown', handleWindowEscape);
+    return () => window.removeEventListener('keydown', handleWindowEscape);
+  }, [inBookshelf, dialog, expansion, expansionReview, toolPanel, focusMode, railTarget]);
+
+  const persistSession = useCallback(() => {
+    writeWritingSession({ ...session.current, layout: readWritingSession().layout });
+  }, []);
 
   const capturePosition = useCallback(() => {
     clearTimeout(positionTimer.current);
@@ -284,8 +320,8 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
     session.current = rememberPosition(session.current, currentId.current, {
       revision: baseRevision.current, anchor, head, scrollTop: view.scrollDOM.scrollTop
     });
-    writeWritingSession(session.current);
-  }, []);
+    persistSession();
+  }, [persistSession]);
   const schedulePosition = useCallback(() => {
     clearTimeout(positionTimer.current);
     positionTimer.current = setTimeout(capturePosition, 240);
@@ -415,7 +451,7 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
     setStatus(opened?.recovered ? '已恢复未完成编辑' : '');
     if (opened) {
       session.current = { ...session.current, recent: { workId: opened.work_id, docId: opened.id } };
-      writeWritingSession(session.current);
+      persistSession();
     }
   }
 
@@ -608,7 +644,7 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
       installDocument(opened);
       if (!nextId) {
         session.current = { ...session.current, recent: null };
-        writeWritingSession(session.current);
+        persistSession();
       }
       setListing(next);
       setSelectedWork(id);
@@ -761,7 +797,7 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
     setToolPanel(null);
     focusDrawer.current = false;
     if (restoreFocus) {
-      if (drawerTrigger.current?.isConnected) drawerTrigger.current.focus();
+      if (drawerTrigger.current?.isConnected && drawerTrigger.current.getClientRects().length) drawerTrigger.current.focus();
       else viewRef.current?.focus();
     }
     drawerTrigger.current = null;
@@ -866,7 +902,7 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
       onRenameVolume={(id, title) => rename('volume', id, title)} onSearchManuscript={openBodySearch}
       collapsed={collapsed[selectedWork] ?? []} onToggleVolume={id => {
         session.current = toggleCollapsedVolume(session.current, selectedWork, id);
-        writeWritingSession(session.current);
+        persistSession();
         setCollapsed(session.current.collapsed);
       }} />
     {trashFor('chapter')}
@@ -965,7 +1001,7 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
       ]
     }
   ];
-  const canvas = <div hidden={inBookshelf} className={`writing-shell ${focusMode?'is-focused':''} ${dockPanel?'has-docked-panel':''} ${toolPanel && !isReference ? 'has-work-panel' : ''} ${inlineRail?'has-inline-rail':''} ${showResourceTools?'has-resource-tools':''}`}>
+  const canvas = <div ref={shellRef} hidden={inBookshelf} className={`writing-shell ${focusMode?'is-focused':''} ${dockPanel?'has-docked-panel':''} ${toolPanel && !isReference ? 'has-work-panel' : ''} ${inlineRail?'has-inline-rail':''} ${showResourceTools?'has-resource-tools':''}`}>
     {inlineRail}
     <section className="writing-main">
       <header className="writing-toolbar"><div className="toolbar-inner">
@@ -1032,7 +1068,7 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
         </footer>
       </div></div>}
     </section>
-    {drawer && isReference && !dockPanel && <button type="button" className="writing-overlay-dismiss" aria-label="返回正文"
+    {drawer && !dockPanel && <button type="button" className="writing-overlay-dismiss" aria-label="返回正文"
       onClick={() => closeToolPanel(true)} />}
     {drawer}
     {showResourceTools && <WritingResourceTools activeKind={isReference ? toolPanel : toolPanel === 'material' ? resourceKind : null}

@@ -6,7 +6,7 @@ import { RetrievalPreferences } from './RetrievalPreferences.jsx';
 import { Conversation, useConversation } from './Conversation.jsx';
 import { CardEditor, Reader, Reference } from './Reference.jsx';
 import { Writing, flushWriting } from './Writing.jsx';
-import { clearWritingSession } from './writing-session.mjs';
+import { clearWritingSession, readWritingSession, writeWritingSession } from './writing-session.mjs';
 import {
   AppearancePreferences, ExpansionPreferences, loadPreferences, normalizePreferences, ReaderSizePreference,
   savePreferences, WritingPreferences, writingSurface
@@ -124,6 +124,7 @@ function App() {
   const readerTrigger = useRef(null);
   const [epoch, setEpoch] = useState(0);
   const [railTarget, setRailTarget] = useState(null);
+  const [railCollapsed, setRailCollapsed] = useState(() => readWritingSession().layout.railCollapsed);
   const [error, setError] = useState(null);
   const [banner, setBanner] = useState('');
   const [preferences, setPreferences] = useState(loadPreferences);
@@ -155,6 +156,14 @@ function App() {
 
   function updatePreferences(patch) {
     setPreferences(current => normalizePreferences({ ...current, ...patch }));
+  }
+
+  function toggleRail() {
+    setRailCollapsed(current => {
+      const next = !current;
+      writeWritingSession({ ...readWritingSession(), layout: { railCollapsed: next } });
+      return next;
+    });
   }
 
   async function changeView(next, target = null) {
@@ -191,21 +200,28 @@ function App() {
     ['settings', '资料与设置', 'settings']
   ];
   const reading = Boolean(reader);
-  return <div className={`studio ${reading || (view === 'writing' && focused) ? 'studio-focused' : ''}`} data-theme={preferences.theme}
+  const railLabel = railCollapsed ? '展开侧栏' : '收起侧栏';
+  return <div className={`studio ${railCollapsed ? 'studio-rail-collapsed' : ''} ${reading || (view === 'writing' && focused) ? 'studio-focused' : ''}`} data-theme={preferences.theme}
     style={{ '--reader-font': `${preferences.readerSize}px` }}>
     <aside className="app-rail" hidden={reading}>
-      <div className="brand"><span className="brand-mark"><Icon name="book" size={19} /></span><strong>小说工作台</strong></div>
+      <div className="brand" title="小说工作台"><span className="brand-mark"><Icon name="book" size={19} /></span><strong>小说工作台</strong></div>
       <nav className="topnav" aria-label="主导航">
         {tabs.map(([key, label, icon]) =>
-          <button type="button" key={key} aria-current={view === key ? 'page' : undefined} onClick={() => changeView(key)}>
-            <Icon name={icon} size={16} />{label}
+          <button type="button" key={key} aria-label={label} title={label} aria-current={view === key ? 'page' : undefined} onClick={() => changeView(key)}>
+            <Icon name={icon} size={16} /><span>{label}</span>
           </button>
         )}
       </nav>
       <div ref={setRailTarget} className="app-rail-content" hidden={view !== 'writing'} />
       <footer className="app-rail-footer">
-        <span className="local-status"><i />本机资料库</span>
-        <span className="app-version">{info ? `v${info.version}` : ''}</span>
+        <div className="rail-footer-meta">
+          <span className="local-status"><i />本机资料库</span>
+          <span className="app-version">{info ? `v${info.version}` : ''}</span>
+        </div>
+        <button type="button" className="rail-toggle" aria-label={railLabel} title={railLabel}
+          aria-expanded={!railCollapsed} onClick={toggleRail}>
+          <Icon name="panel" size={15} /><span>{railLabel}</span>
+        </button>
       </footer>
     </aside>
     <div className="studio-content" hidden={reading}>
@@ -235,6 +251,7 @@ function App() {
           setReferenceView(INITIAL_REFERENCE_VIEW);
           referenceShelfScroll.current = 0;
           clearWritingSession();
+          setRailCollapsed(false);
           setEpoch(value => value + 1);
           await refresh();
         }} />
