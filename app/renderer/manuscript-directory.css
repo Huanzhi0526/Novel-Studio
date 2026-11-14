@@ -16,7 +16,7 @@
   min-width: 0;
   min-height: 32px;
   white-space: nowrap;
-  font-size: 12px;
+  font-size: var(--fs-ui);
   font-weight: 650;
 }
 
@@ -77,7 +77,7 @@
   background: transparent;
   padding: 4px 2px;
   color: var(--ink);
-  font-size: 12px;
+  font-size: var(--fs-ui);
 }
 
 .writing-rail .manuscript-directory-search input::placeholder {
@@ -101,7 +101,7 @@
   padding: 2px 7px;
   border-color: var(--border);
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--fs-ui);
   white-space: nowrap;
 }
 
@@ -171,5 +171,5 @@
 .manuscript-directory-empty {
   margin: 12px 8px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--fs-meta);
 }

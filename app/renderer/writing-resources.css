@@ -25,7 +25,7 @@
   border-radius: 7px;
   background: transparent;
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--fs-meta);
   line-height: 1.25;
 }
 
@@ -69,7 +69,7 @@
   width: 0;
   min-width: 0;
   padding: 4px 7px;
-  font-size: 12px;
+  font-size: var(--fs-ui);
 }
 
 .writing-resources-actions > input:focus-visible { outline: 1px solid var(--accent); outline-offset: 1px; }
@@ -82,7 +82,7 @@
   border-color: transparent;
   background: transparent;
   color: var(--accent);
-  font-size: 12px;
+  font-size: var(--fs-ui);
   white-space: nowrap;
 }
 
@@ -100,7 +100,7 @@
 }
 
 .resource-list > li + li { margin-top: 2px; }
-.resource-list button small { display: block; color: var(--muted); font-size: 10px; font-weight: 400; }
+.resource-list button small { display: block; color: var(--muted); font-size: var(--fs-meta); font-weight: 400; }
 
 .resource-list button {
   width: 100%;
@@ -126,7 +126,7 @@
   padding: 10px 12px;
   margin: 0;
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--fs-meta);
 }
 
 .resource-empty strong { color: var(--ink); }
@@ -154,7 +154,7 @@
   min-width: 0;
   overflow: hidden;
   margin: 0;
-  font-size: 13px;
+  font-size: var(--fs-ui);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -164,7 +164,7 @@
   align-items: center;
   gap: 3px;
 }
-.resource-preview-actions small { font-size: 11px; white-space: nowrap; }
+.resource-preview-actions small { font-size: var(--fs-meta); white-space: nowrap; }
 .writing-resources .trash-items { max-height: min(100px, 18vh); }
 .writing-resources .trash-list { background: var(--panel); }
 

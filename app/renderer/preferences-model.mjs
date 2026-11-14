@@ -41,7 +41,7 @@ export const writingDefaults = {
   fontSize: 16,
   lineHeight: 1.95,
   width: 680,
-  widthMode: 'window',
+  widthMode: 'limit',
   indent: false
 };
 
@@ -58,6 +58,8 @@ function bounded(value, fallback, min, max) {
 export function normalizePreferences(values = {}) {
   const prefs = values ?? {};
   const width = bounded(prefs.width, defaults.width, 560, 1040);
+  // 旧数据缺少 widthMode 时：若 width === 680 回退 'window'，否则（曾自定义过宽度）回退 'limit'
+  const fallbackWidthMode = width === defaults.width ? 'window' : 'limit';
   return {
     theme: listed(prefs.theme, themes, defaults.theme),
     paper: listed(prefs.paper, papers, defaults.paper),
@@ -66,7 +68,7 @@ export function normalizePreferences(values = {}) {
     fontSize: bounded(prefs.fontSize, defaults.fontSize, 14, 28),
     lineHeight: bounded(prefs.lineHeight, defaults.lineHeight, 1.5, 2.3),
     width,
-    widthMode: listed(prefs.widthMode, writingWidths, width === defaults.width ? defaults.widthMode : 'limit'),
+    widthMode: listed(prefs.widthMode, writingWidths, fallbackWidthMode),
     indent: prefs.indent === true,
     readerSize: readerSizes.includes(prefs.readerSize) ? prefs.readerSize : defaults.readerSize
   };
@@ -74,8 +76,21 @@ export function normalizePreferences(values = {}) {
 
 export function loadPreferences(storage = globalThis.localStorage) {
   try {
-    const saved = JSON.parse(storage?.getItem(storageKey)) ?? {};
+    const raw = storage?.getItem(storageKey);
     const legacyReaderSize = Number(storage?.getItem('reader-size'));
+    if (raw == null) {
+      return {
+        ...defaults,
+        readerSize: readerSizes.includes(legacyReaderSize) ? legacyReaderSize : defaults.readerSize
+      };
+    }
+    const saved = JSON.parse(raw);
+    if (!saved || typeof saved !== 'object') {
+      return {
+        ...defaults,
+        readerSize: readerSizes.includes(legacyReaderSize) ? legacyReaderSize : defaults.readerSize
+      };
+    }
     return normalizePreferences({ readerSize: legacyReaderSize, ...saved });
   } catch {
     return { ...defaults };
@@ -92,6 +107,8 @@ export function savePreferences(preferences, storage = globalThis.localStorage) 
 
 export function writingSurface(preferences) {
   const { paper, ruling, font, fontSize, lineHeight, width, widthMode, indent } = preferences;
+  const measure = widthMode === 'limit' ? `${width}px` : '100%';
+  const focusMeasure = widthMode === 'limit' ? `${width}px` : `${fontSize * 42}px`;
   return {
     'data-writing-paper': paper,
     'data-writing-ruling': ruling,
@@ -101,7 +118,9 @@ export function writingSurface(preferences) {
       '--writing-font-size': `${fontSize}px`,
       '--writing-line-height': lineHeight,
       '--writing-line-step': `${fontSize * lineHeight}px`,
-      '--writing-width': widthMode === 'limit' ? `${width}px` : '100%',
+      '--writing-measure': measure,
+      '--writing-width': measure,
+      '--writing-focus-measure': focusMeasure,
       '--writing-indent': indent ? '2em' : '0em'
     }
   };

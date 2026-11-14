@@ -191,8 +191,8 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | --- | --- | --- | --- | --- |
 | P1-1 | 参考库（KB v2）打开知识卡弹窗 → 点击“编辑” → 保存时报 `KB_V2_READONLY` | 误以为卡片可改，填写后保存失败形成死路 | `CardEditor` 增加 `editable`（`!info?.kbV2`），v2 隐藏“编辑”并说明只读，v1 保留 | 已完成（`bd99363`） |
 | P1-2 | 多卷原创作品首次从书架进入写作页，按跨卷 `position` 落到后续卷开头（实测落到“第10章 灯塔”） | 初次打开书目跳卷，打乱阅读与续写定位 | 新增 `orderedChapters(volumes, docs)` 按卷顺序展开章节，`chooseWork` 与页脚导航统一复用 | 已完成（`bd99363`） |
-| P1-3（D1） | 写作页默认“跟随窗口”每行约 66 字，专注模式约 85 字 | 中文长行扫视疲劳 | 保留已有偏好；全新本机默认“限制宽度 680px”；专注模式始终居中可读列宽（`--writing-focus-measure`） | 未开始 |
-| P1-4 | 全局根字号 13px，大量 9–11px 界面与菜单文字 | 阅读费力、层级混乱 | 建立 `--fs-meta(12px)` 至 `--fs-h1(22px)` 标尺，根字号升至 14px，消除 `<12px` 可见文字 | 未开始 |
+| P1-3（D1） | 写作页默认“跟随窗口”每行约 66 字，专注模式约 85 字 | 中文长行扫视疲劳 | 保留已有偏好；全新本机默认“限制宽度 680px”；专注模式始终居中可读列宽（`--writing-focus-measure`） | 已完成（B5，见 §9.3） |
+| P1-4 | 全局根字号 13px，大量 9–11px 界面与菜单文字 | 阅读费力、层级混乱 | 建立 `--fs-meta(12px)` 至 `--fs-h1(22px)` 标尺，根字号升至 14px，消除 `<12px` 可见文字 | 已完成（B5，见 §9.3） |
 | P1-5 | 创作助手忙碌时禁用输入框，回合完成后无条件清空草稿 | 等待期间无法记录下一句构思，或写了一半被清空 | 忙碌时仅禁用发送按钮并忽略 Enter；仅当草稿仍等于本轮已发文本时清空，失败保留草稿 | 已完成（`8bebfa8`） |
 | P1-6 | 助手 controller 常驻每秒轮询 `assistant.get` | 空闲时持续 IPC 与重渲染开销 | 仅在 `pending \|\| state?.busy` 时轮询，切换作品/进入视图/发送结束时单次刷新，消息列表 `React.memo` | 已完成（`8bebfa8`） |
 | P1-7 | KB v2 检索区显示九类“类别”下拉，实际仅作 3 组侧重加权且名称与卡片标签不一致 | 筛选预期偏差 | v2 改为“侧重”（不限 / 人物与设定 / 剧情场次 / 原文描写），同步设置页 v2 说明文案 | 已完成（`bd99363`） |
@@ -207,11 +207,11 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | P2-9（D2） | 参考检索 Enter 发送，创作助手 Ctrl+Enter 发送 | 跨面板输入习惯割裂 | 统一 `sendIntent`：Enter 发送、Shift+Enter 换行、Ctrl/⌘+Enter 兼容发送、IME 组字保护 | 已完成（`8bebfa8`） |
 | P2-10（D3） | 参考检索默认 `fast`（AI），且切页后参考库模式与已选作品重置 | 每次打开默认指向外传模式，跨页对照丢失位置 | v2 默认 `local`（会话内保留切换，重启回 `local`）；App 层保持参考库视图状态与书架滚动位置 | 已完成（`afbe4fe`） |
 | P2-11 | 参考库、创作助手、设置页顶栏高度与标题层级不一致 | 跨页切换跳跃感明显 | 提取 `PageHeader` 统一 48px 页头，压缩助手页头，去除设置页重复顶栏 | 未开始 |
-| P2-12 | CodeMirror 查找替换面板 12px 紧凑排布 | 查找框输入局促 | `.cm-search` 控件统一 `--fs-ui`、30px 最小高度与语义色变量 | 未开始 |
+| P2-12 | CodeMirror 查找替换面板 12px 紧凑排布 | 查找框输入局促 | `.cm-search` 控件统一 `--fs-ui`、30px 最小高度与语义色变量 | 已完成（B5，见 §9.3） |
 | P2-13 | 光标在括号提示内未全选时“AI 扩写”直接禁用，弹窗“生成预览”无主按钮样式 | 扩写触发门槛不直观 | 新增只读辅助函数 `enclosingExpansionPair`，提供“选中提示”快捷选中按钮；“生成预览”补主按钮样式 | 未开始 |
 | P2-14（D5） | 夜写纸张时周边栏位仍为亮色，缺少独立整站深色模式 | 夜间写作眩光对比强烈 | 新增 `appearance`（`light`/`dark`/`system`）与全套语义色变量，五主题适配深色且与纸张独立 | 未开始 |
 | P3 | `Modal` 缺 Tab 焦点圈闭、导航/扩写图标重复、章节菜单带框拥挤、删标记无撤销、助手样式写死色值 | 键盘可访问性与细节一致性不足 | `Modal` 补焦点圈闭、区分助手与扩写图标、菜单无框化、删除标记 5 秒内可撤销、清理残余硬编码色值 | 未开始 |
-| D4 | 启动始终停在书架，需再次点选上次正在写的书 | 日常续写多一步点击 | 启动读取书架后若 `recent.workId` 仍存在则自动进入并恢复章节与光标，失败或恢复备份后停在书架 | 已完成（B4，见 §9.3） |
+| D4 | 启动始终停在书架，需再次点选上次正在写的书 | 日常续写多一步点击 | 启动读取书架后若 `recent.workId` 仍存在则自动进入并恢复章节与光标，失败或恢复备份后停在书架 | 已完成（`54b977e`） |
 
 ### 9.3 每批实施记录（复制此模板追加）
 
@@ -308,7 +308,7 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 - 行为差异：新装或恢复备份后启动仍停在书架；存在有效 `recent.workId` 时重启直接进入上次作品与章节并恢复光标/滚动，可通过“返回书架”返回。
 - 组件旧→新映射：无。
 - 依赖、IPC、偏好存储键、权限变化：无。
-- 提交：本批提交信息 `feat(ui): reopen the last manuscript on launch`（详见 `git log`）。
+- 提交：`54b977e`（`feat(ui): reopen the last manuscript on launch`）。
 - 验证：
   - `npm run build && npm test`（2026-11-15 04:13）：PASS（106 / 106 通过）。
   - `node --disable-warning=ExperimentalWarning scripts/qa-writing-workflow.mjs`（2026-11-15 04:14）：PASS（`.local/writing-workflow-BxVx5G`）。
@@ -317,6 +317,30 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
   - `node --disable-warning=ExperimentalWarning scripts/qa-expansion.mjs`（2026-11-15 04:22）：PASS（`.local/expansion-qa-T4YXLn`）。
   - `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B4`（2026-11-15 04:23）：PASS（0 页面错误，`.local/claude-frontend-ux/B4-1794687783961/`）。
 - 仍有问题与下一步：Phase 1（B2–B4）已完成并交付 `@verifier` 独立核验；后续进入 Phase 2（B5 字号标尺与行宽）。
+
+#### B5：字号标尺、行宽与专注模式（D1、P1-3、P1-4、P2-12）
+
+- 时间与目标：2026-11-15 04:28–04:40；分 3 个提交完成：① 零语义差异格式化 `assistant.css`；② 抽离纯 JS 偏好模型 `preferences-model.mjs`；③ 定义 `--fs-*`/`--lh-*` 字号行高标尺与 14px 根字号、清理全部 12 个 CSS 中的 `<12px` 声明、落实 D1 默认宽度与专注模式列宽对齐、放大 `.cm-search` 查找替换控件并补充测试与全尺寸溢出/字号断言。
+- 发现/决定与取舍：
+  1. `assistant.css` 格式化时同步保留了 B2（`8bebfa8`）对 `.assistant-composer-actions` 的 `flex-wrap: wrap` 与紧凑侧栏 `width: 100%` 键位提示换行规则，并在 Node 下做去空白语义一致性校验通过。
+  2. `preferences-model.mjs` 抽离 `Preferences.jsx` 的偏好常量与 `normalizePreferences`/`loadPreferences`/`savePreferences`/`writingSurface`，`Preferences.jsx` 重新导出保持既有导入兼容。`writingDefaults.widthMode` 设为 `'limit'`，`loadPreferences` 在 `localStorage` 无 `studio.preferences.v1` 记录时默认返回 `'limit'`，而已有旧 JSON 缺 `widthMode` 时仍保留 `width === 680 ? 'window' : 'limit'` 回退规则；`writingSurface` 同时输出 `--writing-measure` 与 `--writing-focus-measure`（`'limit'` 取 `${width}px`，`'window'` 取 `${fontSize * 42}px`）。
+  3. `.writing-main` 提升 `--editor-gutter: clamp(16px, 3vw, 58px)`，使 `.is-focused .toolbar-inner` 与 `.is-focused .editor-column` 共享同一 `--writing-focus-measure` 宽度并左右齐平；`.cm-search` 保持 CodeMirror 原有换行流，控件字号升至 `--fs-ui`、`min-height: 30px`。
+- 实际变更：
+  - Commit 1：格式化 `app/renderer/assistant.css`。
+  - Commit 2：新建 `app/renderer/preferences-model.mjs`，更新 `app/renderer/Preferences.jsx`。
+  - Commit 3：修改 `app/renderer/preferences-model.mjs`、`app/renderer/app.css`、`app/renderer/writing.css`、`app/renderer/assistant.css`、`app/renderer/card-content.css`、`app/renderer/manuscript-directory.css`、`app/renderer/writing-resources.css`、`app/renderer/reference-bookshelf.css`、`app/renderer/reader-workspace.css`、`app/renderer/workspace-settings.css`、`app/renderer/expansion-dialog.css`、`app/renderer/book-cover.css`、`README.md`；新增 `tests/preferences-model.test.mjs`；更新 `.local/claude-frontend-ux/audit-screens.mjs`（增加 B5+ `sub12 === []` 与 `1460×930`/`980×760`/`880×600` 无横向溢出断言）。
+- 行为差异：新安装（无本地偏好）及“恢复默认”后默认“限制宽度 680px”，已有保存偏好不变；专注模式正文列与顶栏始终居中对齐可读列宽；全局最小可见字号不低于 12px，查找替换面板控件高度增至 30px。
+- 组件旧→新映射：`Preferences.jsx` 中的 `storageKey`、`themes`、`papers`、`rulings`、`fonts`、`readerSizes`、`writingWidths`、`writingDefaults`、`defaults`、`normalizePreferences`、`loadPreferences`、`savePreferences`、`writingSurface` 迁入 `app/renderer/preferences-model.mjs`，由 `Preferences.jsx` 重新导出。
+- 依赖、IPC、偏好存储键、权限变化：无（`studio.preferences.v1` 结构未新增字段，仅变更全新默认 `widthMode` 为 `'limit'`）。
+- 提交：`4839d1e`（`style: reformat assistant.css without semantic changes`）、`1d9d64c`（`refactor(ui): extract preference model for tests`）、Commit 3（`style(ui): type scale tokens, readable writing measure and focus column`，详见下一批补填）。
+- 验证：
+  - `npm run build && npm test`（2026-11-15 04:34）：PASS（109 / 109 通过，含新增 3 项 `preferences-model` 单测）。
+  - `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B5`（2026-11-15 04:34）：PASS（0 页面错误，`sub12=[]`，`overflowWide=[]`，`overflowNarrow=[]`，`overflowMin=[]`，截图位于 `.local/claude-frontend-ux/B5-1794688476117/`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-writing-workflow.mjs`（2026-11-15 04:35）：PASS（`.local/writing-workflow-c2G8UD`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-writing-regressions.mjs`（2026-11-15 04:36）：PASS（`.local/writing-regressions-IXZP0I`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-desktop.mjs`（2026-11-15 04:39）：PASS（`.local/desktop-qa-R4mLCd`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-visual.mjs`（2026-11-15 04:39）：PASS（`.local/visual-qa-A0QzYE`）。
+- 仍有问题与下一步：进入 B6（写作页结构：工具栏固定顺序与分组“更多”菜单、可收起左侧栏、统一遮罩与全局 Esc 优先级、历史正文预览、资料 Markdown 预览、扩写提示快捷选中）。
 
 ### 9.4 验证与截图台账
 
@@ -329,6 +353,7 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | B2 发送键、忙碌草拟与界面回归 | `npm test` (106/106) + `qa-assistant` + `qa-assistant-experience` + `qa-visual` + `audit-screens.mjs B2` | PASS | `.local/assistant-027/experience-1794686840349`、`.local/claude-frontend-ux/B2-1794686862068/` | `qa-assistant-responsiveness.mjs` 记为 `NOT_RUN`（需安装版 EXE 与正式库） |
 | B3 参考默认本地混合与跨页状态保持 | `npm test` (106/106) + `qa-workspace-ui` + `qa-retrieval` + `qa-visual` + `audit-screens.mjs B3` | PASS | `.local/workspace-ui-rL3ms1`、`.local/retrieval-qa-cby5VS`、`.local/claude-frontend-ux/B3-1794687067400/` | 仅合成/fixture 资料 |
 | B4 启动自动回到上次作品与崩溃/重启恢复 | `npm test` (106/106) + `qa-writing-workflow` + `qa-writing-regressions` + `qa-desktop` + `qa-expansion` + `audit-screens.mjs B4` | PASS | `.local/writing-workflow-BxVx5G`、`.local/writing-regressions-ahUT2q`、`.local/desktop-qa-lL5pam`、`.local/expansion-qa-T4YXLn`、`.local/claude-frontend-ux/B4-1794687783961/` | 仅合成资料与本地模拟扩写服务 |
+| B5 字号标尺、D1 默认宽度、专注列宽与无溢出 | `npm test` (109/109) + `qa-writing-workflow` + `qa-writing-regressions` + `qa-desktop` + `qa-visual` + `audit-screens.mjs B5` | PASS | `.local/writing-workflow-c2G8UD`、`.local/writing-regressions-IXZP0I`、`.local/desktop-qa-R4mLCd`、`.local/visual-qa-A0QzYE`、`.local/claude-frontend-ux/B5-1794688476117/` | 仅合成资料；`sub12=[]` 且 3 种窗口尺寸均无横向溢出 |
 
 ### 9.5 最终合并交接（停写时填写）
 
