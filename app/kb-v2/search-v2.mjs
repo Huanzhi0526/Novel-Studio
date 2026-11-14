@@ -242,7 +242,7 @@ export class SearchEngineV2 {
       tableJoin = `JOIN passage_chunks t ON t.id=v.unit_row JOIN works w ON w.work_id=t.work_id WHERE v.unit_type='passage' AND v.model_id=? AND ${wf.sql}`;
     }
 
-    const rows = this.db.prepare(`SELECT v.unit_row AS id, v.dimension, v.data FROM vectors v ${tableJoin}`).all(
+    const rows = this.db.prepare(`SELECT v.unit_row AS id, v.dimension, v.data FROM vectors v ${tableJoin}`).iterate(
       this.embedding.id, ...wf.args, ...extraArgs
     );
 
@@ -258,6 +258,7 @@ export class SearchEngineV2 {
       }
       if (bestCosine >= floor) {
         results.push({ id, cosine: bestCosine });
+        if (results.length > limit * 2) { results.sort((a,b)=>b.cosine-a.cosine); results.length=limit; }
       }
     }
     results.sort((a, b) => b.cosine - a.cosine || a.id - b.id);

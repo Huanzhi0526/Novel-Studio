@@ -303,3 +303,10 @@ AgyFlashClient新增separateAgyStatus：仅识别CLI的API error(attempt n)与Yo
 ## 按书创作助手（0.2.4）
 
 入口与文件边界见[创作助手](创作助手.md)。主服务app/main/assistant.mjs；界面app/renderer/Assistant.jsx；ACP会话扩展app/kb-v2/agy-client.mjs。测试npm test和node scripts/qa-assistant.mjs。工作区assistant-books需随正式资料完整备份，旧数据库ZIP不含此目录。助手专用MCP token仅进程内持有，不写交接或AGENTS。
+
+
+### 0.2.5 助手检索工作线程
+
+助手reference_search交给既有RetrievalEngineV2的fast/deep流程；工作线程运行只读SQLite、FTS与流式向量评分，模型请求通过线程消息委托主进程的既有检索配置客户端，embedding请求同样异步转交共享本机模型。检索AI与创作助手模型分别配置。检索失败本地回退必须明确显示。
+
+入口app/main/assistant-search.mjs和assistant-search-worker.mjs；打包必须额外生成worker的ESM bundle，并加入createRequire banner，否则yauzl等依赖会在安装版抛Dynamic require错误。节点回归不能替代打包版验收。`node scripts/qa-assistant-responsiveness.mjs <隔离EXE> <只读参考库路径>`使用本机模拟检索AI和合成向量检查大库检索时的页面切换/IPC，不发送正文到外部。

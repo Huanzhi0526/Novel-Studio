@@ -179,6 +179,8 @@ export class RetrievalEngineV2 {
     }
   }
 
+  completeForSearch(messages, options = {}, signal) { return this.#complete(messages, options, signal); }
+
   async #complete(messages, options = {}, signal) {
     if (this.customComplete) {
       return await this.customComplete(messages, options, signal);

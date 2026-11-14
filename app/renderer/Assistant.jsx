@@ -34,6 +34,7 @@ export function Assistant({active,openCard,openEvidence}) {
       <div role="log" aria-label="助手讨论记录">{state.messages.map((m,i)=><article key={i} style={{padding:'12px 0',borderBottom:'1px solid var(--border,#ddd)'}}><strong>{m.role==='user'?'你':'创作助手'}</strong><ReactMarkdown components={{a:({children,href})=><span>{children}（{href}）</span>}}>{m.text}</ReactMarkdown></article>)}</div>
       {busy&&<div role="status"><p>{state.activity||'正在思考…'}</p><ReactMarkdown>{state.partial||''}</ReactMarkdown></div>}
       {state.permissions?.map(p=><aside key={p.id} className="notice"><strong>反重力请求：{p.title}</strong><pre style={{whiteSpace:'pre-wrap'}}>{JSON.stringify(p.input,null,2)}</pre>{p.options.filter(o=>o.kind!=='allow_always').map(o=><button key={o.optionId} onClick={()=>api('assistant.permission',{workId,id:p.id,optionId:o.optionId}).catch(setError)}>{o.name}</button>)}<button onClick={()=>api('assistant.permission',{workId,id:p.id}).catch(setError)}>拒绝</button></aside>)}
+      {state.sources?.reason&&<p role="status">{state.sources.reason}</p>}
       {state.sources?.hits?.map((c,i)=><Card key={i} card={c} compact openCard={openCard} openEvidence={openEvidence}/>)}
       <label>讨论问题<textarea aria-label="助手问题" value={text} disabled={busy} onChange={e=>setText(e.target.value)} placeholder="这里想给男主设置一个困境或任务……" style={{width:'100%',minHeight:100}}/></label>
       <button disabled={busy||!text.trim()} onClick={run}>{busy?'正在思考与检索…':'发送'}</button>

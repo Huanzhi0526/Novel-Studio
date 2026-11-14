@@ -889,3 +889,13 @@ Automations工具已成功删除novel-studio，deleteStatus=deleted，不再自�
 - `fetch`通用词Bing RSS：HTTP200，10条item。完整网页读取不在首版范围。
 - `npm run package:windows`、隔离NSIS安装、`node scripts/qa-installed-smoke.mjs <EXE> 0.2.4`及安装版助手UI通过。`pwsh -NoProfile -File scripts/upgrade-windows.ps1 -Version 0.2.4 -IsolatedInstall .local/assistant-v024/install -RecordFile .local/assistant-v024/upgrade-receipt.json -GracefulClose`：正式升级与快捷方式目标隔离启动通过（显式使用真实LOCALAPPDATA）。
 - 升级前全资料与旧程序备份254文件摘要一致；既有正式资料全文件摘要比较见.local/assistant-v024/formal-verification.json。测试和截图在.local/assistant-v024，首版未做真实书籍建议质量人工验收。
+
+
+## 2026-11-15：0.2.5 助手发送后未响应修复
+
+- 只读真实86部参考库，以合成向量复现原同步passage扫描49,500ms，事件循环0次响应、RSS998MiB。未读取或重发用户原消息，未将正文发送给外部AI。
+- 修复为独立只读worker和流式向量读取/有限候选。用户澄清助手应委托检索AI，reference_search已接入现有RetrievalEngineV2 fast/deep；沿用检索来源/模型/凭证，助手负责结合本书资料汇总。AI及embedding请求通过消息异步交给既有客户端，SQLite读取计算不在Electron主线程进行。
+- `npm test`：90/90通过，新增只读worker、无模型回退、事件循环响应/取消，以及检索AI规划改写参与召回的测试。
+- 同库合成向量修复后检索12,411ms，485次心跳、最长间隔38.1ms、RSS102.5MiB；取消106.5ms。
+- 首次打包worker缺createRequire导致依赖加载失败；已补齐banner重新打包并重新隔离安装。最终`node scripts/qa-assistant-responsiveness.mjs .local/assistant-freeze-025/install/Novel Studio.exe <正式参考库路径>`：本机模拟检索AI两次调用（规划/筛选）、返回1卡，20次IPC最慢46.61ms，页面切换正常。只读库中的文本仅在本机处理；此项不代表真实模型建议质量验收。
+- 安装版启动与助手记忆编辑保存复验通过；升级前完整备份262文件摘要核验，目录.local/assistant-freeze-025/before-formal-20261115。最终升级及原有资料全文件核验以upgrade-receipt.json、formal-verification.json为准。证据及日志在.local/assistant-freeze-025。

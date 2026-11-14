@@ -1,3 +1,4 @@
+import { AssistantSearch } from './assistant-search.mjs';
 import { AssistantService } from './assistant.mjs';
 import { app, BrowserWindow, dialog, ipcMain, Menu, protocol, safeStorage, session, shell } from 'electron';
 import { randomUUID } from 'node:crypto';
@@ -128,7 +129,7 @@ async function modelOptions(preferVulkan = false) {
 }
 
 function register(writing, reference, imports, search, backup, expansion, retrieval) {
-  assistantService = new AssistantService(writing, useKbV2 ? search : null, dataDir);
+  assistantService = new AssistantService(writing, useKbV2 ? new AssistantSearch(search, {retrieval}) : null, dataDir);
   const handlers = new Map();
   for (const name of ['get','send','models','memory','reset','permission']) handlers.set('assistant.'+name, assistantService[name].bind(assistantService));
   const expose = (prefix, service, methods) => {

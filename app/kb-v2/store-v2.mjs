@@ -208,23 +208,24 @@ CREATE TABLE vectors (
 export class ReferenceStoreV2 {
   generation = 0;
 
-  constructor(filename) {
+  constructor(filename, { readOnly = false } = {}) {
+    this.readOnly = readOnly;
     this.filename = filename;
-    if (filename !== ':memory:') mkdirSync(dirname(filename), { recursive: true });
+    if (!readOnly && filename !== ':memory:') mkdirSync(dirname(filename), { recursive: true });
     this.open();
   }
 
   open() {
-    this.db = new DatabaseSync(this.filename, { enableForeignKeyConstraints: true });
+    this.db = new DatabaseSync(this.filename, { enableForeignKeyConstraints: true, readOnly: this.readOnly });
     try {
       this.db.exec('PRAGMA trusted_schema=OFF; PRAGMA busy_timeout=5000;');
       const { user_version: version } = this.db.prepare('PRAGMA user_version').get();
-      if (version === 0) {
+      if (version === 0 && !this.readOnly) {
         this.transaction(() => this.db.exec(schemaV2 + `PRAGMA user_version=${databaseVersionV2};`));
       } else if (version !== databaseVersionV2) {
         fail('DATABASE_VERSION_V2', `不受支持的参考库 v2 版本: ${version}`);
       }
-      this.db.exec('PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;');
+      if (!this.readOnly) this.db.exec('PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;');
     } catch (error) {
       this.close();
       throw error;
