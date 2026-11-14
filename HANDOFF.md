@@ -2,6 +2,17 @@
 
 工作区 `D:\Vibe Coding\Novel Studio`。2026-11-12初始化本地Git，0.1.19基线371be17保留；2026-11-13已合并至main并正式升级0.2.0。此前无Git仓库的记录属于历史。本文记录当前状态，早期施工及逐轮验收保存在 [项目历史](docs/project-history.md)。
 
+## 0.2.4 已上线：按书创作助手（2026-11-15）
+
+- 用户已授权按每书独立工作区、反重力ACP持续会话、AGENTS.md文件记忆方案开发。当前main，源码、锁文件与正式安装均0.2.4；桌面快捷方式目标已独立核验。
+- 新增创作助手导航：选择原创书、动态刷新Gemini模型、聊天、停止、编辑本书记忆、重开讨论。工作区在资料目录assistant-books/<work_id UTF8 hex>/，AGENTS.md为任务/记忆，chat.json为界面记录，session.json为CLI会话关联；文件仅本机，不入Git。
+- AssistantService通过仅绑定127.0.0.1且带随机Bearer令牌的MCP HTTP入口提供本书资料目录/单篇读取（含最新暂存稿，排除章节与删除资料）、本地混合参考检索、最多45段原文核证、记忆读写及Bing RSS辅助搜索。专用工具自动单次许可，其他工具须界面明确许可。原检索与扩写单轮行为不变。
+- 助手按本机agentCapabilities.loadSession尝试恢复CLI会话；不支持或加载失败时新建并提供最近讨论摘要。上下文压缩依赖CLI；AGENTS.md在新会话启动时显式提供，不依赖全局规则发现。未自行实现向量记忆或新Agent框架。
+- 自动记忆写入保留AGENTS.md.previous；正式原稿与参考库不写。新增助手文件目前不包含在既有数据库ZIP备份中，需另备份assistant-books目录。网络结果仅链接与摘要，不保证全文读取。
+- 隔离UI记忆编辑验收通过，截图.local/assistant-v024/ui/assistant.png。首次真实合成多工具试验150秒取消，已确认MCP读资料与检索权限请求；不把此写成整链成功。87项回归最终通过，含持续会话与原单轮隔离、跨书资料隔离、记忆保护、MCP认证及未知工具拒绝。后续真实Carbon low合成试验完成资料读取、参考检索、记忆写入与第二轮追问；进程重启后实测session/load接回原会话并答出测试口令。Bing RSS通用查询HTTP200/10条；没有发送真实小说或用户原创。
+- 安装器隔离安装、启动和助手页面记忆保存验收通过；正式全资料+旧程序备份.local/assistant-v024/before-formal-20261115共254文件逐个摘要核验。正式升级回执upgrade-receipt.json：0.2.3→0.2.4，资料指纹未变、快捷方式目标启动通过；全部既有资料摘要复核见formal-verification.json。旧发布件未改。发布件为release/NovelStudio-0.2.4-x64-Setup.exe、源码ZIP和SHA清单。完整说明见docs/创作助手.md。
+- 尚未证明：真实书籍创作建议质量、所有模型的工具遵从、不同CLI版本的恢复兼容性。用户下一步可选书、补充主旨偏好、实际讨论一个情节；不自动拆书或扫描正文。证据.local/assistant-v024。
+
 ## 0.2.3 已上线：Flash超时诊断与容量错误处理（2026-11-13）
 
 - 当前main，源码/锁文件/正式安装版本0.2.3。本次以固定合成句对照Flash ACP、Carbon ACP及CLI直接print：Flash上游明确返回UNAVAILABLE(code 503): No capacity available for model gemini-3.8-flash-low on the server；本机CLI日志同时记录attempt failed/retrying。Carbon同路径正常。不是参考库缺失、API Key设置或单字分词导致；不能把服务端容量不足说成已由本地代码消除。

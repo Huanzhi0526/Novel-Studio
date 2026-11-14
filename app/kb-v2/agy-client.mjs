@@ -144,7 +144,8 @@ export class AgyFlashClient {
     spawnImpl = spawn,
     initializeTimeoutMs = 45_000,
     sessionNewTimeoutMs = 90_000,
-    capacityGraceMs = 20_000
+    capacityGraceMs = 20_000,
+    assistant = null
   } = {}) {
     this.executable = executable || resolveAgyExecutable(env ?? process.env);
     this.cwd = cwd;
@@ -156,6 +157,7 @@ export class AgyFlashClient {
     this.initializeTimeoutMs = initializeTimeoutMs;
     this.sessionNewTimeoutMs = sessionNewTimeoutMs;
     this.capacityGraceMs = capacityGraceMs;
+    this.assistant = assistant;
     this.sessionStatus = new Map();
     this.child = null;
     this.seq = 0;
@@ -217,6 +219,7 @@ export class AgyFlashClient {
         if (msg.method === 'session/update') {
           const sid = msg.params?.sessionId;
           const upd = msg.params?.update;
+          this.assistant?.onUpdate?.(upd);
           if (sid && upd?.sessionUpdate === 'agent_message_chunk' && typeof upd?.content?.text === 'string') {
             const list = this.sessionChunks.get(sid);
             if (list) {
@@ -238,6 +241,10 @@ export class AgyFlashClient {
               }
             }
           }
+        } else if (msg.method === 'session/request_permission' && msg.id != null && this.assistant?.permission) {
+          Promise.resolve(this.assistant.permission(msg.params)).then(outcome => {
+            if (this.child === child) child.stdin.write(JSON.stringify({jsonrpc:'2.0',id:msg.id,result:{outcome}})+'\n');
+          }).catch(() => {});
         } else if (msg.method && msg.id != null) {
           // Pure text generation client: never grant tool execution permissions
           const response = msg.method === 'session/request_permission'
@@ -261,6 +268,7 @@ export class AgyFlashClient {
       this.readyPromise = null;
       this.warmupPromise = null;
       this.prewarmedSessionId = null;
+      this.assistantSessionId = null;
       for (const [id, p] of this.pending.entries()) {
         this.#clearPending(id, p);
         p.reject(err);
@@ -274,7 +282,7 @@ export class AgyFlashClient {
       protocolVersion: 1,
       clientInfo: { name: 'novel-studio-kb-v2', version: '0.1' },
       clientCapabilities: {}
-    }, { timeoutMs: this.initializeTimeoutMs, signal }).catch(err => {
+    }, { timeoutMs: this.initializeTimeoutMs, signal }).then(result => { this.agentCapabilities = result.agentCapabilities ?? {}; return result; }).catch(err => {
       if (this.child === child) this.#killCurrentChild();
       throw err;
     });
@@ -293,6 +301,7 @@ export class AgyFlashClient {
     this.readyPromise = null;
     this.warmupPromise = null;
     this.prewarmedSessionId = null;
+    this.assistantSessionId = null;
     for (const state of this.sessionStatus.values()) clearTimeout(state.timer);
     for (const [id, p] of this.pending.entries()) {
       this.#clearPending(id, p);
@@ -353,11 +362,14 @@ export class AgyFlashClient {
   async #createConfiguredSession(signal) {
     await this.#ensureStarted(signal);
     try {
-      const { sessionId } = await this.#rpc(
-        'session/new',
-        { cwd: this.cwd, mcpServers: [] },
-        { timeoutMs: this.sessionNewTimeoutMs, signal, resetOnTimeout: true }
-      );
+      const params = { cwd: this.cwd, mcpServers: this.assistant?.mcpServers ?? [] };
+      let sessionId;
+      if (this.assistant?.resumeId && this.agentCapabilities.loadSession) {
+        try { await this.#rpc('session/load', { ...params, sessionId: this.assistant.resumeId }, {timeoutMs:this.sessionNewTimeoutMs,signal}); sessionId=this.assistant.resumeId; }
+        catch(error) { if(signal?.aborted) throw error; this.assistant.resumeId=null; }
+      }
+      if(!sessionId) ({sessionId}=await this.#rpc('session/new',params,{timeoutMs:this.sessionNewTimeoutMs,signal,resetOnTimeout:true}));
+      if(this.assistant) { this.assistant.resumeId=sessionId; this.assistant.onSession?.(sessionId); }
       await this.#rpc('session/set_model', { sessionId, modelId: this.modelId }, { timeoutMs: 15_000, signal, resetOnTimeout: true });
       // Some catalogue entries (e.g. Orchestrator) expose no effort suffix.
       if (this.thoughtLevel) {
@@ -406,7 +418,7 @@ export class AgyFlashClient {
       await this.warmupPromise.catch(() => {});
     }
     signal?.throwIfAborted();
-    let sessionId = this.prewarmedSessionId;
+    let sessionId = this.assistantSessionId ?? this.prewarmedSessionId;
     if (sessionId && this.child && !this.child.killed) {
       this.prewarmedSessionId = null;
     } else {
@@ -414,10 +426,11 @@ export class AgyFlashClient {
       sessionId = await this.#createConfiguredSession(signal);
     }
 
+    if (this.assistant) this.assistantSessionId = sessionId;
     this.sessionChunks.set(sessionId, []);
     this.sessionStatus.set(sessionId, { capacity: false, timer: null });
     try {
-      const fullPrompt = [
+      const fullPrompt = this.assistant ? promptString : [
         this.outputMode === 'text'
           ? '【你处于小说局部补写模式。严禁调用工具、读取文件或执行命令。只根据输入写出缺口里的新增正文，不输出JSON、代码围栏或解释；连接测试则按测试句要求输出。】'
           : '【重要执行要求：你处于纯文本分析模式，严禁调用任何工具、读取文件或执行终端命令。直接依据下方输入文本输出要求的纯 JSON 结果，不要输出任何额外说明文字。】',

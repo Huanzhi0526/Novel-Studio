@@ -1,3 +1,4 @@
+import { AssistantService } from './assistant.mjs';
 import { app, BrowserWindow, dialog, ipcMain, Menu, protocol, safeStorage, session, shell } from 'electron';
 import { randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync } from 'node:fs';
@@ -31,6 +32,7 @@ let store;
 let storeV2;
 let agyClient;
 let expansionProvider;
+let assistantService;
 let useKbV2 = false;
 let embedding;
 let waitingForClose = false;
@@ -126,7 +128,9 @@ async function modelOptions(preferVulkan = false) {
 }
 
 function register(writing, reference, imports, search, backup, expansion, retrieval) {
+  assistantService = new AssistantService(writing, useKbV2 ? search : null, dataDir);
   const handlers = new Map();
+  for (const name of ['get','send','models','memory','reset','permission']) handlers.set('assistant.'+name, assistantService[name].bind(assistantService));
   const expose = (prefix, service, methods) => {
     for (const name of methods) handlers.set(`${prefix}.${name}`, service[name].bind(service));
   };
@@ -236,7 +240,7 @@ function register(writing, reference, imports, search, backup, expansion, retrie
     return true;
   });
   const expansionRequests = new Set();
-  const cancellable = new Set(['import.inspect', 'search.query', 'search.prepare', 'expand.generate', 'expand.config.test', 'retrieval.config.test', 'retrieval.provider.listModels', 'retrieval.provider.test', 'expand.provider.listModels', 'expand.provider.test']);
+  const cancellable = new Set(['assistant.send','import.inspect', 'search.query', 'search.prepare', 'expand.generate', 'expand.config.test', 'retrieval.config.test', 'retrieval.provider.listModels', 'retrieval.provider.test', 'expand.provider.listModels', 'expand.provider.test']);
   ipcMain.handle('novel:invoke', async (event, method, args) => {
     if (event.sender !== window?.webContents || event.senderFrame?.url !== appUrl || !handlers.has(method)) {
       return { ok: false, error: { code: 'IPC_METHOD', message: '操作不可用' } };
@@ -357,6 +361,7 @@ if (!app.requestSingleInstanceLock()) {
     void embedding?.close();
     agyClient?.close();
     expansionProvider?.close();
+    assistantService?.close();
     storeV2?.close();
     store?.close();
   });

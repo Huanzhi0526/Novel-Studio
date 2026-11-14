@@ -1,3 +1,4 @@
+import { Assistant } from './Assistant.jsx';
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { api, ErrorMessage, Icon } from './ui.jsx';
@@ -181,6 +182,7 @@ function App() {
   const tabs = [
     ['writing', '原创写作', 'edit'],
     ['reference', '参考库', 'library'],
+    ['assistant', '创作助手', 'book'],
     ['settings', '资料与设置', 'settings']
   ];
   const reading = Boolean(reader);
@@ -218,6 +220,7 @@ function App() {
         <Reference works={works} refresh={refresh} conversation={libraryChat} openCard={setCard} openEvidence={openEvidence} openReader={openReader}
           kbV2={Boolean(info?.kbV2)} onSettings={() => changeView('settings', 'retrieval-settings')} />
       </main>}
+      <main className="workspace-main" hidden={view !== 'assistant'}><Assistant active={view === 'assistant'} openCard={setCard} openEvidence={openEvidence} /></main>
       {view === 'settings' && <main className="workspace-main settings-main">
         <Settings info={info} preferences={preferences} updatePreferences={updatePreferences} settingsTarget={settingsTarget} restored={async () => {
           writingChat.clear();

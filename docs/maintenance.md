@@ -298,3 +298,8 @@ AI辅助检索设置新增模型来源：auto（优先既有API，无配置时�
 AgyFlashClient新增separateAgyStatus：仅识别CLI的API error(attempt n)与Your previous turn状态行，普通正文中的警告符号保留。503/No capacity进入20秒短暂恢复窗口，无有效模型文本时以AGY_CAPACITY及upstreamStatus=503结束；429/RESOURCE_EXHAUSTED以AGY_RATE_LIMIT提示。窗口内恢复且ACP end_turn完成，返回清理后的实际JSON/正文，不把警告写进卡片或原创预览。非end_turn的部分输出以AGY_INCOMPLETE拒绝。通用超时以实际modelId及RPC阶段报告，避免Carbon等模型也误称Flash。参数capacityGraceMs仅用于独立测试注入，默认20,000ms。
 
 本次本机CLI直接print与ACP均复现Flash-low的503，日志为No capacity available for model；Carbon同一路径成功。外部仓库类似报告仅作旁证，本机trace与CLI日志才是当前诊断依据。不更新CLI、不更换账号、不改正式模型选择、不自动重发整库或切模型。服务端容量波动仍由上游决定。
+
+
+## 按书创作助手（0.2.4）
+
+入口与文件边界见[创作助手](创作助手.md)。主服务app/main/assistant.mjs；界面app/renderer/Assistant.jsx；ACP会话扩展app/kb-v2/agy-client.mjs。测试npm test和node scripts/qa-assistant.mjs。工作区assistant-books需随正式资料完整备份，旧数据库ZIP不含此目录。助手专用MCP token仅进程内持有，不写交接或AGENTS。

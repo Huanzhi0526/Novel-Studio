@@ -877,3 +877,15 @@ Automations工具已成功删除novel-studio，deleteStatus=deleted，不再自�
 - 本机证据`.local/flash-diagnosis-023`：修复前model-summary/trace、direct-print.json；修复后after/；synthetic-retrieval/result.json；tests.txt、ui/report.json及备份/升级/发布回执。CLI默认日志仅只读筛查No capacity等诊断行，未读取或导出凭证。网上同类报告仅旁证，根因以本机真实回执为准。
 
 实际命令：本轮probe.mjs对照两种ACP及CLI --print（固定合成JSON句），只读筛查本机CLI日志No capacity/attempt failed；node --test tests/agy-status.test.mjs（5/5）；沙箱外npm test（83/83）；probe-after.mjs复验；synthetic-retrieval.mjs内存虚构两段正文完整快速检索；npm run package:windows及/S /NOSHORTCUT隔离安装；scripts/qa-agy-model-settings.mjs <隔离EXE> .local/flash-diagnosis-023/ui --real-test；backup-formal.ps1完整备份、scripts/upgrade-windows.ps1 -Version 0.2.3 -IsolatedInstall ... -GracefulClose；逐文件SHA复核。仅修桥接和诊断，不重建向量，不改生产模型配置。
+
+
+## 2026-11-15：0.2.4 创作助手
+
+用户授权按书工作区、AGENTS.md记忆与反重力持续会话方案。实现与边界见[创作助手](创作助手.md)。本轮没有读取/外传正式原创或真实参考小说作外部验收。
+
+- `npm test`：87/87通过；首轮沙箱运行的模拟接口网络用例受限，按相同命令在允许本机端口的环境复验全部通过。
+- `node scripts/qa-assistant.mjs <隔离EXE>`：助手导航、选择原创书、编辑/保存记忆、输入问题及截图通过。
+- 完全合成的真实Carbon low ACP：资料读取、模拟参考搜索、AGENTS.md写入、连续两轮均通过。重启另进程，捕获的方法顺序initialize/session/load/session/set_model/session/set_config_option/session/prompt，返回正确测试口令。首次150秒中止样本仍保留，不以它冒充通过。
+- `fetch`通用词Bing RSS：HTTP200，10条item。完整网页读取不在首版范围。
+- `npm run package:windows`、隔离NSIS安装、`node scripts/qa-installed-smoke.mjs <EXE> 0.2.4`及安装版助手UI通过。`pwsh -NoProfile -File scripts/upgrade-windows.ps1 -Version 0.2.4 -IsolatedInstall .local/assistant-v024/install -RecordFile .local/assistant-v024/upgrade-receipt.json -GracefulClose`：正式升级与快捷方式目标隔离启动通过（显式使用真实LOCALAPPDATA）。
+- 升级前全资料与旧程序备份254文件摘要一致；既有正式资料全文件摘要比较见.local/assistant-v024/formal-verification.json。测试和截图在.local/assistant-v024，首版未做真实书籍建议质量人工验收。
