@@ -168,7 +168,8 @@
 .writing-resources .trash-items { max-height: min(100px, 18vh); }
 .writing-resources .trash-list { background: var(--panel); }
 
-.resource-preview pre {
+.resource-preview pre,
+.resource-markdown {
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
@@ -177,8 +178,18 @@
   color: var(--ink);
   font: inherit;
   line-height: 1.75;
-  white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+.resource-preview pre { white-space: pre-wrap; }
+.resource-markdown :first-child { margin-top: 0; }
+.resource-markdown :last-child { margin-bottom: 0; }
+.resource-markdown h1 { font-size: var(--fs-h2); margin: 12px 0 6px; }
+.resource-markdown h2 { font-size: var(--fs-h3); margin: 10px 0 5px; }
+.resource-markdown h3, .resource-markdown h4 { font-size: var(--fs-body); margin: 8px 0 4px; }
+.resource-markdown p, .resource-markdown ul, .resource-markdown ol, .resource-markdown blockquote { margin: 0 0 8px; }
+.resource-markdown ul, .resource-markdown ol { padding-left: 18px; }
+.resource-markdown blockquote { padding-left: 10px; border-left: 2px solid var(--border); color: var(--muted); }
+.resource-markdown hr { border: 0; border-top: 1px solid var(--border); margin: 10px 0; }
 
-.resource-preview pre:focus-visible { outline: 1px solid var(--accent); outline-offset: -2px; }
+.resource-preview pre:focus-visible,
+.resource-markdown:focus-visible { outline: 1px solid var(--accent); outline-offset: -2px; }

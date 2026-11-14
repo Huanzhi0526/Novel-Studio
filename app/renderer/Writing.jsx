@@ -9,7 +9,7 @@ import { OriginalBookshelf } from './OriginalBookshelf.jsx';
 import { WritingPreferences } from './Preferences.jsx';
 import { WritingResources, WritingResourceTools } from './WritingResources.jsx';
 import { ExpansionDialog } from './ExpansionDialog.jsx';
-import { expansionSelection } from '../shared/expansion-selection.mjs';
+import { enclosingExpansionPair, expansionSelection } from '../shared/expansion-selection.mjs';
 import { orderedChapters } from './writing-order.mjs';
 import { matchingPosition, readWritingSession, rememberPosition, toggleCollapsedVolume, writeWritingSession } from './writing-session.mjs';
 import { Icon } from './ui.jsx';
@@ -33,6 +33,10 @@ const searchPhrases = {
   close: '关闭查找', 'current match': '当前匹配', 'on line': '行'
 };
 const wordCount = text => (text.match(/[\p{L}\p{N}]/gu) || []).length;
+function formatHistoryDelta(delta) {
+  if (delta === 0) return '±0';
+  return `${delta > 0 ? '+' : '−'}${Math.abs(delta)}`;
+}
 function editorExpansionSelection(state) {
   const { from, to, empty } = state.selection.main;
   if (empty || state.selection.ranges.length !== 1) return null;
@@ -40,6 +44,14 @@ function editorExpansionSelection(state) {
   const end = Math.min(state.doc.length, to + 1);
   const match = expansionSelection(state.sliceDoc(start, end), from - start, to - start);
   return match && { ...match, from: match.from + start, to: match.to + start };
+}
+function cursorExpansionPrompt(state, kind) {
+  if (kind !== 'chapter' || state.selection.ranges.length !== 1) return null;
+  const { empty, head } = state.selection.main;
+  if (!empty) return null;
+  const line = state.doc.lineAt(head);
+  const match = enclosingExpansionPair(line.text, head - line.from);
+  return match && { ...match, from: line.from + match.from, to: line.from + match.to };
 }
 
 function tidyParagraphs(view) {
@@ -164,12 +176,15 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
   const [doc, setDoc] = useState(null);
   const [marks, setMarks] = useState([]);
   const [historyItems, setHistoryItems] = useState([]);
+  const [historyPreview, setHistoryPreview] = useState(null);
+  const [historyLimit, setHistoryLimit] = useState(20);
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
   const [selectedText, setSelectedText] = useState('');
   const [canExpand, setCanExpand] = useState(false);
+  const [enclosingPrompt, setEnclosingPrompt] = useState(null);
   const [expansion, setExpansion] = useState(null);
   const expansionReview = expansion?.review;
   const isPreviewing = Boolean(expansionReview);
@@ -393,6 +408,8 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
   useEffect(() => {
     if (toolPanel !== 'history' || !activeId) return;
     let active = true;
+    setHistoryPreview(null);
+    setHistoryLimit(20);
     async function loadHistory() {
       try {
         await doSave(false);
@@ -441,10 +458,13 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
     setDoc(opened);
     setSelectedText('');
     setCanExpand(false);
+    setEnclosingPrompt(null);
     setExpansion(null);
     setLiveWordCount(wordCount(textRef.current));
     setMarks(opened?.marks ?? []);
     setHistoryItems([]);
+    setHistoryPreview(null);
+    setHistoryLimit(20);
     setUndoState({ undo: false, redo: false });
     setFormatStatus('');
     setError('');
@@ -516,7 +536,9 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
           if (update.selectionSet || update.docChanged) {
             const { from, to } = update.state.selection.main;
             setSelectedText(update.state.sliceDoc(from, to));
-            setCanExpand(doc.kind === 'chapter' && Boolean(editorExpansionSelection(update.state)));
+            const expand = doc.kind === 'chapter' && Boolean(editorExpansionSelection(update.state));
+            setCanExpand(expand);
+            setEnclosingPrompt(expand ? null : cursorExpansionPrompt(update.state, doc.kind));
             schedulePosition();
           }
         }), EditorView.domEventHandlers({
@@ -528,7 +550,9 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
     if (focus) view.focus();
     const selection = state.selection.main;
     setSelectedText(state.sliceDoc(selection.from, selection.to));
-    setCanExpand(doc.kind === 'chapter' && Boolean(editorExpansionSelection(state)));
+    const expand = doc.kind === 'chapter' && Boolean(editorExpansionSelection(state));
+    setCanExpand(expand);
+    setEnclosingPrompt(expand ? null : cursorExpansionPrompt(state, doc.kind));
     let frame;
     if (jump || position) {
       initializingView.current = view;
@@ -551,6 +575,15 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
     const view = viewRef.current;
     if (view) view.dispatch({ effects: markCompartment.current.reconfigure(markDecorations(marks, edits.current)) });
   }, [marks]);
+
+  function selectEnclosingPrompt() {
+    const view = viewRef.current;
+    if (!view || !enclosingPrompt || doc?.kind !== 'chapter' || transition.current || isPreviewing) return;
+    const { from, to } = enclosingPrompt;
+    if (to > view.state.doc.length) return;
+    view.dispatch({ selection: { anchor: from, head: to }, scrollIntoView: true });
+    view.focus();
+  }
 
   function openExpansion() {
     const view = viewRef.current;
@@ -948,7 +981,32 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
     </section>
     : toolPanel === 'marks'
     ? <section className="mark-panel"><div className="mark-create"><label>标记类型<select value={markType} onChange={e=>setMarkType(e.target.value)}>{MARK_TYPES.map(x=><option key={x.value} value={x.value}>{x.label}</option>)}</select></label><input aria-label="标记备注" placeholder="备注（可选）" value={markNote} onChange={e=>setMarkNote(e.target.value)}/><button className="primary-button" disabled={!selectedText} onClick={()=>addMark()}>标记所选文字</button><small>{selectedText?'已选中文字可创建标记':'在正文中选中文字后创建标记'}</small></div><ul className="mark-list">{marks.map(m=><li key={m.id} className={m.invalid?'invalid':''}><button className="mark-jump" disabled={m.invalid} title={m.invalid?'标记已失效，请重新选择定位':'跳转到标记位置'} onClick={()=>jumpToMark(m.id)}><b>{MARK_TYPES.find(x=>x.value===m.type)?.label||m.type}{m.invalid?' · 失效':''}</b><span>{m.quote||m.note||'定位标记'}</span></button>{m.invalid&&<button className="quiet-button" onClick={()=>{const v=viewRef.current;if(v){const sel=v.state.selection.main;if(!sel.empty)addMark(m.id);else{setError('请先在正文中重新选中这条标记对应的文字。');v.focus();}}}}>重选</button>}<button className="quiet-button" aria-label="删除标记" onClick={()=>deleteMark(m.id)}>×</button></li>)}</ul></section>
-    : <section className="history-panel">{historyItems.length?historyItems.slice(0,20).map(item=><div className="history-item" key={item.revision}><span>{new Date(item.saved).toLocaleString()}</span><button onClick={()=>restoreHistory(item)}>恢复此版本</button></div>):<p className="panel-empty">当前章节还没有历史版本。</p>}</section>;
+    : <section className="history-panel">
+      {historyPreview ? <div className="history-preview-view">
+        <div className="history-preview-bar">
+          <button type="button" onClick={() => setHistoryPreview(null)}>返回列表</button>
+          <button type="button" className="history-restore-button" onClick={() => restoreHistory(historyPreview)}>恢复此版本</button>
+        </div>
+        <div className="history-preview-meta">
+          <span>{new Date(historyPreview.saved).toLocaleString()}</span>
+          <span>{wordCount(historyPreview.text).toLocaleString()} 字（{formatHistoryDelta(wordCount(historyPreview.text) - liveWordCount)} 字）</span>
+        </div>
+        <pre className="history-preview-body" tabIndex={0} aria-label="历史版本正文预览">{historyPreview.text || '（此版本为空白）'}</pre>
+      </div> : historyItems.length ? <>
+        <ul className="history-list">{historyItems.slice(0, historyLimit).map(item => {
+          const words = wordCount(item.text);
+          const delta = words - liveWordCount;
+          return <li key={item.revision}>
+            <button type="button" className="history-item-button" onClick={() => setHistoryPreview(item)}>
+              <span className="history-item-time">{new Date(item.saved).toLocaleString()}</span>
+              <span className="history-item-stats">{words.toLocaleString()} 字 · {formatHistoryDelta(delta)} 字</span>
+            </button>
+          </li>;
+        })}</ul>
+        {historyItems.length > historyLimit && <button type="button" className="history-more"
+          onClick={() => setHistoryLimit(limit => limit + 20)}>显示更多（剩余 {historyItems.length - historyLimit} 条）</button>}
+      </> : <p className="panel-empty">当前章节还没有历史版本。</p>}
+    </section>;
   const drawer = !focusMode && toolPanel && <aside ref={drawerRef} className={`writing-drawer ${dockPanel?'is-docked':''} ${isReference?'is-reference':''}`}
     aria-label={panelTitle} onKeyDown={event => {
       if (event.key === 'Escape' && !event.nativeEvent.isComposing && !event.defaultPrevented) {
@@ -960,11 +1018,18 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
       <><header className="drawer-head"><strong>{panelTitle}</strong><button className="icon-button" aria-label="关闭侧栏" onClick={() => closeToolPanel(true)}>×</button></header><div className="drawer-content">{panelContent}</div></>}
   </aside>;
   const inlineRail = railTarget ? null : rail;
-  const expandButton = doc?.kind === 'chapter' && <button type="button"
-    className={canExpand ? 'writing-expand-button is-ready' : 'writing-expand-button'}
-    disabled={!canExpand || transitioning || isPreviewing}
-    title={canExpand ? '预览所选括号提示的扩写' : '先选中一对括号中的提示'}
-    onMouseDown={event => event.preventDefault()} onClick={openExpansion}>AI 扩写</button>;
+  const expandButton = doc?.kind === 'chapter' && <>
+    <button type="button"
+      className={canExpand ? 'writing-expand-button is-ready' : 'writing-expand-button'}
+      disabled={!canExpand || transitioning || isPreviewing}
+      title={canExpand ? '预览所选括号提示的扩写' : '先选中一对括号中的提示'}
+      onMouseDown={event => event.preventDefault()} onClick={openExpansion}>AI 扩写</button>
+    {!canExpand && !isPreviewing && enclosingPrompt && <button type="button"
+      className="writing-select-prompt-button"
+      disabled={transitioning}
+      title={`选中括号内提示（${enclosingPrompt.prompt.slice(0, 24)}）`}
+      onMouseDown={event => event.preventDefault()} onClick={selectEnclosingPrompt}>选中提示</button>}
+  </>;
   const breadcrumbText = focusMode
     ? '专注写作'
     : `${activeWork?.title ?? ''}${doc ? ` / ${activeVolume?.title ?? WORK_SECTIONS[doc.kind].label}` : ''}`;

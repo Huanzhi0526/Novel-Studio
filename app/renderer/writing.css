@@ -103,7 +103,9 @@
 .toolbar-buttons button i { display: inline-grid; min-width: 18px; height: 18px; place-items: center; margin-left: 4px; border-radius: 50%; background: var(--accent-soft); color: var(--ink); font-size: var(--fs-meta); font-style: normal; }
 .toolbar-buttons button[aria-pressed=true] { background: var(--accent-soft); color: var(--accent); }
 .toolbar-buttons .writing-expand-button.is-ready,
-.writing-focus-actions .writing-expand-button.is-ready { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); color: var(--accent); font-weight: 600; }
+.writing-focus-actions .writing-expand-button.is-ready,
+.toolbar-buttons .writing-select-prompt-button,
+.writing-focus-actions .writing-select-prompt-button { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); color: var(--accent); font-weight: 600; }
 .toolbar-buttons .writing-settings-button { font-weight: 600; color: var(--ink); }
 .toolbar-buttons .writing-focus-button { border-color: var(--border); color: var(--ink); }
 .editor-host .cm-panels { background: var(--panel); color: var(--ink); }
@@ -205,9 +207,19 @@
 .mark-jump b { color: var(--ink); font-size: var(--fs-ui); font-weight: 600; }
 .mark-jump span { overflow: hidden; color: var(--muted); font-size: var(--fs-meta); text-overflow: ellipsis; white-space: nowrap; }
 .quiet-button { min-height: 26px !important; padding: 3px 6px !important; color: var(--muted) !important; font-size: var(--fs-meta) !important; }
-.history-panel { padding: 8px 13px; }
-.history-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 1px; border-bottom: 1px solid var(--border); color: var(--muted); font-size: var(--fs-meta); }
-.history-item button { min-height: 26px; color: var(--ink); font-size: var(--fs-meta); }
+.history-panel { padding: 10px 13px; display: grid; gap: 8px; }
+.history-list { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.history-item-button { width: 100%; display: grid; gap: 2px; justify-content: stretch; padding: 7px 9px; border-color: var(--border); background: var(--panel); text-align: left; }
+.history-item-button:hover:not(:disabled) { background: var(--hover); }
+.history-item-time { color: var(--ink); font-size: var(--fs-ui); font-weight: 500; }
+.history-item-stats { color: var(--muted); font-size: var(--fs-meta); font-variant-numeric: tabular-nums; }
+.history-more { width: 100%; border-color: var(--border); color: var(--accent); font-size: var(--fs-ui); }
+.history-preview-view { display: grid; gap: 8px; }
+.history-preview-bar { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.history-preview-bar button { border-color: var(--border); font-size: var(--fs-ui); }
+.history-preview-bar .history-restore-button { background: var(--accent); border-color: var(--accent); color: var(--panel); font-weight: 600; }
+.history-preview-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 10px; color: var(--muted); font-size: var(--fs-meta); font-variant-numeric: tabular-nums; }
+.history-preview-body { margin: 0; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--ink); font: inherit; font-size: var(--fs-ui); line-height: var(--lh-body); max-height: calc(100vh - 210px); overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
 .panel-empty { padding: 16px 4px; color: var(--muted); font-size: var(--fs-meta); }
 .is-focused .writing-toolbar { border: 0; }
 .is-focused .toolbar-inner {

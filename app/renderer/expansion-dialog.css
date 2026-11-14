@@ -25,6 +25,11 @@
 .expansion-error { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; color: #a0353c; font-size: var(--fs-ui); }
 .expansion-error span { overflow-wrap: anywhere; }
 .expansion-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.expansion-actions .primary-button { background: var(--accent); border-color: var(--accent); color: var(--panel); font-weight: 600; }
+.expansion-actions .primary-button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent) 84%, white);
+  border-color: color-mix(in srgb, var(--accent) 84%, white);
+}
 .writing-focus-actions { display: flex; align-items: center; gap: 6px; }
 
 .expansion-inline-preview {

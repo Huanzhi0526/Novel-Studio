@@ -196,19 +196,19 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | P1-5 | 创作助手忙碌时禁用输入框，回合完成后无条件清空草稿 | 等待期间无法记录下一句构思，或写了一半被清空 | 忙碌时仅禁用发送按钮并忽略 Enter；仅当草稿仍等于本轮已发文本时清空，失败保留草稿 | 已完成（`8bebfa8`） |
 | P1-6 | 助手 controller 常驻每秒轮询 `assistant.get` | 空闲时持续 IPC 与重渲染开销 | 仅在 `pending \|\| state?.busy` 时轮询，切换作品/进入视图/发送结束时单次刷新，消息列表 `React.memo` | 已完成（`8bebfa8`） |
 | P1-7 | KB v2 检索区显示九类“类别”下拉，实际仅作 3 组侧重加权且名称与卡片标签不一致 | 筛选预期偏差 | v2 改为“侧重”（不限 / 人物与设定 / 剧情场次 / 原文描写），同步设置页 v2 说明文案 | 已完成（`bd99363`） |
-| P2-1 | 章节历史仅显示保存时间，点击即弹恢复确认 | 无法先核对版本内容与字数差异 | 列表展示字数与差值，点击先在抽屉内只读预览正文，再决定恢复或返回列表 | 未开始 |
-| P2-2 | 写作工具栏两端分散、开关抽屉时按钮位移、缺少按下态与分组收纳 | 肌肉记忆受干扰、窄窗拥挤 | 工具栏左对齐固定顺序，合并“更多”分组菜单，标记/历史补 `aria-pressed`，窄容器收纳次要项 | 未开始 |
-| P2-3 | 左侧栏不可折叠；窄窗下普通抽屉无遮罩且 Esc 需焦点在抽屉内才生效 | 窄窗正文空间局促，关闭抽屉手势不一致 | 左侧栏支持折叠为 56px 图标条（持久于 `writingSession.layout.railCollapsed`）；非停靠抽屉统一遮罩与全局 Esc 优先级 | 未开始 |
+| P2-1 | 章节历史仅显示保存时间，点击即弹恢复确认 | 无法先核对版本内容与字数差异 | 列表展示字数与差值，点击先在抽屉内只读预览正文，再决定恢复或返回列表 | 已完成（B6，见 §9.3） |
+| P2-2 | 写作工具栏两端分散、开关抽屉时按钮位移、缺少按下态与分组收纳 | 肌肉记忆受干扰、窄窗拥挤 | 工具栏左对齐固定顺序，合并“更多”分组菜单，标记/历史补 `aria-pressed`，窄容器收纳次要项 | 已完成（`e906e26`） |
+| P2-3 | 左侧栏不可折叠；窄窗下普通抽屉无遮罩且 Esc 需焦点在抽屉内才生效 | 窄窗正文空间局促，关闭抽屉手势不一致 | 左侧栏支持折叠为 56px 图标条（持久于 `writingSession.layout.railCollapsed`）；非停靠抽屉统一遮罩与全局 Esc 优先级 | 已完成（`56019d2`） |
 | P2-4 | 设置页模型来源与兼容 API 混排、两个保存按钮易混、缺少当前生效摘要、顶栏标题重复 | 不易判断当前实际生效的模型来源 | 顶部增加生效摘要，拆分为“模型来源”与“兼容 API 配置”卡片，去重顶栏，补创作助手跳转说明 | 未开始 |
 | P2-5 | 助手记忆在狭小下拉浮层编辑，“载入最新记忆”无未保存保护，“重新开始讨论”用原生 confirm 且紧挨发送 | 长记忆难编辑、易误覆盖或误清空讨论 | 改为右侧抽屉/面板并检测未保存修改；新增原生 `<dialog>` 确认框 `ConfirmDialog`；重开讨论移入 `⋯` 菜单 | 未开始 |
-| P2-6 | 写作右侧大纲/角色/设定速查预览直接显示 Markdown 源码 | 标题与列表符号干扰对照阅读 | 使用受限白名单 `react-markdown`（`skipHtml`）渲染资料预览，章节对照保持纯文本 | 未开始 |
+| P2-6 | 写作右侧大纲/角色/设定速查预览直接显示 Markdown 源码 | 标题与列表符号干扰对照阅读 | 使用受限白名单 `react-markdown`（`skipHtml`）渲染资料预览，章节对照保持纯文本 | 已完成（B6，见 §9.3） |
 | P2-7 | 卡片弹窗标题写“知识卡”重复层级、证据全折叠、紧凑卡“查看完整卡片”像小标题且易被遮罩压住 | 查卡与核证原文多一步操作 | 弹窗直接以卡名为标题、眉题写作品与类别，默认展开前 3 条证据；紧凑卡底部右侧改为“展开全文 →” | 未开始 |
 | P2-8 | 写作 364px 侧栏中 KB v2 模式按钮与“接口设置”挤压换行，两条外传说明占高 | 侧栏检索视野局促 | 侧栏模式按钮显示短名（保留完整可访问名称/title），接口设置改图标按钮，合并外传提示 | 未开始 |
 | P2-9（D2） | 参考检索 Enter 发送，创作助手 Ctrl+Enter 发送 | 跨面板输入习惯割裂 | 统一 `sendIntent`：Enter 发送、Shift+Enter 换行、Ctrl/⌘+Enter 兼容发送、IME 组字保护 | 已完成（`8bebfa8`） |
 | P2-10（D3） | 参考检索默认 `fast`（AI），且切页后参考库模式与已选作品重置 | 每次打开默认指向外传模式，跨页对照丢失位置 | v2 默认 `local`（会话内保留切换，重启回 `local`）；App 层保持参考库视图状态与书架滚动位置 | 已完成（`afbe4fe`） |
 | P2-11 | 参考库、创作助手、设置页顶栏高度与标题层级不一致 | 跨页切换跳跃感明显 | 提取 `PageHeader` 统一 48px 页头，压缩助手页头，去除设置页重复顶栏 | 未开始 |
 | P2-12 | CodeMirror 查找替换面板 12px 紧凑排布 | 查找框输入局促 | `.cm-search` 控件统一 `--fs-ui`、30px 最小高度与语义色变量 | 已完成（B5，见 §9.3） |
-| P2-13 | 光标在括号提示内未全选时“AI 扩写”直接禁用，弹窗“生成预览”无主按钮样式 | 扩写触发门槛不直观 | 新增只读辅助函数 `enclosingExpansionPair`，提供“选中提示”快捷选中按钮；“生成预览”补主按钮样式 | 未开始 |
+| P2-13 | 光标在括号提示内未全选时“AI 扩写”直接禁用，弹窗“生成预览”无主按钮样式 | 扩写触发门槛不直观 | 新增只读辅助函数 `enclosingExpansionPair`，提供“选中提示”快捷选中按钮；“生成预览”补主按钮样式 | 已完成（B6，见 §9.3） |
 | P2-14（D5） | 夜写纸张时周边栏位仍为亮色，缺少独立整站深色模式 | 夜间写作眩光对比强烈 | 新增 `appearance`（`light`/`dark`/`system`）与全套语义色变量，五主题适配深色且与纸张独立 | 未开始 |
 | P3 | `Modal` 缺 Tab 焦点圈闭、导航/扩写图标重复、章节菜单带框拥挤、删标记无撤销、助手样式写死色值 | 键盘可访问性与细节一致性不足 | `Modal` 补焦点圈闭、区分助手与扩写图标、菜单无框化、删除标记 5 秒内可撤销、清理残余硬编码色值 | 未开始 |
 | D4 | 启动始终停在书架，需再次点选上次正在写的书 | 日常续写多一步点击 | 启动读取书架后若 `recent.workId` 仍存在则自动进入并恢复章节与光标，失败或恢复备份后停在书架 | 已完成（`54b977e`） |
@@ -332,7 +332,7 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 - 行为差异：新安装（无本地偏好）及“恢复默认”后默认“限制宽度 680px”，已有保存偏好不变；专注模式正文列与顶栏始终居中对齐可读列宽；全局最小可见字号不低于 12px，查找替换面板控件高度增至 30px。
 - 组件旧→新映射：`Preferences.jsx` 中的 `storageKey`、`themes`、`papers`、`rulings`、`fonts`、`readerSizes`、`writingWidths`、`writingDefaults`、`defaults`、`normalizePreferences`、`loadPreferences`、`savePreferences`、`writingSurface` 迁入 `app/renderer/preferences-model.mjs`，由 `Preferences.jsx` 重新导出。
 - 依赖、IPC、偏好存储键、权限变化：无（`studio.preferences.v1` 结构未新增字段，仅变更全新默认 `widthMode` 为 `'limit'`）。
-- 提交：`4839d1e`（`style: reformat assistant.css without semantic changes`）、`1d9d64c`（`refactor(ui): extract preference model for tests`）、Commit 3（`style(ui): type scale tokens, readable writing measure and focus column`，详见下一批补填）。
+- 提交：`4839d1e`（`style: reformat assistant.css without semantic changes`）、`1d9d64c`（`refactor(ui): extract preference model for tests`）、`9df2359`（`style(ui): type scale tokens, readable writing measure and focus column`）。
 - 验证：
   - `npm run build && npm test`（2026-11-15 04:34）：PASS（109 / 109 通过，含新增 3 项 `preferences-model` 单测）。
   - `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B5`（2026-11-15 04:34）：PASS（0 页面错误，`sub12=[]`，`overflowWide=[]`，`overflowNarrow=[]`，`overflowMin=[]`，截图位于 `.local/claude-frontend-ux/B5-1794688476117/`）。
@@ -341,6 +341,32 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
   - `node --disable-warning=ExperimentalWarning scripts/qa-desktop.mjs`（2026-11-15 04:39）：PASS（`.local/desktop-qa-R4mLCd`）。
   - `node --disable-warning=ExperimentalWarning scripts/qa-visual.mjs`（2026-11-15 04:39）：PASS（`.local/visual-qa-A0QzYE`）。
 - 仍有问题与下一步：进入 B6（写作页结构：工具栏固定顺序与分组“更多”菜单、可收起左侧栏、统一遮罩与全局 Esc 优先级、历史正文预览、资料 Markdown 预览、扩写提示快捷选中）。
+
+#### B6：写作页结构（P2-1、P2-2、P2-3、P2-6、P2-13）
+
+- 时间与目标：2026-11-15 04:40–04:55；分 3 个提交完成：① 工具栏固定左对齐顺序与分组“更多”菜单（合并顶部“作品/编辑”，容器查询窄窗收纳次要项），同步更新 `qa-desktop.mjs`、`qa-writing-workflow.mjs`、`qa-writing-regressions.mjs` 顶部菜单触发定位器；② 左侧栏可收起为 56px 图标条（`writingSession.layout.railCollapsed`）、统一非停靠抽屉 `writing-overlay-dismiss` 遮罩与 window 级 Esc 优先级；③ 历史抽屉字数/差值与只读正文预览、资料速查 `react-markdown`（`skipHtml`）渲染（章节对照保持 `<pre>`）、`enclosingExpansionPair`“选中提示”快捷选中与弹窗主按钮样式。
+- 发现/决定与取舍：
+  1. 工具栏“更多”仅合并顶部“作品”与“编辑”两份下拉（分组为“本章”/“作品”并在 `@container writing-workspace (max-width: 740px)` 下显露“视图与工具”），列表/资料行内 `ActionMenu`（`更多${label}操作`）保持不动。同步更新 3 份 QA 脚本顶部菜单触发定位器至 `getByLabel('更多', { exact: true })`，原有整理、导入、导出及防误改断言全部保留。
+  2. `App.jsx` 与 `Writing.jsx` 共同读写 `studio.writingSession.v1`：`Writing.jsx` 通过 `persistSession()` 在保存位置/折叠/最近文档时合并最新的 `layout.railCollapsed`，防止覆盖主侧栏折叠状态；`backup.restore` 回调同步重置 `railCollapsed` 为 `false`。
+  3. window 级 `Escape` 统一按 `打开菜单(details.rail-menu[open]) → 对话框/弹窗/CodeMirror 查找栏 → 行内扩写预览 → 右侧抽屉（含焦点归还） → 专注模式` 顺序处理，并跳过 IME 组字与全局 `Modal`/`Reader`。
+  4. `WritingResources.jsx` 仅对大纲、角色、设定启用受限白名单 `react-markdown`（`allowedElements` 13 项 + `skipHtml`），章节对照继续保留 `<pre tabIndex={0} aria-label="条目正文">`，确保 `qa-writing-workflow.mjs` 逐字换行对照不变。
+- 实际变更：
+  - Commit 1：修改 `app/renderer/Writing.jsx`、`app/renderer/writing.css`、`scripts/qa-desktop.mjs`、`scripts/qa-writing-workflow.mjs`、`scripts/qa-writing-regressions.mjs`。
+  - Commit 2：修改 `app/renderer/writing-session.mjs`、`app/renderer/App.jsx`、`app/renderer/app.css`、`app/renderer/Writing.jsx`、`tests/writing-session.test.mjs`。
+  - Commit 3：修改 `app/shared/expansion-selection.mjs`、`tests/expansion-selection.test.mjs`、`app/renderer/WritingResources.jsx`、`app/renderer/writing-resources.css`、`app/renderer/expansion-dialog.css`、`app/renderer/Writing.jsx`、`app/renderer/writing.css`、`.local/claude-frontend-ux/audit-screens.mjs` 与本交接台账。
+- 行为差异：工具栏按钮顺序固定且窄窗次要按钮收进“更多”；左侧导航支持收起为 56px 图标条并持久记忆；窄窗所有右侧抽屉均带遮罩，Esc 按统一优先级逐层关闭；历史列表显示字数及差值且先预览再恢复；大纲/角色/设定预览支持 Markdown 排版；光标位于未选中括号提示内时“AI 扩写”旁显示“选中提示”。
+- 组件旧→新映射：新增纯函数 `enclosingExpansionPair`（`app/shared/expansion-selection.mjs`）；`writing-session.mjs` 的 `normalizeSession` 新增 `layout: { railCollapsed }` 字段。
+- 依赖、IPC、偏好存储键、权限变化：无（`studio.writingSession.v1` 仅新增向后兼容的 `layout.railCollapsed` 布尔字段）。
+- 提交：`e906e26`（`feat(ui): stable writing toolbar with grouped overflow menu`）、`56019d2`（`feat(ui): collapsible rail, consistent drawer overlay and Esc`）、Commit 3（本提交 `feat(ui): history preview, rendered material preview, expansion prompt helper`）。
+- 验证：
+  - `npm run build && npm test`（2026-11-15 04:47）：PASS（112 / 112 通过，含新增 `writing-session` layout 单测及 2 项 `enclosingExpansionPair` 单测）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-writing-workflow.mjs`（2026-11-15 04:48）：PASS（`.local/writing-workflow-1Bp77A`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-writing-regressions.mjs`（2026-11-15 04:49）：PASS（`.local/writing-regressions-eLvgDX`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-expansion.mjs`（2026-11-15 04:50）：PASS（`.local/expansion-qa-p50yJF`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-desktop.mjs`（2026-11-15 04:52）：PASS（`.local/desktop-qa-FlTCQt`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-visual.mjs`（2026-11-15 04:53）：PASS（`.local/visual-qa-5S4Koo`）。
+  - `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B6`（2026-11-15 04:54）：PASS（0 页面错误，`sub12=[]`、`railCollapsedOverflow=[]`、`overflowWide=[]`、`overflowNarrow=[]`、`overflowMin=[]`，B6 折叠侧栏/历史预览/遮罩关闭/选中提示断言全部通过，截图 `.local/claude-frontend-ux/B6-1794689626584/`）。
+- 仍有问题与下一步：进入 B7（整站深色界面与语义色变量，独立于写作纸张并满足 WCAG 对比度抽检）。
 
 ### 9.4 验证与截图台账
 
@@ -354,6 +380,7 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | B3 参考默认本地混合与跨页状态保持 | `npm test` (106/106) + `qa-workspace-ui` + `qa-retrieval` + `qa-visual` + `audit-screens.mjs B3` | PASS | `.local/workspace-ui-rL3ms1`、`.local/retrieval-qa-cby5VS`、`.local/claude-frontend-ux/B3-1794687067400/` | 仅合成/fixture 资料 |
 | B4 启动自动回到上次作品与崩溃/重启恢复 | `npm test` (106/106) + `qa-writing-workflow` + `qa-writing-regressions` + `qa-desktop` + `qa-expansion` + `audit-screens.mjs B4` | PASS | `.local/writing-workflow-BxVx5G`、`.local/writing-regressions-ahUT2q`、`.local/desktop-qa-lL5pam`、`.local/expansion-qa-T4YXLn`、`.local/claude-frontend-ux/B4-1794687783961/` | 仅合成资料与本地模拟扩写服务 |
 | B5 字号标尺、D1 默认宽度、专注列宽与无溢出 | `npm test` (109/109) + `qa-writing-workflow` + `qa-writing-regressions` + `qa-desktop` + `qa-visual` + `audit-screens.mjs B5` | PASS | `.local/writing-workflow-c2G8UD`、`.local/writing-regressions-IXZP0I`、`.local/desktop-qa-R4mLCd`、`.local/visual-qa-A0QzYE`、`.local/claude-frontend-ux/B5-1794688476117/` | 仅合成资料；`sub12=[]` 且 3 种窗口尺寸均无横向溢出 |
+| B6 写作页结构、可收起侧栏、历史/资料预览与选中提示 | `npm test` (112/112) + `qa-writing-workflow` + `qa-writing-regressions` + `qa-expansion` + `qa-desktop` + `qa-visual` + `audit-screens.mjs B6` | PASS | `.local/writing-workflow-1Bp77A`、`.local/writing-regressions-eLvgDX`、`.local/expansion-qa-p50yJF`、`.local/desktop-qa-FlTCQt`、`.local/visual-qa-5S4Koo`、`.local/claude-frontend-ux/B6-1794689626584/` | 仅合成资料与本地模拟扩写服务；`sub12=[]`、3 种尺寸及折叠侧栏均无横向溢出 |
 
 ### 9.5 最终合并交接（停写时填写）
 

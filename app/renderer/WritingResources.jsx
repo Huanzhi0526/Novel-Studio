@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import Markdown from 'react-markdown';
 import { Icon } from './ui.jsx';
 import './writing-resources.css';
+
+const MATERIAL_ELEMENTS = ['h1', 'h2', 'h3', 'h4', 'p', 'strong', 'em', 'ul', 'ol', 'li', 'blockquote', 'br', 'hr'];
 
 const resources = {
   outline: {
@@ -98,7 +101,11 @@ function ResourcePanel({ kind, documents, preview, onPreview, onOpen, onCreate, 
         <div className="resource-preview-note">
           <p role="alert">{preview.error}</p>
           <button className="resource-open" type="button" onClick={() => onPreview(active)}>重试</button>
-        </div> : preview.text ? <pre tabIndex={0} aria-label="条目正文">{preview.text}</pre> :
+        </div> : preview.text ? (isChapter
+          ? <pre tabIndex={0} aria-label="条目正文">{preview.text}</pre>
+          : <div className="resource-markdown" tabIndex={0} aria-label="条目正文">
+              <Markdown allowedElements={MATERIAL_ELEMENTS} unwrapDisallowed skipHtml>{preview.text}</Markdown>
+            </div>) :
           <p className="resource-preview-note">此条目还没有内容，可以打开编辑。</p>}
     </section> : documents.length > 0 && <p className="resource-preview-note">
       {isChapter ? hint : '选择条目即可预览，正文继续留在编辑器中。'}
