@@ -1,4 +1,4 @@
-import { Assistant } from './Assistant.jsx';
+import { Assistant, useAssistantController } from './Assistant.jsx';
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { api, ErrorMessage, Icon } from './ui.jsx';
@@ -125,6 +125,7 @@ function App() {
   const [error, setError] = useState(null);
   const [banner, setBanner] = useState('');
   const [preferences, setPreferences] = useState(loadPreferences);
+  const assistantController = useAssistantController();
   const writingChat = useConversation();
   const libraryChat = useConversation();
 
@@ -212,6 +213,7 @@ function App() {
       <main className="workspace-main" hidden={view !== 'writing'} {...writingSurface(preferences)}>
         <Writing key={epoch} api={api} setFocused={setFocused} railTarget={view === 'writing' ? railTarget : null}
           preferences={preferences} updatePreferences={updatePreferences}
+          renderAssistant={(close,workId)=><Assistant active={view==='writing'} controller={assistantController} compact boundWorkId={workId} onClose={close} openCard={setCard} openEvidence={openEvidence}/>}
           onExpansionSettings={() => changeView('settings', 'expansion-settings')}
           renderReference={close => <Conversation sidebar state={writingChat} works={works} close={close} kbV2={Boolean(info?.kbV2)}
             openCard={setCard} openEvidence={openEvidence} onSettings={() => changeView('settings', 'retrieval-settings')} />} />
@@ -220,7 +222,7 @@ function App() {
         <Reference works={works} refresh={refresh} conversation={libraryChat} openCard={setCard} openEvidence={openEvidence} openReader={openReader}
           kbV2={Boolean(info?.kbV2)} onSettings={() => changeView('settings', 'retrieval-settings')} />
       </main>}
-      <main className="workspace-main" hidden={view !== 'assistant'}><Assistant active={view === 'assistant'} openCard={setCard} openEvidence={openEvidence} /></main>
+      <main className="workspace-main" hidden={view !== 'assistant'}><Assistant controller={assistantController} active={view === 'assistant'} openCard={setCard} openEvidence={openEvidence} /></main>
       {view === 'settings' && <main className="workspace-main settings-main">
         <Settings info={info} preferences={preferences} updatePreferences={updatePreferences} settingsTarget={settingsTarget} restored={async () => {
           writingChat.clear();

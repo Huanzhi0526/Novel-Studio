@@ -910,3 +910,13 @@ Automations工具已成功删除novel-studio，deleteStatus=deleted，不再自�
 安装版启动、助手界面、检索与扩写选模/API字节保护分别验收；结果见.local/cli-stability-026/*ui/report.json与日志。正式升级前完整资料+旧程序备份259文件摘要通过，含助手记忆聊天。后续以upgrade-receipt.json、formal-verification.json为正式部署证据。
 
 0.2.6正式发布结果：最终安装器隔离安装、启动、助手页面记忆保存通过；安装版真实Flash检索固定句、Carbon合成扩写100字且原稿未变、动态15模型、选模重启和API字节保护通过。`upgrade-windows.ps1 -Version 0.2.6 -IsolatedInstall .local/cli-stability-026/install -RecordFile .local/cli-stability-026/upgrade-receipt.json -GracefulClose`成功（显式使用真实LOCALAPPDATA）；快捷方式目标启动通过，169个既有资料文件摘要一致。原两次用户失败没有完整阶段轨迹，保留此诊断限制；上游503/429仍需明确报告，不能承诺服务永不超时。
+
+
+## 2026-11-15：0.2.7 助手长检索任务、阅读界面与写作侧栏
+
+- 用户授权修复再次检索超时并改善阅读/增加写作右侧助手。正式无正文诊断只显示外层324443ms complete，原内部失败缺阶段信息；不声称已完整复盘该次故障。改为reference_search提交、reference_result短轮询领取，任务360秒总预算、单次领取8秒，MCP调用不再挂完整长任务；正常AI路径lazyFallback不预扫备用全库。
+- `npm test`：100/100通过，覆盖异步提交立即返回、同查询去重、跨书任务隔离、失败领取/可见、未领取禁止伪完成，以及不重复扫描/失败仍回退。`node scripts/qa-writing-workflow.mjs`通过，章节/大纲/资料/自动保存/光标/滚动/历史回归证据.local/writing-workflow-QrkCgT。
+- 合成真实Carbon普通任务：检索人为延迟20秒，1次提交、领取后汇总，总42347ms。185秒延迟长任务：总210394ms，1次提交、领取done后汇总，未因MCP单次等待超时。报告.local/assistant-027/real/report.json、real-long/report.json；没有发送真实小说或用户原创。
+- `node scripts/qa-assistant-experience.mjs <隔离EXE>`通过：长中文Markdown、标题/段落/列表/引用排版、主视图/写作右侧/窄窗截图、关闭重开和两入口草稿保留，无pageerror。最终截图.local/assistant-027/experience-1794681847262。视觉为自查，brief见assistant-ui-brief.md。隐藏窗口普通截图超时/旧帧未当作通过，采用既有原生刷新捕获后检查。
+- `npm run package:windows`、隔离NSIS安装、`qa-installed-smoke.mjs <EXE> 0.2.7`、`qa-assistant.mjs <EXE>`及上述experience通过。`qa-assistant-responsiveness.mjs <EXE> <正式参考库只读路径>`：本机模拟AI两次规划/筛选，1卡，20次IPC最慢55.54ms且页面可切换；无正文外传。
+- 全资料+旧程序备份261文件摘要通过；`upgrade-windows.ps1 -Version 0.2.7 -IsolatedInstall .local/assistant-027/install -RecordFile .local/assistant-027/upgrade-receipt.json -GracefulClose`（显式真实LOCALAPPDATA）成功。快捷方式目标启动与171个既有资料文件摘要核验通过；原稿、参考库、配置、聊天、记忆未变。安装器、源码ZIP及SHA清单在release/下单独发布。

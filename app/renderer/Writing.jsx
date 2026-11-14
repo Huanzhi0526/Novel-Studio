@@ -137,7 +137,7 @@ function InlineExpansionPreview({ review, onKeep, onRestore, onRegenerate }) {
   </section>;
 }
 
-export function Writing({ api, renderReference, setFocused, railTarget = null, preferences, updatePreferences, onExpansionSettings }) {
+export function Writing({ api, renderReference, renderAssistant, setFocused, railTarget = null, preferences, updatePreferences, onExpansionSettings }) {
   const [listing, setListing] = useState({ works: [], volumes: [], docs: [] });
   const [selectedWork, setSelectedWork] = useState(null);
   const [inBookshelf, setInBookshelf] = useState(true);
@@ -765,8 +765,8 @@ export function Writing({ api, renderReference, setFocused, railTarget = null, p
     }
   }
   function toggleResource(kind, event) {
-    const panel = kind === 'reference' ? 'reference' : 'material';
-    if (toolPanel === panel && (panel === 'reference' || resourceKind === kind)) {
+    const panel = ['reference','assistant'].includes(kind) ? kind : 'material';
+    if (toolPanel === panel && (panel !== 'material' || resourceKind === kind)) {
       closeToolPanel();
       return;
     }
@@ -800,7 +800,7 @@ export function Writing({ api, renderReference, setFocused, railTarget = null, p
   const activeWork = listing.works.find(w=>w.id===selectedWork);
   const activeVolume = listing.volumes.find(v=>v.id===doc?.volume_id);
   const liveTitle = listing.docs.find(item => item.id === doc?.id)?.title ?? doc?.title;
-  const isReference = toolPanel === 'reference';
+  const isReference = ['reference','assistant'].includes(toolPanel);
   const dockPanel = wideWindow && !focusMode && Boolean(toolPanel);
   const showResourceTools = !focusMode;
   useEffect(() => { viewRef.current?.requestMeasure(); }, [dockPanel, railTarget, focusMode, preferences]);
@@ -846,7 +846,7 @@ export function Writing({ api, renderReference, setFocused, railTarget = null, p
   const panelTitle = {
     marks: '原创标记', history: '章节历史', preferences: '写作设置',
     material: resourceKind === 'chapter' ? '章节对照' : `${WORK_SECTIONS[resourceKind].label}速查`,
-    'body-search': '全书正文搜索', reference: '参考检索侧栏'
+    'body-search': '全书正文搜索', reference: '参考检索侧栏', assistant:'创作助手侧栏'
   }[toolPanel];
   const panelContent = toolPanel === 'preferences'
     ? <WritingPreferences preferences={preferences} update={updatePreferences} />
@@ -892,7 +892,7 @@ export function Writing({ api, renderReference, setFocused, railTarget = null, p
         closeToolPanel(true);
       }
     }}>
-    {isReference ? renderReference(() => closeToolPanel(true)) :
+    {toolPanel==='assistant' ? renderAssistant(()=>closeToolPanel(true),selectedWork) : isReference ? renderReference(() => closeToolPanel(true)) :
       <><header className="drawer-head"><strong>{panelTitle}</strong><button className="icon-button" aria-label="关闭侧栏" onClick={() => closeToolPanel(true)}>×</button></header><div className="drawer-content">{panelContent}</div></>}
   </aside>;
   const inlineRail = railTarget ? null : rail;
@@ -978,7 +978,7 @@ export function Writing({ api, renderReference, setFocused, railTarget = null, p
     {drawer && isReference && !dockPanel && <button type="button" className="writing-overlay-dismiss" aria-label="返回正文"
       onClick={() => closeToolPanel(true)} />}
     {drawer}
-    {showResourceTools && <WritingResourceTools activeKind={isReference ? 'reference' : toolPanel === 'material' ? resourceKind : null}
+    {showResourceTools && <WritingResourceTools activeKind={isReference ? toolPanel : toolPanel === 'material' ? resourceKind : null}
       onSelect={toggleResource} hasWork={Boolean(selectedWork)} />}
     {expansion && !expansionReview && <ExpansionDialog api={api} snapshot={expansion} onPreview={previewExpansion}
       onClose={() => closeExpansion()}

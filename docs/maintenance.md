@@ -319,3 +319,12 @@ AgyFlashClient新增separateAgyStatus：仅识别CLI的API error(attempt n)与Yo
 预算：助手总600秒、无输出/工具进展150秒；受控工具运行保持活动，检索工具自己150秒（纯本地60秒）截止并abort其异步模型任务。参考官方[MCP超时说明](https://antigravity.google/docs/mcp?hl=en)默认180秒；ACP传入timeoutSeconds字段不能替代本机期限控制。检索返回后须给助手留出汇总时间。
 
 每个CLI工作区cli-events.jsonl为无正文诊断记录，含模型、时间、状态、错误码与耗时，256KiB轮换。原始CLI日志的插件认证告警不等于模型账户失效，须结合真实调用；不可因此擅自改登录、全局MCP、CLI版本或凭证。
+
+
+### 0.2.7 长检索任务与助手阅读界面
+
+MCP工具reference_search只提交任务、reference_result领取结果；不把整个检索AI回合挂在一次HTTP请求上。任务内存态按书隔离、去重、串行、上限20条，随当前用户回合结束取消；未领取不得保存完整答案。get接口只显示当前回合任务状态和错误。worker的AI预算360秒，单次领取8秒；正常路径lazyFallback避免重复全库扫描。生成/本机记忆体系继续使用CLI，没有新建Agent框架或记忆数据库。
+
+已核对官方[MCP Tasks扩展](https://modelcontextprotocol.github.io/ext-tasks/)的任务句柄/轮询模式；它要求客户端声明扩展能力。本机现有ACP/MCP桥接没有验证原生Tasks扩展兼容性，因此本轮使用普通工具提供薄兼容层，不宣称实现标准tasks/get或可持久恢复任务，不复制或引入额外SDK/数据库。后续若核实CLI原生扩展可用可替换此适配层。
+
+App中useAssistantController为独立页和写作侧栏共享控制器；侧栏通过renderAssistant绑定selectedWork，绝不以DOM全局选择器读取或自动发送正文。assistant.css独立限定样式，主题沿用panel/border/ink/muted。验收node scripts/qa-assistant-experience.mjs [隔离EXE]，输出合成长文主视图、窄窗和侧栏截图，验证草稿跨入口保持。Windows隐藏窗口需用项目既有短暂showInactive+双帧刷新+native capture取当前帧，不能用旧帧当视觉验收。

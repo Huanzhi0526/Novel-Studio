@@ -300,7 +300,8 @@ export class RetrievalEngineV2 {
       if (generation !== this.search.reference.generation) fail('SEARCH_STALE', '资料库已变更，请重新搜索');
       if (sourceSnapshot !== this.sourceProvider?.snapshot()) fail('SEARCH_CONFIG_CHANGED', '检索模型来源或模型已切换，请重新检索。');
     };
-    const basePromise = this.search.query({ ...args, limit: args.limit ?? 12 }, { signal }).then(value => ({ value }), error => ({ error }));
+    const localBase=()=>this.search.query({ ...args, limit: args.limit ?? 12 }, { signal }).then(value => ({ value }), error => ({ error }));
+    const basePromise = args.lazyFallback ? null : localBase();
     try {
       const result = mode === 'fast'
         ? await this.#runFastMode(args, { signal })
@@ -310,7 +311,7 @@ export class RetrievalEngineV2 {
     } catch (error) {
       signal?.throwIfAborted();
       ensureSource();
-      const local = await basePromise;
+      const local = await (basePromise ?? localBase());
       if (local.error) throw local.error;
       const base = local.value;
       const hint = error.code === 'EXPAND_NOT_CONFIGURED' ? '请先在「资料与设置 → AI 辅助检索」中配置接口。' : `（原因：${error.message || error.code || '接口异常'}）`;

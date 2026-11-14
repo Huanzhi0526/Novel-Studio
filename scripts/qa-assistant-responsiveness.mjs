@@ -18,7 +18,7 @@ try {
    const db=new DatabaseSync(reference,{readOnly:true});const model=db.prepare('SELECT model_id,dimension FROM vectors LIMIT 1').get();db.close();
    const vector=new Float32Array(model.dimension);vector[0]=1;
    return new Promise((resolve,reject)=>{
-     const worker=new Worker(join(app.getAppPath(),'app/main/assistant-search-worker.mjs'),{workerData:{filename:reference,modelId:model.model_id,method:'query',ai:true,args:{query:'共同完成任务',mode:'fast',limit:8},vectors:[vector]}});
+     const worker=new Worker(join(app.getAppPath(),'app/main/assistant-search-worker.mjs'),{workerData:{filename:reference,modelId:model.model_id,method:'query',ai:true,args:{query:'共同完成任务',mode:'fast',lazyFallback:true,limit:8},vectors:[vector]}});
      require('node:fs').writeFileSync(progress,'started\n');
      const timer=setTimeout(()=>{void worker.terminate();reject(new Error('worker deadline'));},150000);
      worker.once('error',error=>{clearTimeout(timer);resolve({workerError:String(error),stack:error.stack,code:error.code});});

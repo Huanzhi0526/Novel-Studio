@@ -6,7 +6,7 @@ export class AssistantSearch {
     this.search=search;this.retrieval=retrieval;this.workerURL=workerURL;this.active=new Set();
   }
   async query(args,{signal}={}) {
-    if(this.retrieval)return this.run('query',{...args,mode:args.mode??'fast'},{signal});
+    if(this.retrieval)return this.run('query',{...args,mode:args.mode??'fast',lazyFallback:true},{signal});
     let vectors=[],embeddingError;
     try {vectors=await this.search.encode([args.query],signal,true);}
     catch(error){signal?.throwIfAborted();embeddingError=error.code??'EMBED_UNAVAILABLE';}
@@ -25,7 +25,7 @@ export class AssistantSearch {
         this.active.delete(worker);void worker.terminate();error?reject(error):resolve(value);
       };
       const abort=()=>finish(signal.reason??new Error('检索已取消'));
-      const timer=setTimeout(()=>finish(new Error('参考检索超过等待上限，已停止；可缩小问题后重试。')),this.retrieval?150000:60000);
+      const timer=setTimeout(()=>finish(new Error('参考检索超过等待上限，已停止；可缩小问题后重试。')),this.retrieval?360000:60000);
       worker.on('message',async message=>{
         if(message.kind==='complete'||message.kind==='embed') {
           try {const text=await (message.kind==='embed'?this.search.encode(message.texts,signal,message.query):this.retrieval.completeForSearch(message.messages,message.options,signal));if(!settled)worker.postMessage({id:message.id,text});}

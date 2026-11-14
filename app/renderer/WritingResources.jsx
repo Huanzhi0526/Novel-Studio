@@ -23,6 +23,7 @@ const resources = {
     hint: '选择另一章，与当前正文并排阅读。',
     icon: <><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M12 5v14M7 9h2m6 0h2M7 13h2m6 0h2"/></>
   },
+  assistant: {label:'助手',icon:<><path d="M4 5h16v11H9l-5 4V5Z"/><path d="M8 9h8M8 12h5"/></>},
   reference: {
     label: '参考',
     icon: <><path d="M5 5v14m4-14v14m4-13 4-1 4 13-4 1z"/></>
@@ -44,7 +45,7 @@ export function WritingResourceTools({ activeKind, onSelect, hasWork }) {
     {Object.entries(resources).map(([kind, resource]) => <button type="button" key={kind}
       className={`writing-resource-tool${kind === 'reference' ? ' reference-tool' : ''}`}
       disabled={!hasWork && kind !== 'reference'} aria-pressed={activeKind === kind}
-      title={{ chapter: '章节对照', reference: '参考库检索' }[kind] ?? `${resource.label}速查`}
+      title={{ chapter: '章节对照', reference: '参考库检索', assistant:'创作助手' }[kind] ?? `${resource.label}速查`}
       onClick={event => onSelect(kind, event)} onKeyDown={moveToolFocus}>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{resource.icon}</svg>
