@@ -113,8 +113,15 @@ function sideTool(name) {
 
 async function openFirstChapter() {
   await tab('原创写作');
-  await page.getByRole('region', { name: '我的作品' }).getByRole('button', { name: '中文写作验收', exact: true }).click();
-  await page.getByRole('heading', { name: '第一章', exact: true }).waitFor();
+  const firstHeading = page.getByRole('heading', { name: '第一章', exact: true });
+  const workButton = page.getByRole('region', { name: '我的作品' })
+    .locator('.original-shelf-grid[aria-busy="false"]')
+    .getByRole('button', { name: '中文写作验收', exact: true });
+  await Promise.race([firstHeading.waitFor(), workButton.waitFor()]);
+  if (await workButton.isVisible().catch(() => false)) {
+    await workButton.click();
+    await firstHeading.waitFor();
+  }
   await page.locator('.cm-content').waitFor();
 }
 
@@ -342,7 +349,7 @@ try {
   await sidebar.getByText('燈塔', { exact: true }).waitFor();
   await query.fill('绛星原稿隔离探针');
   await query.press('Enter');
-  await sidebar.getByText('没有找到匹配的知识卡。', { exact: true }).waitFor();
+  await sidebar.getByText('没有找到匹配的参考条目。', { exact: true }).waitFor();
   record('参考工具与资料互斥、切换与收起保留会话、真实命中、原创隔离、版本证据、图片和注释');
 
   await tab('资料与设置');

@@ -181,6 +181,7 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
   const focusNewDocument = useRef(false);
   const previewRequest = useRef(0);
   const searchRequest = useRef(0);
+  const autoOpened = useRef(false);
 
   const reload = useCallback(async workId => {
     try { const next = await api('writing.list', workId ? { workId } : {}); setListing(next); if (workId) setSelectedWork(workId); }
@@ -189,16 +190,26 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
   useEffect(() => {
     let active = true;
     async function loadBookshelf() {
+      let recentId = null;
       try {
         const next = await api('writing.list');
-        if (active) setListing(next);
+        if (!active) return;
+        setListing(next);
+        const candidate = session.current.recent?.workId;
+        if (!autoOpened.current && candidate && next.works.some(work => work.id === candidate)) {
+          autoOpened.current = true;
+          recentId = candidate;
+        }
       } catch (failure) {
         if (active) setError(failure.message || '无法读取作品书架');
       } finally {
         if (active) {
           transition.current = false;
-          setTransitioning(false);
+          if (!recentId) setTransitioning(false);
         }
+      }
+      if (active && recentId) {
+        await chooseWork(recentId);
       }
     }
     void loadBookshelf();

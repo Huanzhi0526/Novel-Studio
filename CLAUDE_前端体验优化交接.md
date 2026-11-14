@@ -205,13 +205,13 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | P2-7 | 卡片弹窗标题写“知识卡”重复层级、证据全折叠、紧凑卡“查看完整卡片”像小标题且易被遮罩压住 | 查卡与核证原文多一步操作 | 弹窗直接以卡名为标题、眉题写作品与类别，默认展开前 3 条证据；紧凑卡底部右侧改为“展开全文 →” | 未开始 |
 | P2-8 | 写作 364px 侧栏中 KB v2 模式按钮与“接口设置”挤压换行，两条外传说明占高 | 侧栏检索视野局促 | 侧栏模式按钮显示短名（保留完整可访问名称/title），接口设置改图标按钮，合并外传提示 | 未开始 |
 | P2-9（D2） | 参考检索 Enter 发送，创作助手 Ctrl+Enter 发送 | 跨面板输入习惯割裂 | 统一 `sendIntent`：Enter 发送、Shift+Enter 换行、Ctrl/⌘+Enter 兼容发送、IME 组字保护 | 已完成（`8bebfa8`） |
-| P2-10（D3） | 参考检索默认 `fast`（AI），且切页后参考库模式与已选作品重置 | 每次打开默认指向外传模式，跨页对照丢失位置 | v2 默认 `local`（会话内保留切换，重启回 `local`）；App 层保持参考库视图状态与书架滚动位置 | 已完成（B3，见 §9.3） |
+| P2-10（D3） | 参考检索默认 `fast`（AI），且切页后参考库模式与已选作品重置 | 每次打开默认指向外传模式，跨页对照丢失位置 | v2 默认 `local`（会话内保留切换，重启回 `local`）；App 层保持参考库视图状态与书架滚动位置 | 已完成（`afbe4fe`） |
 | P2-11 | 参考库、创作助手、设置页顶栏高度与标题层级不一致 | 跨页切换跳跃感明显 | 提取 `PageHeader` 统一 48px 页头，压缩助手页头，去除设置页重复顶栏 | 未开始 |
 | P2-12 | CodeMirror 查找替换面板 12px 紧凑排布 | 查找框输入局促 | `.cm-search` 控件统一 `--fs-ui`、30px 最小高度与语义色变量 | 未开始 |
 | P2-13 | 光标在括号提示内未全选时“AI 扩写”直接禁用，弹窗“生成预览”无主按钮样式 | 扩写触发门槛不直观 | 新增只读辅助函数 `enclosingExpansionPair`，提供“选中提示”快捷选中按钮；“生成预览”补主按钮样式 | 未开始 |
 | P2-14（D5） | 夜写纸张时周边栏位仍为亮色，缺少独立整站深色模式 | 夜间写作眩光对比强烈 | 新增 `appearance`（`light`/`dark`/`system`）与全套语义色变量，五主题适配深色且与纸张独立 | 未开始 |
 | P3 | `Modal` 缺 Tab 焦点圈闭、导航/扩写图标重复、章节菜单带框拥挤、删标记无撤销、助手样式写死色值 | 键盘可访问性与细节一致性不足 | `Modal` 补焦点圈闭、区分助手与扩写图标、菜单无框化、删除标记 5 秒内可撤销、清理残余硬编码色值 | 未开始 |
-| D4 | 启动始终停在书架，需再次点选上次正在写的书 | 日常续写多一步点击 | 启动读取书架后若 `recent.workId` 仍存在则自动进入并恢复章节与光标，失败或恢复备份后停在书架 | 未开始 |
+| D4 | 启动始终停在书架，需再次点选上次正在写的书 | 日常续写多一步点击 | 启动读取书架后若 `recent.workId` 仍存在则自动进入并恢复章节与光标，失败或恢复备份后停在书架 | 已完成（B4，见 §9.3） |
 
 ### 9.3 每批实施记录（复制此模板追加）
 
@@ -286,7 +286,7 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 - 行为差异：KB v2 独立页与写作侧栏默认均选中“本地混合”；从参考库切换主导航再返回后保持原模式、选中作品、封存筛选、搜索词与书架滚动位置。
 - 组件旧→新映射：无（`Reference` 新增可选受控 props `viewState`、`setViewState`、`shelfScroll`，保留默认非受控兜底）。
 - 依赖、IPC、偏好存储键、权限变化：无。
-- 提交：待本批提交后在 B4 开头补填 hash（`feat(ui): default reference search to local mode and keep reference view state across pages`）。
+- 提交：`afbe4fe`（`feat(ui): default reference search to local mode and keep reference view state across pages`）。
 - 验证：
   - `npm run build && npm test`（2026-11-15 04:10）：PASS（106 / 106 通过）。
   - `node --disable-warning=ExperimentalWarning scripts/qa-workspace-ui.mjs`（2026-11-15 04:10）：PASS（`.local/workspace-ui-rL3ms1`）。
@@ -294,6 +294,29 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
   - `node --disable-warning=ExperimentalWarning scripts/qa-visual.mjs`（2026-11-15 04:11）：PASS（`.local/visual-qa-y5cB4f`）。
   - `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B3`（2026-11-15 04:11）：PASS（断言 `sidebarDefaultV2Mode="本地混合"`、`v2DefaultMode="本地混合"`、`referenceModeAfterReturn="书架"`、`referenceWorkOpenAfterReturn=true` 全部通过，0 页面错误，`.local/claude-frontend-ux/B3-1794687067400/`）。
 - 仍有问题与下一步：进入 B4，实现启动读取书架后自动回到上次写作作品并更新受影响的 3 份 QA 脚本定位衔接。
+
+#### B4：启动自动回到上次写作的作品（D4）
+
+- 时间与目标：2026-11-15 04:12–04:24；在 `Writing.jsx` 初次 `loadBookshelf` 完成后，若 `session.current.recent?.workId` 存在于 `listing.works`，每次挂载最多自动调用一次 `chooseWork(recentId)` 恢复上次作品、章节、光标与滚动并聚焦编辑器；若不存在或报错则停在书架；同步更新 `qa-writing-workflow.mjs`、`qa-desktop.mjs`、`qa-expansion.mjs` 重启后的定位衔接并保留全部保护断言。
+- 发现/决定与取舍：
+  1. `Writing.jsx` 新增 `autoOpened = useRef(false)`。在初次 `loadBookshelf` 读取 `writing.list` 后，仅当 `!autoOpened.current && candidate && next.works.some(work => work.id === candidate)` 时标记 `autoOpened.current = true` 并记住 `recentId`；在 `finally` 释放 `transition.current = false`（若无 `recentId` 才释放 `transitioning`，避免自动打开前书架按钮短暂可点）后再 `await chooseWork(recentId)`，避免与 `withEditorLocked` 嵌套死锁。若 `writing.list` 或 `chooseWork` 报错，则停在书架并显示错误；`backup.restore` 已调用 `clearWritingSession()` 并递增 `epoch` 重挂，故恢复备份后停在书架。
+  2. QA 定位调整（**保留全部保存、光标恢复、崩溃恢复、未采纳扩写与隔离保护断言**）：
+     - `scripts/qa-writing-workflow.mjs`（L322–331）：因 D4 启动自动进入上次作品，重启后先直接等待 `heading(firstTitle)`、断言书架隐藏并核对 `expectPosition(beforeSwitch)` 与正文一致，再调用 `returnToBookshelf()` 断言“继续写作”与“返回书架”可达并重新打开作品衔接后续全文搜索。
+     - `scripts/qa-desktop.mjs`（`openFirstChapter` L114–125）：因 D4 崩溃重启后自动回到编辑器，改为等待 `firstHeading`（已自动进入）或 `.original-shelf-grid[aria-busy="false"]` 内的作品按钮（如恢复备份清空 session 后停在书架），消除与自动打开之间的竞态；另同步 L352（原 L345）处 `main@ac91913` 改版时遗留的空结果定位文案 `'没有找到匹配的知识卡。'` → `'没有找到匹配的参考条目。'`（`Conversation.jsx:137`），保留原隔离无结果断言。
+     - `scripts/qa-expansion.mjs`（新增 `reopenWorkAfterRestart` 辅助，L365–385）：因 D4 启动自动进入上次作品，两次重启后改为兼容自动进入编辑器或从 `aria-busy="false"` 书架点击进入，保留全部未采纳原稿保护与配置保存断言。
+- 实际变更：修改 `app/renderer/Writing.jsx`、`scripts/qa-writing-workflow.mjs`、`scripts/qa-desktop.mjs`、`scripts/qa-expansion.mjs`。
+- 行为差异：新装或恢复备份后启动仍停在书架；存在有效 `recent.workId` 时重启直接进入上次作品与章节并恢复光标/滚动，可通过“返回书架”返回。
+- 组件旧→新映射：无。
+- 依赖、IPC、偏好存储键、权限变化：无。
+- 提交：本批提交信息 `feat(ui): reopen the last manuscript on launch`（详见 `git log`）。
+- 验证：
+  - `npm run build && npm test`（2026-11-15 04:13）：PASS（106 / 106 通过）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-writing-workflow.mjs`（2026-11-15 04:14）：PASS（`.local/writing-workflow-BxVx5G`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-writing-regressions.mjs`（2026-11-15 04:14）：PASS（`.local/writing-regressions-ahUT2q`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-desktop.mjs`（2026-11-15 04:20）：PASS（`.local/desktop-qa-lL5pam`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-expansion.mjs`（2026-11-15 04:22）：PASS（`.local/expansion-qa-T4YXLn`）。
+  - `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B4`（2026-11-15 04:23）：PASS（0 页面错误，`.local/claude-frontend-ux/B4-1794687783961/`）。
+- 仍有问题与下一步：Phase 1（B2–B4）已完成并交付 `@verifier` 独立核验；后续进入 Phase 2（B5 字号标尺与行宽）。
 
 ### 9.4 验证与截图台账
 
@@ -305,6 +328,7 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | B2 200 条长对话改动前后轮询与长任务对比 | `measure-assistant-polling.mjs before` / `after` | PASS | `.local/claude-frontend-ux/B2-perf-before-1794686623878/` 与 `B2-perf-after-1794686782080/` | 合成 200 条消息，忙碌期为 IPC 模拟流式 |
 | B2 发送键、忙碌草拟与界面回归 | `npm test` (106/106) + `qa-assistant` + `qa-assistant-experience` + `qa-visual` + `audit-screens.mjs B2` | PASS | `.local/assistant-027/experience-1794686840349`、`.local/claude-frontend-ux/B2-1794686862068/` | `qa-assistant-responsiveness.mjs` 记为 `NOT_RUN`（需安装版 EXE 与正式库） |
 | B3 参考默认本地混合与跨页状态保持 | `npm test` (106/106) + `qa-workspace-ui` + `qa-retrieval` + `qa-visual` + `audit-screens.mjs B3` | PASS | `.local/workspace-ui-rL3ms1`、`.local/retrieval-qa-cby5VS`、`.local/claude-frontend-ux/B3-1794687067400/` | 仅合成/fixture 资料 |
+| B4 启动自动回到上次作品与崩溃/重启恢复 | `npm test` (106/106) + `qa-writing-workflow` + `qa-writing-regressions` + `qa-desktop` + `qa-expansion` + `audit-screens.mjs B4` | PASS | `.local/writing-workflow-BxVx5G`、`.local/writing-regressions-ahUT2q`、`.local/desktop-qa-lL5pam`、`.local/expansion-qa-T4YXLn`、`.local/claude-frontend-ux/B4-1794687783961/` | 仅合成资料与本地模拟扩写服务 |
 
 ### 9.5 最终合并交接（停写时填写）
 

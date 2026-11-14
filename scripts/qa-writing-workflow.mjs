@@ -322,13 +322,15 @@ try {
   await app.close();
   app = null;
   await launch();
-  await bookshelf().waitFor();
-  await heading(firstTitle).waitFor({ state: 'hidden' });
-  await openWork(workTitle);
   await heading(firstTitle).waitFor();
+  await bookshelf().waitFor({ state: 'hidden' });
   const afterRestart = await expectPosition(beforeSwitch, '正常重启后未恢复上次章节的光标和滚动位置');
   assert.equal((await readEditor(true)).text, longBody);
-  record('重启先显示书架，点选作品后恢复上次章节、光标、滚动和正文', { afterRestart });
+  await returnToBookshelf();
+  await bookshelf().getByText('继续写作', { exact: true }).waitFor();
+  await openWork(workTitle);
+  await heading(firstTitle).waitFor();
+  record('重启自动回到上次作品并恢复上次章节、光标、滚动和正文，返回书架与继续写作仍可达', { afterRestart });
 
   await page.getByRole('button', { name: '搜索全书正文', exact: true }).click();
   const searchPane = page.getByRole('complementary', { name: '全书正文搜索', exact: true });
