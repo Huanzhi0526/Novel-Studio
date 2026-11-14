@@ -189,13 +189,13 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 
 | 编号/优先级 | 页面与复现步骤 | 对作者的影响 | 拟改方案与理由 | 状态/实际commit |
 | --- | --- | --- | --- | --- |
-| P1-1 | 参考库（KB v2）打开知识卡弹窗 → 点击“编辑” → 保存时报 `KB_V2_READONLY` | 误以为卡片可改，填写后保存失败形成死路 | `CardEditor` 增加 `editable`（`!info?.kbV2`），v2 隐藏“编辑”并说明只读，v1 保留 | 已完成（B1） |
-| P1-2 | 多卷原创作品首次从书架进入写作页，按跨卷 `position` 落到后续卷开头（实测落到“第10章 灯塔”） | 初次打开书目跳卷，打乱阅读与续写定位 | 新增 `orderedChapters(volumes, docs)` 按卷顺序展开章节，`chooseWork` 与页脚导航统一复用 | 已完成（B1） |
+| P1-1 | 参考库（KB v2）打开知识卡弹窗 → 点击“编辑” → 保存时报 `KB_V2_READONLY` | 误以为卡片可改，填写后保存失败形成死路 | `CardEditor` 增加 `editable`（`!info?.kbV2`），v2 隐藏“编辑”并说明只读，v1 保留 | 已完成（`bd99363`） |
+| P1-2 | 多卷原创作品首次从书架进入写作页，按跨卷 `position` 落到后续卷开头（实测落到“第10章 灯塔”） | 初次打开书目跳卷，打乱阅读与续写定位 | 新增 `orderedChapters(volumes, docs)` 按卷顺序展开章节，`chooseWork` 与页脚导航统一复用 | 已完成（`bd99363`） |
 | P1-3（D1） | 写作页默认“跟随窗口”每行约 66 字，专注模式约 85 字 | 中文长行扫视疲劳 | 保留已有偏好；全新本机默认“限制宽度 680px”；专注模式始终居中可读列宽（`--writing-focus-measure`） | 未开始 |
 | P1-4 | 全局根字号 13px，大量 9–11px 界面与菜单文字 | 阅读费力、层级混乱 | 建立 `--fs-meta(12px)` 至 `--fs-h1(22px)` 标尺，根字号升至 14px，消除 `<12px` 可见文字 | 未开始 |
-| P1-5 | 创作助手忙碌时禁用输入框，回合完成后无条件清空草稿 | 等待期间无法记录下一句构思，或写了一半被清空 | 忙碌时仅禁用发送按钮并忽略 Enter；仅当草稿仍等于本轮已发文本时清空，失败保留草稿 | 未开始 |
-| P1-6 | 助手 controller 常驻每秒轮询 `assistant.get` | 空闲时持续 IPC 与重渲染开销 | 仅在 `pending \|\| state?.busy` 时轮询，切换作品/进入视图/发送结束时单次刷新，消息列表 `React.memo` | 未开始 |
-| P1-7 | KB v2 检索区显示九类“类别”下拉，实际仅作 3 组侧重加权且名称与卡片标签不一致 | 筛选预期偏差 | v2 改为“侧重”（不限 / 人物与设定 / 剧情场次 / 原文描写），同步设置页 v2 说明文案 | 已完成（B1） |
+| P1-5 | 创作助手忙碌时禁用输入框，回合完成后无条件清空草稿 | 等待期间无法记录下一句构思，或写了一半被清空 | 忙碌时仅禁用发送按钮并忽略 Enter；仅当草稿仍等于本轮已发文本时清空，失败保留草稿 | 已完成（B2，见 §9.3） |
+| P1-6 | 助手 controller 常驻每秒轮询 `assistant.get` | 空闲时持续 IPC 与重渲染开销 | 仅在 `pending \|\| state?.busy` 时轮询，切换作品/进入视图/发送结束时单次刷新，消息列表 `React.memo` | 已完成（B2，见 §9.3） |
+| P1-7 | KB v2 检索区显示九类“类别”下拉，实际仅作 3 组侧重加权且名称与卡片标签不一致 | 筛选预期偏差 | v2 改为“侧重”（不限 / 人物与设定 / 剧情场次 / 原文描写），同步设置页 v2 说明文案 | 已完成（`bd99363`） |
 | P2-1 | 章节历史仅显示保存时间，点击即弹恢复确认 | 无法先核对版本内容与字数差异 | 列表展示字数与差值，点击先在抽屉内只读预览正文，再决定恢复或返回列表 | 未开始 |
 | P2-2 | 写作工具栏两端分散、开关抽屉时按钮位移、缺少按下态与分组收纳 | 肌肉记忆受干扰、窄窗拥挤 | 工具栏左对齐固定顺序，合并“更多”分组菜单，标记/历史补 `aria-pressed`，窄容器收纳次要项 | 未开始 |
 | P2-3 | 左侧栏不可折叠；窄窗下普通抽屉无遮罩且 Esc 需焦点在抽屉内才生效 | 窄窗正文空间局促，关闭抽屉手势不一致 | 左侧栏支持折叠为 56px 图标条（持久于 `writingSession.layout.railCollapsed`）；非停靠抽屉统一遮罩与全局 Esc 优先级 | 未开始 |
@@ -204,7 +204,7 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | P2-6 | 写作右侧大纲/角色/设定速查预览直接显示 Markdown 源码 | 标题与列表符号干扰对照阅读 | 使用受限白名单 `react-markdown`（`skipHtml`）渲染资料预览，章节对照保持纯文本 | 未开始 |
 | P2-7 | 卡片弹窗标题写“知识卡”重复层级、证据全折叠、紧凑卡“查看完整卡片”像小标题且易被遮罩压住 | 查卡与核证原文多一步操作 | 弹窗直接以卡名为标题、眉题写作品与类别，默认展开前 3 条证据；紧凑卡底部右侧改为“展开全文 →” | 未开始 |
 | P2-8 | 写作 364px 侧栏中 KB v2 模式按钮与“接口设置”挤压换行，两条外传说明占高 | 侧栏检索视野局促 | 侧栏模式按钮显示短名（保留完整可访问名称/title），接口设置改图标按钮，合并外传提示 | 未开始 |
-| P2-9（D2） | 参考检索 Enter 发送，创作助手 Ctrl+Enter 发送 | 跨面板输入习惯割裂 | 统一 `sendIntent`：Enter 发送、Shift+Enter 换行、Ctrl/⌘+Enter 兼容发送、IME 组字保护 | 未开始 |
+| P2-9（D2） | 参考检索 Enter 发送，创作助手 Ctrl+Enter 发送 | 跨面板输入习惯割裂 | 统一 `sendIntent`：Enter 发送、Shift+Enter 换行、Ctrl/⌘+Enter 兼容发送、IME 组字保护 | 已完成（B2，见 §9.3） |
 | P2-10（D3） | 参考检索默认 `fast`（AI），且切页后参考库模式与已选作品重置 | 每次打开默认指向外传模式，跨页对照丢失位置 | v2 默认 `local`（会话内保留切换，重启回 `local`）；App 层保持参考库视图状态与书架滚动位置 | 未开始 |
 | P2-11 | 参考库、创作助手、设置页顶栏高度与标题层级不一致 | 跨页切换跳跃感明显 | 提取 `PageHeader` 统一 48px 页头，压缩助手页头，去除设置页重复顶栏 | 未开始 |
 | P2-12 | CodeMirror 查找替换面板 12px 紧凑排布 | 查找框输入局促 | `.cm-search` 控件统一 `--fs-ui`、30px 最小高度与语义色变量 | 未开始 |
@@ -243,7 +243,7 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 - 行为差异：KB v2 卡片弹窗不再显示“编辑”按钮并新增只读说明；KB v2 检索筛选标签由“类别（9类）”改为“侧重（不限 / 人物与设定 / 剧情场次 / 原文描写）”；无历史记录的多卷原创作品首次打开固定进入第一卷第一章。
 - 组件旧→新映射：新增辅助纯函数模块 `app/renderer/writing-order.mjs`（`orderedChapters`）；组件名未变。
 - 依赖、IPC、偏好存储键、权限变化：无。
-- 提交：见本批提交（`fix(ui): hide read-only v2 card edit, open first chapter in volume order, relabel v2 focus filter`）。
+- 提交：`bd99363`（`fix(ui): hide read-only v2 card edit, open first chapter in volume order, relabel v2 focus filter`）。
 - 验证：
   - `npm run build && npm test`（2026-11-15 03:52）：PASS（102 / 102 通过）。
   - `node --disable-warning=ExperimentalWarning scripts/qa-writing-workflow.mjs`（2026-11-15 03:52）：PASS（`.local/writing-workflow-yoEkPE`）。
@@ -253,6 +253,29 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
   - `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B1`（2026-11-15 03:53）：PASS（断言 `firstOpenedTitle==="第一章 熄灭的信号灯"`、`cardModalHasEditButton===false`、`categoryLabel==="侧重"` 全部通过，截图位于 `.local/claude-frontend-ux/B1-1794685986461/`）。
 - 仍有问题与下一步：进入 B2，统一 Enter 发送键、支持助手运行期间继续草拟输入、优化助手空闲轮询并进行长对话测量。
 
+#### B2：发送键统一、助手运行期草拟输入与轮询优化（D2、P1-5、P1-6、P2-9）
+
+- 时间与目标：2026-11-15 04:03–04:09；统一参考检索与创作助手（独立页+写作侧栏）为 Enter 发送 / Shift+Enter 换行（含 IME 组字保护与 Ctrl/⌘+Enter 兼容别名），允许助手忙碌时继续编辑草稿且不清空新写草稿，将 `assistant.get` 轮询收窄至忙碌期并为长消息列表加 `React.memo`，对 200 条合成长对话改动前后各测一次长任务与轮询次数。
+- 发现/决定与取舍：
+  1. 200 条 × 约 600 字长对话实测复现了 P1-6 性能问题：改动前在空闲 30 秒内持续产生 30 次 `assistant.get` 与 30 次长任务（`totalLongtaskMs=2165`，`maxLongtaskMs=86`），忙碌模拟 6 秒内产生 6 次长任务（`totalLongtaskMs=442`，`maxLongtaskMs=79`）；改动后空闲 30 秒降为 0 次调用与 0 次长任务，忙碌 6 秒仍按预期轮询 6 次 `assistant.get` 但因 `MessageList` `React.memo` 跳过历史消息重渲染而降为 0 次长任务（`totalLongtaskMs=0`，`maxLongtaskMs=0`）。
+  2. `Assistant.jsx` 将 `useAssistantController` 轮询拆分为：切换 `workId` 单次 `load`、`active` 从假变真单次 `refreshWorks()` + `refreshState()`、仅在 `Boolean(workId) && busy` 时每秒轮询；加入 `syncEpoch` 防止切换作品或回合结束时在途轮询覆盖新状态；`run()` 记录 `sent` 并在失败 `catch` 时静默拉取一次 `assistant.get` 同步 `lastError` / `failedPartial` / `busy: false`。
+  3. 紧凑侧栏移除 `.assistant-compact .assistant-composer-actions>span{display:none}`，改为提示占首行、按钮居第二行自动换行，避免 364px 侧栏下横向溢出。
+- 实际变更：新建 `app/renderer/input-keys.mjs`、`tests/input-keys.test.mjs`；修改 `app/renderer/Conversation.jsx`、`app/renderer/Assistant.jsx`、`app/renderer/assistant.css`、`scripts/qa-assistant-experience.mjs`、`docs/创作助手.md`、`docs/assistant-ui-brief.md`。
+- 行为差异：参考检索与创作助手统一为 `Enter` 发送、`Shift+Enter` 换行（`Ctrl/⌘+Enter` 仍兼容发送，IME 组字与忙碌期间按 `Enter` 不发送也不换行）；助手忙碌时输入框保持可编辑，回合完成后若草稿已被用户改写则保留；侧栏底部显示键位提示。
+- 组件旧→新映射：新增纯函数模块 `app/renderer/input-keys.mjs`（`sendIntent`）；`Assistant.jsx` 抽离 `MessageList = React.memo(...)`。
+- 依赖、IPC、偏好存储键、权限变化：无（快捷键变化：创作助手发送键由 `Ctrl/⌘+Enter` 统一为 `Enter`，仍兼容 `Ctrl/⌘+Enter`）。
+- 提交：待本批提交后在 B3 开头补填 hash（`feat(ui): unify Enter-to-send, allow drafting while assistant runs, poll assistant only when busy`）。
+- 验证：
+  - `measure-assistant-polling.mjs before`（2026-11-15 04:04）：PASS — 空闲 30s：`assistantGetCalls=30`，`longtaskCount=30`，`totalLongtaskMs=2165`，`maxLongtaskMs=86`；忙碌 6s：`assistantGetCalls=6`，`longtaskCount=6`，`totalLongtaskMs=442`，`maxLongtaskMs=79`（`.local/claude-frontend-ux/B2-perf-before-1794686623878/`）。
+  - `npm run build && npm test`（2026-11-15 04:06）：PASS（106 / 106 通过）。
+  - `measure-assistant-polling.mjs after`（2026-11-15 04:07）：PASS — 空闲 30s：`assistantGetCalls=0`，`longtaskCount=0`，`totalLongtaskMs=0`，`maxLongtaskMs=0`；忙碌 6s：`assistantGetCalls=6`，`longtaskCount=0`，`totalLongtaskMs=0`，`maxLongtaskMs=0`（`.local/claude-frontend-ux/B2-perf-after-1794686782080/`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-assistant.mjs`（2026-11-15 04:07）：PASS。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-assistant-experience.mjs`（2026-11-15 04:07）：PASS（保留既有跨入口草稿保持断言，新增 Shift+Enter、IME 组字、忙碌期打字/Enter 抑制、草稿保留/清空与失败同步断言，证据 `.local/assistant-027/experience-1794686840349`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-visual.mjs`（2026-11-15 04:08）：PASS（`.local/visual-qa-LLxaWt`）。
+  - `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B2`（2026-11-15 04:08）：PASS（0 页面错误，`.local/claude-frontend-ux/B2-1794686862068/`）。
+  - `node scripts/qa-assistant-responsiveness.mjs`：`NOT_RUN`（需已打包安装版 EXE 与 `reference-v2.sqlite`，按本轮红线不打包且不读写正式库）。
+- 仍有问题与下一步：进入 B3，将 KB v2 默认检索模式改为本地混合（`local`）并在 App 层保持参考库视图状态与书架滚动位置。
+
 ### 9.4 验证与截图台账
 
 | 旅程/窗口/状态 | 实际命令或操作 | 结果 PASS/FAIL/NOT_RUN | 证据路径 | 未覆盖与限制 |
@@ -260,6 +283,8 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | B0 基线单测（100 项） | `npm run build && npm test` | PASS | 终端日志（100 pass / 0 fail） | 改动前基线核验 |
 | B0 改动前全页面基线截图（1460×930 / 980×760 / 880×600） | `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B0-baseline` | PASS | `.local/worktrees/claude-frontend-ux/.local/claude-frontend-ux/B0-baseline-1794685557053/` | 仅合成资料与本地无模型模式 |
 | B1 写作顺序、v1/v2 卡片只读与侧重筛选 | `npm test` + `qa-writing-workflow` + `qa-writing-regressions` + `qa-card-viewer` + `qa-card-markdown` + `audit-screens.mjs B1` | PASS | `.local/worktrees/claude-frontend-ux/.local/claude-frontend-ux/B1-1794685986461/` | v1 编辑流与 v2 只读态分别覆盖 |
+| B2 200 条长对话改动前后轮询与长任务对比 | `measure-assistant-polling.mjs before` / `after` | PASS | `.local/claude-frontend-ux/B2-perf-before-1794686623878/` 与 `B2-perf-after-1794686782080/` | 合成 200 条消息，忙碌期为 IPC 模拟流式 |
+| B2 发送键、忙碌草拟与界面回归 | `npm test` (106/106) + `qa-assistant` + `qa-assistant-experience` + `qa-visual` + `audit-screens.mjs B2` | PASS | `.local/assistant-027/experience-1794686840349`、`.local/claude-frontend-ux/B2-1794686862068/` | `qa-assistant-responsiveness.mjs` 记为 `NOT_RUN`（需安装版 EXE 与正式库） |
 
 ### 9.5 最终合并交接（停写时填写）
 

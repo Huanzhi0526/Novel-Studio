@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { api, Card, categories, ErrorMessage, Icon } from './ui.jsx';
+import { sendIntent } from './input-keys.mjs';
 
 export function useConversation() {
   const [draft, setDraft] = useState('');
@@ -147,9 +148,9 @@ export function Conversation({ state, works, openEvidence, openCard, sidebar = f
       <textarea id={sidebar ? 'sidebar-query' : 'library-query'} placeholder={kbV2 ? '自然语言提问：例如“有哪些约会情节？”“有哪些服装设计与描写？”…' : '描述你想找的人物、情节或设定…'} maxLength={500} rows={2}
         value={draft} onChange={event => setDraft(event.target.value)}
         onKeyDown={event => {
-          if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing && event.keyCode !== 229) {
+          if (sendIntent(event) === 'send') {
             event.preventDefault();
-            event.currentTarget.form.requestSubmit();
+            if (!running && draft.trim()) event.currentTarget.form.requestSubmit();
           }
         }} />
       <div className="composer-foot">
