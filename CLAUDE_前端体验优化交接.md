@@ -209,7 +209,7 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | P2-11 | 参考库、创作助手、设置页顶栏高度与标题层级不一致 | 跨页切换跳跃感明显 | 提取 `PageHeader` 统一 48px 页头，压缩助手页头，去除设置页重复顶栏 | 未开始 |
 | P2-12 | CodeMirror 查找替换面板 12px 紧凑排布 | 查找框输入局促 | `.cm-search` 控件统一 `--fs-ui`、30px 最小高度与语义色变量 | 已完成（B5，见 §9.3） |
 | P2-13 | 光标在括号提示内未全选时“AI 扩写”直接禁用，弹窗“生成预览”无主按钮样式 | 扩写触发门槛不直观 | 新增只读辅助函数 `enclosingExpansionPair`，提供“选中提示”快捷选中按钮；“生成预览”补主按钮样式 | 已完成（B6，见 §9.3） |
-| P2-14（D5） | 夜写纸张时周边栏位仍为亮色，缺少独立整站深色模式 | 夜间写作眩光对比强烈 | 新增 `appearance`（`light`/`dark`/`system`）与全套语义色变量，五主题适配深色且与纸张独立 | 未开始 |
+| P2-14（D5） | 夜写纸张时周边栏位仍为亮色，缺少独立整站深色模式 | 夜间写作眩光对比强烈 | 新增 `appearance`（`light`/`dark`/`system`）与全套语义色变量，五主题适配深色且与纸张独立 | 已完成（B7，见 §9.3） |
 | P3 | `Modal` 缺 Tab 焦点圈闭、导航/扩写图标重复、章节菜单带框拥挤、删标记无撤销、助手样式写死色值 | 键盘可访问性与细节一致性不足 | `Modal` 补焦点圈闭、区分助手与扩写图标、菜单无框化、删除标记 5 秒内可撤销、清理残余硬编码色值 | 未开始 |
 | D4 | 启动始终停在书架，需再次点选上次正在写的书 | 日常续写多一步点击 | 启动读取书架后若 `recent.workId` 仍存在则自动进入并恢复章节与光标，失败或恢复备份后停在书架 | 已完成（`54b977e`） |
 
@@ -357,7 +357,7 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 - 行为差异：工具栏按钮顺序固定且窄窗次要按钮收进“更多”；左侧导航支持收起为 56px 图标条并持久记忆；窄窗所有右侧抽屉均带遮罩，Esc 按统一优先级逐层关闭；历史列表显示字数及差值且先预览再恢复；大纲/角色/设定预览支持 Markdown 排版；光标位于未选中括号提示内时“AI 扩写”旁显示“选中提示”。
 - 组件旧→新映射：新增纯函数 `enclosingExpansionPair`（`app/shared/expansion-selection.mjs`）；`writing-session.mjs` 的 `normalizeSession` 新增 `layout: { railCollapsed }` 字段。
 - 依赖、IPC、偏好存储键、权限变化：无（`studio.writingSession.v1` 仅新增向后兼容的 `layout.railCollapsed` 布尔字段）。
-- 提交：`e906e26`（`feat(ui): stable writing toolbar with grouped overflow menu`）、`56019d2`（`feat(ui): collapsible rail, consistent drawer overlay and Esc`）、Commit 3（本提交 `feat(ui): history preview, rendered material preview, expansion prompt helper`）。
+- 提交：`e906e26`（`feat(ui): stable writing toolbar with grouped overflow menu`）、`56019d2`（`feat(ui): collapsible rail, consistent drawer overlay and Esc`）、`13f0926`（`feat(ui): history preview, rendered material preview, expansion prompt helper`）。
 - 验证：
   - `npm run build && npm test`（2026-11-15 04:47）：PASS（112 / 112 通过，含新增 `writing-session` layout 单测及 2 项 `enclosingExpansionPair` 单测）。
   - `node --disable-warning=ExperimentalWarning scripts/qa-writing-workflow.mjs`（2026-11-15 04:48）：PASS（`.local/writing-workflow-1Bp77A`）。
@@ -367,6 +367,26 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
   - `node --disable-warning=ExperimentalWarning scripts/qa-visual.mjs`（2026-11-15 04:53）：PASS（`.local/visual-qa-5S4Koo`）。
   - `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B6`（2026-11-15 04:54）：PASS（0 页面错误，`sub12=[]`、`railCollapsedOverflow=[]`、`overflowWide=[]`、`overflowNarrow=[]`、`overflowMin=[]`，B6 折叠侧栏/历史预览/遮罩关闭/选中提示断言全部通过，截图 `.local/claude-frontend-ux/B6-1794689626584/`）。
 - 仍有问题与下一步：进入 B7（整站深色界面与语义色变量，独立于写作纸张并满足 WCAG 对比度抽检）。
+
+#### B7：整站深色界面与语义色变量（P2-14、D5）
+
+- 时间与目标：2026-11-15 04:55–05:03；在 `preferences-model.mjs` 新增 `appearance`（`light`/`dark`/`system`，默认 `light`），在 `App.jsx` 监听系统深浅色并同步 `data-appearance` 与 `colorScheme`；在全部 CSS 中清理写死颜色及深色下发白 `color-mix` 遮罩，补齐 `ink/indigo/jade/rose/amber` 5 主题深色与 `card-content.css` 深色语义覆盖，保持写作纸张独立并完成 WCAG 对比度抽样实测。
+- 发现/决定与取舍：
+  1. `preferences-model.mjs` 新增 `appearances = [['light','浅色'], ['dark','深色'], ['system','跟随系统']]` 与 `defaults.appearance = 'light'`（非法值回退 `'light'`）；`Preferences.jsx` 的 `AppearancePreferences` 在主题色上方展示“界面明暗”分段按钮，并附“写作纸张在「写作偏好」中单独设置；夜间写作可搭配「夜写」纸张”提示。
+  2. `App.jsx` 新增 `useResolvedAppearance(preferences.appearance)` 监听 `matchMedia('(prefers-color-scheme: dark)')`，在 `.studio` 设置 `data-appearance`，同步 `document.documentElement.style.colorScheme`；`index.html` `<meta name="color-scheme">` 更新为 `light dark`。
+  3. `:root` 与 `.studio[data-appearance=dark]` 补齐 `--accent-ink`、`--scrim`、`--danger-*`、`--success-*`、`--warn-*`、`--shadow`、`--shadow-sm` 语义变量（深色下 `--accent-ink: #16181d` 配提亮主题 `--accent`），并将 `app.css`、`writing.css`、`assistant.css`、`manuscript-directory.css`、`expansion-dialog.css`、`reader-workspace.css`、`ui.jsx` 的写死颜色及发白 `color-mix(..., var(--ink))` 遮罩/阴影全部改为语义变量；`card-content.css` 为 10 类知识卡与 8 组标签在深色模式下配置低明度底色与提亮文字色；`[data-writing-paper]` 与 `[data-writing-paper=dark] .expansion-inline-preview` 保持独立于 `data-appearance`。
+  4. **已知限制**：因本轮红线禁止修改 `app/main/**`，主进程 `BrowserWindow` 创建时的初始 `#ffffff` 背景色未同步调整，冷启动首帧渲染前可能存在极短白闪（首次挂载后即由 `data-appearance` 与 `colorScheme` 接管）。
+- 实际变更：修改 `app/renderer/preferences-model.mjs`、`tests/preferences-model.test.mjs`、`app/renderer/Preferences.jsx`、`app/renderer/index.html`、`app/renderer/ui.jsx`、`app/renderer/App.jsx`、`app/renderer/app.css`、`app/renderer/writing.css`、`app/renderer/assistant.css`、`app/renderer/card-content.css`、`app/renderer/manuscript-directory.css`、`app/renderer/expansion-dialog.css`、`app/renderer/reader-workspace.css`、`README.md`、`.local/claude-frontend-ux/audit-screens.mjs` 与本交接台账。
+- 行为差异：外观偏好新增独立于写作纸张的“浅色 / 深色 / 跟随系统”明暗模式，5 套主题均可在深色界面的同时自由搭配白纸/米纸/护眼/夜写纸张；原生控件、滚动条、弹窗遮罩、知识卡标签与报错条随明暗切换自适应。
+- 组件旧→新映射：`preferences-model.mjs` 新增 `appearances` 常量；`App.jsx` 新增 `useResolvedAppearance` hook。
+- 依赖、IPC、偏好存储键、权限变化：无（`studio.preferences.v1` 新增向后兼容 `appearance` 字段，默认 `'light'`）。
+- 提交：B7 单一提交（`feat(ui): independent dark appearance with semantic color tokens`）。
+- 验证：
+  - `npm run build && npm test`（2026-11-15 04:58）：PASS（113 / 113 通过，含新增 `appearance` 规范化/持久化单测）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-desktop.mjs`（2026-11-15 05:00）：PASS（`.local/desktop-qa-R8DSBV`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-visual.mjs`（2026-11-15 05:00）：PASS（`.local/visual-qa-nevIpS`）。
+  - `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B7`（2026-11-15 05:02）：PASS（0 页面错误，`sub12=[]`，`b7WhitePaperInDarkUi` 确认深色界面下白纸保持 `rgb(255, 255, 255)` / `rgb(35, 36, 40)`；Chromium 实测 5 主题深色对比度：`inkOnBg=13.35`、`inkOnPanel=12.14`、`mutedOnBg=6.82`、`mutedOnPanel=6.20`、`accentInkOnAccent=7.41–12.32`、`linkOnPanel=7.07–7.99`、`accentOnSoft=5.46–8.53`、`accentOnChrome=5.94–9.55`，全部达标；截图 `.local/claude-frontend-ux/B7-1794690142065/`）。
+- 仍有问题与下一步：Phase 2（B5–B7）已全部完成并交付 `@verifier` 独立复核；等待核验通过后由 Phase 3 继续 B8–B11。
 
 ### 9.4 验证与截图台账
 
@@ -381,6 +401,7 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | B4 启动自动回到上次作品与崩溃/重启恢复 | `npm test` (106/106) + `qa-writing-workflow` + `qa-writing-regressions` + `qa-desktop` + `qa-expansion` + `audit-screens.mjs B4` | PASS | `.local/writing-workflow-BxVx5G`、`.local/writing-regressions-ahUT2q`、`.local/desktop-qa-lL5pam`、`.local/expansion-qa-T4YXLn`、`.local/claude-frontend-ux/B4-1794687783961/` | 仅合成资料与本地模拟扩写服务 |
 | B5 字号标尺、D1 默认宽度、专注列宽与无溢出 | `npm test` (109/109) + `qa-writing-workflow` + `qa-writing-regressions` + `qa-desktop` + `qa-visual` + `audit-screens.mjs B5` | PASS | `.local/writing-workflow-c2G8UD`、`.local/writing-regressions-IXZP0I`、`.local/desktop-qa-R4mLCd`、`.local/visual-qa-A0QzYE`、`.local/claude-frontend-ux/B5-1794688476117/` | 仅合成资料；`sub12=[]` 且 3 种窗口尺寸均无横向溢出 |
 | B6 写作页结构、可收起侧栏、历史/资料预览与选中提示 | `npm test` (112/112) + `qa-writing-workflow` + `qa-writing-regressions` + `qa-expansion` + `qa-desktop` + `qa-visual` + `audit-screens.mjs B6` | PASS | `.local/writing-workflow-1Bp77A`、`.local/writing-regressions-eLvgDX`、`.local/expansion-qa-p50yJF`、`.local/desktop-qa-FlTCQt`、`.local/visual-qa-5S4Koo`、`.local/claude-frontend-ux/B6-1794689626584/` | 仅合成资料与本地模拟扩写服务；`sub12=[]`、3 种尺寸及折叠侧栏均无横向溢出 |
+| B7 整站深色界面、5 主题适配与 WCAG 对比度 | `npm test` (113/113) + `qa-desktop` + `qa-visual` + `audit-screens.mjs B7` | PASS | `.local/desktop-qa-R8DSBV`、`.local/visual-qa-nevIpS`、`.local/claude-frontend-ux/B7-1794690142065/` | 仅合成资料；`app/main` 未改致冷启动首帧前存在短暂白闪；5 主题深色 WCAG 抽检全部达标 |
 
 ### 9.5 最终合并交接（停写时填写）
 

@@ -4,7 +4,7 @@
   margin: auto;
   color: var(--ink);
 }
-.expansion-dialog::backdrop { background: #23242856; }
+.expansion-dialog::backdrop { background: var(--scrim); }
 .expansion-dialog h3 { margin: 0 0 6px; font-size: var(--fs-h3); }
 .expansion-instruction p {
   margin: 0;
@@ -22,13 +22,13 @@
 .expansion-options label { display: flex; align-items: center; gap: 7px; width: fit-content; }
 .expansion-options label input[type=checkbox] { min-height: auto; margin: 0; }
 .expansion-options p, .expansion-status { margin: 6px 0 0; color: var(--muted); font-size: var(--fs-meta); }
-.expansion-error { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; color: #a0353c; font-size: var(--fs-ui); }
+.expansion-error { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; color: var(--danger-ink); font-size: var(--fs-ui); }
 .expansion-error span { overflow-wrap: anywhere; }
 .expansion-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
-.expansion-actions .primary-button { background: var(--accent); border-color: var(--accent); color: var(--panel); font-weight: 600; }
+.expansion-actions .primary-button { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
 .expansion-actions .primary-button:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--accent) 84%, white);
-  border-color: color-mix(in srgb, var(--accent) 84%, white);
+  background: color-mix(in srgb, var(--accent) 88%, var(--panel));
+  border-color: color-mix(in srgb, var(--accent) 88%, var(--panel));
 }
 .writing-focus-actions { display: flex; align-items: center; gap: 6px; }
 

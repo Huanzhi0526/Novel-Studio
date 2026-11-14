@@ -113,6 +113,25 @@ function Settings({ info, restored, preferences, updatePreferences, settingsTarg
 
 const INITIAL_REFERENCE_VIEW = { mode: 'search', selected: '', archiveOpen: false, query: '' };
 
+function useResolvedAppearance(appearance) {
+  const [systemDark, setSystemDark] = useState(() =>
+    typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+      ? window.matchMedia('(prefers-color-scheme: dark)').matches
+      : false
+  );
+
+  useEffect(() => {
+    if (appearance !== 'system' || typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const update = () => setSystemDark(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, [appearance]);
+
+  return appearance === 'system' ? (systemDark ? 'dark' : 'light') : appearance;
+}
+
 function App() {
   const [view, setView] = useState('writing');
   const [settingsTarget, setSettingsTarget] = useState(null);
@@ -128,6 +147,7 @@ function App() {
   const [error, setError] = useState(null);
   const [banner, setBanner] = useState('');
   const [preferences, setPreferences] = useState(loadPreferences);
+  const resolvedAppearance = useResolvedAppearance(preferences.appearance);
   const [referenceView, setReferenceView] = useState(INITIAL_REFERENCE_VIEW);
   const referenceShelfScroll = useRef(0);
   const assistantController = useAssistantController();
@@ -153,6 +173,9 @@ function App() {
   }, []);
 
   useEffect(() => savePreferences(preferences), [preferences]);
+  useEffect(() => {
+    document.documentElement.style.colorScheme = resolvedAppearance;
+  }, [resolvedAppearance]);
 
   function updatePreferences(patch) {
     setPreferences(current => normalizePreferences({ ...current, ...patch }));
@@ -201,7 +224,8 @@ function App() {
   ];
   const reading = Boolean(reader);
   const railLabel = railCollapsed ? '展开侧栏' : '收起侧栏';
-  return <div className={`studio ${railCollapsed ? 'studio-rail-collapsed' : ''} ${reading || (view === 'writing' && focused) ? 'studio-focused' : ''}`} data-theme={preferences.theme}
+  return <div className={`studio ${railCollapsed ? 'studio-rail-collapsed' : ''} ${reading || (view === 'writing' && focused) ? 'studio-focused' : ''}`}
+    data-theme={preferences.theme} data-appearance={resolvedAppearance}
     style={{ '--reader-font': `${preferences.readerSize}px` }}>
     <aside className="app-rail" hidden={reading}>
       <div className="brand" title="小说工作台"><span className="brand-mark"><Icon name="book" size={19} /></span><strong>小说工作台</strong></div>

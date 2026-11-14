@@ -69,7 +69,7 @@
 .rail-menu > summary { width: 25px; height: 25px; display: grid; place-items: center; border-radius: 5px; color: var(--muted); cursor: pointer; list-style: none; line-height: 1; }
 .rail-menu > summary::-webkit-details-marker { display: none; }
 .rail-menu > summary:hover, .rail-menu[open] > summary { background: var(--accent-soft); color: var(--ink); }
-.rail-menu-items { position: absolute; z-index: 10; top: 25px; right: 0; width: max-content; min-width: 150px; display: grid; gap: 1px; padding: 4px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel); box-shadow: 0 7px 24px color-mix(in srgb, var(--ink) 12%, transparent); }
+.rail-menu-items { position: absolute; z-index: 10; top: 25px; right: 0; width: max-content; min-width: 150px; display: grid; gap: 1px; padding: 4px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel); box-shadow: var(--shadow); }
 .rail-menu-group { display: grid; gap: 1px; }
 .rail-menu-group + .rail-menu-group { margin-top: 3px; padding-top: 3px; border-top: 1px solid var(--border); }
 .rail-menu-heading { padding: 3px 8px 2px; color: var(--muted); font-size: var(--fs-meta); font-weight: 600; }
@@ -170,9 +170,9 @@
 .writing-empty svg { margin-bottom: 10px; color: var(--accent); }
 .writing-empty p { max-width: 350px; margin: 0 auto 14px; font-size: var(--fs-body); }
 .writing-empty button { color: var(--ink); background: var(--accent-soft); }
-.writing-drawer { position: absolute; z-index: 5; top: 54px; right: 0; bottom: 0; width: min(var(--drawer-width), 92vw); min-width: 0; display: flex; flex-direction: column; border-left: 1px solid var(--border); background: var(--panel); box-shadow: -12px 0 30px color-mix(in srgb, var(--ink) 8%, transparent); }
+.writing-drawer { position: absolute; z-index: 5; top: 54px; right: 0; bottom: 0; width: min(var(--drawer-width), 92vw); min-width: 0; display: flex; flex-direction: column; border-left: 1px solid var(--border); background: var(--panel); box-shadow: var(--shadow); }
 .writing-drawer.is-reference:not(.is-docked) { top: 0; }
-.writing-shell .writing-overlay-dismiss, .writing-shell .writing-overlay-dismiss:hover:not(:disabled) { position: absolute; z-index: 4; inset: 0; border: 0; border-radius: 0; background: #14182435; }
+.writing-shell .writing-overlay-dismiss, .writing-shell .writing-overlay-dismiss:hover:not(:disabled) { position: absolute; z-index: 4; inset: 0; border: 0; border-radius: 0; background: var(--scrim); }
 .writing-shell.has-resource-tools .writing-overlay-dismiss { right: 50px; }
 .writing-drawer.is-docked { position: relative; top: auto; right: auto; bottom: auto; grid-column: -2 / -1; grid-row: 1; width: 100%; min-height: 0; align-self: stretch; border-left: 1px solid var(--border); box-shadow: none; }
 .writing-shell.has-inline-rail.has-docked-panel .writing-drawer.is-docked { grid-column: 3; }
@@ -197,7 +197,7 @@
 .mark-create label { display: grid; gap: 3px; color: var(--muted); font-size: var(--fs-meta); }
 .mark-create select { width: 100%; font-size: var(--fs-ui); }
 .mark-create input { font-size: var(--fs-ui); }
-.mark-create .primary-button { grid-column: 1 / -1; min-height: 31px; background: var(--accent); color: var(--panel); font-size: var(--fs-ui); }
+.mark-create .primary-button { grid-column: 1 / -1; min-height: 31px; background: var(--accent); color: var(--accent-ink); font-size: var(--fs-ui); }
 .mark-create small { grid-column: 1 / -1; color: var(--muted); font-size: var(--fs-meta); }
 .mark-list { display: grid; gap: 3px; margin: 9px 0 0; padding: 0; list-style: none; }
 .mark-list li { display: flex; align-items: center; gap: 3px; padding: 4px 5px; border-radius: 6px; }
@@ -217,7 +217,7 @@
 .history-preview-view { display: grid; gap: 8px; }
 .history-preview-bar { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .history-preview-bar button { border-color: var(--border); font-size: var(--fs-ui); }
-.history-preview-bar .history-restore-button { background: var(--accent); border-color: var(--accent); color: var(--panel); font-weight: 600; }
+.history-preview-bar .history-restore-button { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
 .history-preview-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 10px; color: var(--muted); font-size: var(--fs-meta); font-variant-numeric: tabular-nums; }
 .history-preview-body { margin: 0; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--ink); font: inherit; font-size: var(--fs-ui); line-height: var(--lh-body); max-height: calc(100vh - 210px); overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
 .panel-empty { padding: 16px 4px; color: var(--muted); font-size: var(--fs-meta); }
@@ -230,14 +230,14 @@
 }
 .writing-toolbar .focus-exit { border-color: var(--border); background: var(--panel); color: var(--accent); font-weight: 600; white-space: nowrap; }
 .focus-exit kbd { font-size: var(--fs-meta); color: var(--muted); border-radius: 4px; padding: 1px 4px; background: var(--accent-soft); }
-.writing-dialog-backdrop { position: fixed; z-index: 20; inset: 0; display: grid; place-items: center; padding: 18px; background: color-mix(in srgb, var(--ink) 20%, transparent); }
-.writing-dialog { width: min(380px, 100%); display: grid; gap: 12px; padding: 18px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel); box-shadow: 0 16px 45px color-mix(in srgb, var(--ink) 15%, transparent); }
+.writing-dialog-backdrop { position: fixed; z-index: 20; inset: 0; display: grid; place-items: center; padding: 18px; background: var(--scrim); }
+.writing-dialog { width: min(380px, 100%); display: grid; gap: 12px; padding: 18px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel); box-shadow: var(--shadow); }
 .writing-dialog label { font-size: var(--fs-ui); font-weight: 600; }
 .writing-dialog input { width: 100%; }
 .writing-dialog p { margin: 0; color: var(--muted); font-size: var(--fs-body); }
-.writing-dialog p.dialog-error { color: #a0353c; }
+.writing-dialog p.dialog-error { color: var(--danger-ink); }
 .writing-dialog > div { display: flex; justify-content: flex-end; gap: 5px; }
-.writing-dialog .dialog-primary { background: var(--accent); color: var(--panel); }
+.writing-dialog .dialog-primary { background: var(--accent); color: var(--accent-ink); }
 @container writing-workspace (max-width: 740px) {
   .toolbar-buttons > .toolbar-secondary { display: none; }
   .toolbar-overflow-only { display: grid; gap: 1px; }
@@ -265,11 +265,11 @@
   .writing-shell.has-inline-rail { grid-template-columns: minmax(0,1fr); grid-template-rows: minmax(0,1fr); }
   .writing-shell.has-inline-rail.has-docked-panel { grid-template-columns: minmax(0,1fr); }
   .writing-shell.has-resource-tools.has-inline-rail:not(.has-docked-panel) { grid-template-columns: minmax(0,1fr) 50px; }
-  .writing-drawer.is-docked { position: absolute; top: 54px; right: 0; bottom: 0; width: min(370px,92vw); height: auto; box-shadow: -100vw 0 0 100vw color-mix(in srgb, var(--ink) 16%, transparent); }
+  .writing-drawer.is-docked { position: absolute; top: 54px; right: 0; bottom: 0; width: min(370px,92vw); height: auto; box-shadow: -100vw 0 0 100vw var(--scrim); }
   .writing-shell.has-inline-rail > .writing-rail { display: none; }
   .toolbar-inner { flex-wrap: wrap; padding-top: 5px; padding-bottom: 5px; }
   .doc-heading { flex: 1 1 100%; }
   .toolbar-buttons { width: 100%; justify-content: space-between; }
   .editor-host .cm-content { padding-top: 35px; }
-  .writing-drawer { top: 0; width: min(370px, 92vw); box-shadow: -100vw 0 0 100vw color-mix(in srgb, var(--ink) 16%, transparent); }
+  .writing-drawer { top: 0; width: min(370px, 92vw); box-shadow: -100vw 0 0 100vw var(--scrim); }
 }

@@ -55,3 +55,18 @@ test('writingSurface computes --writing-measure and --writing-focus-measure', ()
   assert.equal(windowed.style['--writing-width'], '100%');
   assert.equal(windowed.style['--writing-focus-measure'], `${16 * 42}px`);
 });
+
+test('normalizePreferences and loadPreferences handle appearance modes safely', () => {
+  assert.equal(defaults.appearance, 'light');
+  assert.equal(loadPreferences(memoryStorage()).appearance, 'light');
+  assert.equal(normalizePreferences({ appearance: 'dark' }).appearance, 'dark');
+  assert.equal(normalizePreferences({ appearance: 'system' }).appearance, 'system');
+  assert.equal(normalizePreferences({ appearance: 'sepia' }).appearance, 'light');
+  assert.equal(normalizePreferences({ appearance: null }).appearance, 'light');
+
+  const roundTrip = memoryStorage();
+  savePreferences(normalizePreferences({ appearance: 'dark', theme: 'jade' }), roundTrip);
+  const loaded = loadPreferences(roundTrip);
+  assert.equal(loaded.appearance, 'dark');
+  assert.equal(loaded.theme, 'jade');
+});

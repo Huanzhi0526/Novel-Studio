@@ -1,5 +1,11 @@
 export const storageKey = 'studio.preferences.v1';
 
+export const appearances = [
+  ['light', '浅色'],
+  ['dark', '深色'],
+  ['system', '跟随系统']
+];
+
 export const themes = [
   ['ink', '墨灰', '#25262b'],
   ['indigo', '青黛', '#37538d'],
@@ -45,7 +51,7 @@ export const writingDefaults = {
   indent: false
 };
 
-export const defaults = { ...writingDefaults, theme: 'ink', readerSize: 18 };
+export const defaults = { ...writingDefaults, theme: 'ink', appearance: 'light', readerSize: 18 };
 
 function listed(value, entries, fallback) {
   return entries.some(([id]) => id === value) ? value : fallback;
@@ -62,6 +68,7 @@ export function normalizePreferences(values = {}) {
   const fallbackWidthMode = width === defaults.width ? 'window' : 'limit';
   return {
     theme: listed(prefs.theme, themes, defaults.theme),
+    appearance: listed(prefs.appearance, appearances, defaults.appearance),
     paper: listed(prefs.paper, papers, defaults.paper),
     ruling: listed(prefs.ruling, rulings, defaults.ruling),
     font: listed(prefs.font, fonts, defaults.font),

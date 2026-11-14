@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { api } from './ui.jsx';
 import {
+  appearances,
   fonts,
   loadPreferences,
   normalizePreferences,
@@ -43,7 +44,11 @@ function Slider({ label, value, display, min, max, step, onChange }) {
 }
 
 export function AppearancePreferences({ preferences, update }) {
-  return <Swatches label="主题色" options={themes} value={preferences.theme} onChange={theme => update({ theme })} />;
+  return <div className="writing-preferences">
+    <Swatches label="界面明暗" options={appearances} value={preferences.appearance} onChange={appearance => update({ appearance })} />
+    <Swatches label="主题色" options={themes} value={preferences.theme} onChange={theme => update({ theme })} />
+    <p className="muted preference-note">写作纸张在「写作偏好」中单独设置；夜间写作可搭配「夜写」纸张。</p>
+  </div>;
 }
 
 export function ReaderSizePreference({ preferences, update }) {

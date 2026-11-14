@@ -15,7 +15,7 @@ const icons = {
   book: <><path d="M5 4.5h4.5c1.4 0 2.5.6 2.5 2v13c0-1.4-1.1-2-2.5-2H5z"/><path d="M19 4.5h-4.5c-1.4 0-2.5.6-2.5 2v13c0-1.4 1.1-2 2.5-2H19z"/></>,
   edit: <><path d="M4 20h4l11-11-4-4L4 16z"/><path d="m13 7 4 4m-1.5-6.5 1.3-1.3a1.6 1.6 0 0 1 2.3 0l1.7 1.7a1.6 1.6 0 0 1 0 2.3L19.5 8.5"/></>,
   library: <><path d="M5 4v16M10 4v16m4-15 5-1 3 15-5 1z"/></>,
-  settings: <><path d="M5 7h14M5 17h14"/><circle cx="9" cy="7" r="2.5" fill="var(--icon-fill, #fff)"/><circle cx="15" cy="17" r="2.5" fill="var(--icon-fill, #fff)"/></>,
+  settings: <><path d="M5 7h14M5 17h14"/><circle cx="9" cy="7" r="2.5" fill="var(--icon-fill, var(--panel))"/><circle cx="15" cy="17" r="2.5" fill="var(--icon-fill, var(--panel))"/></>,
   panel: <><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M14 5v14"/></>,
   search: <><circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 4 4"/></>,
   send: <path d="M12 19V5m-5 5 5-5 5 5"/>,

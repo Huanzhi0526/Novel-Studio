@@ -23,11 +23,11 @@
 .writing-rail .manuscript-directory-actions > .manuscript-create-chapter {
   flex: 1;
   background: var(--accent);
-  color: #fff;
+  color: var(--accent-ink);
 }
 
 .writing-rail .manuscript-directory-actions > .manuscript-create-chapter:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--accent) 86%, #fff);
+  background: color-mix(in srgb, var(--accent) 88%, var(--panel));
 }
 
 .writing-rail .manuscript-directory-actions > .manuscript-create-volume {

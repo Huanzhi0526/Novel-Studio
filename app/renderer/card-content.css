@@ -35,3 +35,22 @@
 .card-compact .card-content { max-height: 10rem; overflow: hidden; margin-bottom: 10px; }
 .card-compact .card-content-clipped { mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent); }
 .card-compact .card-content :is(h2, h3) { margin-top: 11px; }
+
+.studio[data-appearance=dark] .knowledge-card { --card-ink: #b6c2d6; --card-tint: #2a303b; }
+.studio[data-appearance=dark] .knowledge-card[data-category=character] { --card-ink: #a7b7ec; --card-tint: #282d42; }
+.studio[data-appearance=dark] .knowledge-card[data-category=setting] { --card-ink: #82cbb9; --card-tint: #203530; }
+.studio[data-appearance=dark] .knowledge-card[data-category=power_system] { --card-ink: #c8a6ea; --card-tint: #31283e; }
+.studio[data-appearance=dark] .knowledge-card[data-category=organization] { --card-ink: #96bed9; --card-tint: #25313c; }
+.studio[data-appearance=dark] .knowledge-card[data-category=event] { --card-ink: #e0b46e; --card-tint: #382e20; }
+.studio[data-appearance=dark] .knowledge-card[data-category=storyline] { --card-ink: #e6a29e; --card-tint: #3a2727; }
+.studio[data-appearance=dark] .knowledge-card[data-category=location] { --card-ink: #81cbd9; --card-tint: #203338; }
+.studio[data-appearance=dark] .knowledge-card[data-category=item] { --card-ink: #cfa98d; --card-tint: #352b25; }
+.studio[data-appearance=dark] .knowledge-card[data-category=technique] { --card-ink: #b8bfc9; --card-tint: #2b2e35; }
+.studio[data-appearance=dark] .card-tag-group { --tag-ink: #b8bfc9; --tag-tint: #2b2e35; }
+.studio[data-appearance=dark] .card-tag-group[data-tone=identity] { --tag-ink: #a7b7ec; --tag-tint: #282d42; }
+.studio[data-appearance=dark] .card-tag-group[data-tone=trait] { --tag-ink: #c8a6ea; --tag-tint: #31283e; }
+.studio[data-appearance=dark] .card-tag-group[data-tone=relation] { --tag-ink: #df9fba; --tag-tint: #382630; }
+.studio[data-appearance=dark] .card-tag-group[data-tone=ability] { --tag-ink: #82cbb9; --tag-tint: #203530; }
+.studio[data-appearance=dark] .card-tag-group[data-tone=cost] { --tag-ink: #e0b46e; --tag-tint: #382e20; }
+.studio[data-appearance=dark] .card-tag-group[data-tone=plot] { --tag-ink: #e6a29e; --tag-tint: #3a2727; }
+.studio[data-appearance=dark] .card-tag-group[data-tone=place] { --tag-ink: #81cbd9; --tag-tint: #203338; }
