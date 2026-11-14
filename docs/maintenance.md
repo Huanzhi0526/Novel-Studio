@@ -310,3 +310,12 @@ AgyFlashClient新增separateAgyStatus：仅识别CLI的API error(attempt n)与Yo
 助手reference_search交给既有RetrievalEngineV2的fast/deep流程；工作线程运行只读SQLite、FTS与流式向量评分，模型请求通过线程消息委托主进程的既有检索配置客户端，embedding请求同样异步转交共享本机模型。检索AI与创作助手模型分别配置。检索失败本地回退必须明确显示。
 
 入口app/main/assistant-search.mjs和assistant-search-worker.mjs；打包必须额外生成worker的ESM bundle，并加入createRequire banner，否则yauzl等依赖会在安装版抛Dynamic require错误。节点回归不能替代打包版验收。`node scripts/qa-assistant-responsiveness.mjs <隔离EXE> <只读参考库路径>`使用本机模拟检索AI和合成向量检查大库检索时的页面切换/IPC，不发送正文到外部。
+
+
+### 0.2.6 CLI稳定性
+
+共享传输app/kb-v2/agy-client.mjs：取消/异常后回收本客户端Windows进程树，等待清理再建会话；不得对所有agy进程执行全局taskkill。仅未发送prompt的会话数据库锁允许一次重建；实际生成、工具或记忆写入不自动重放。provider排队取消必须不外发。助手需MCP tools/list就绪才发送prompt，失败清除sessionId而保留本地聊天和AGENTS。
+
+预算：助手总600秒、无输出/工具进展150秒；受控工具运行保持活动，检索工具自己150秒（纯本地60秒）截止并abort其异步模型任务。参考官方[MCP超时说明](https://antigravity.google/docs/mcp?hl=en)默认180秒；ACP传入timeoutSeconds字段不能替代本机期限控制。检索返回后须给助手留出汇总时间。
+
+每个CLI工作区cli-events.jsonl为无正文诊断记录，含模型、时间、状态、错误码与耗时，256KiB轮换。原始CLI日志的插件认证告警不等于模型账户失效，须结合真实调用；不可因此擅自改登录、全局MCP、CLI版本或凭证。

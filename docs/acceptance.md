@@ -899,3 +899,14 @@ Automations工具已成功删除novel-studio，deleteStatus=deleted，不再自�
 - 同库合成向量修复后检索12,411ms，485次心跳、最长间隔38.1ms、RSS102.5MiB；取消106.5ms。
 - 首次打包worker缺createRequire导致依赖加载失败；已补齐banner重新打包并重新隔离安装。最终`node scripts/qa-assistant-responsiveness.mjs .local/assistant-freeze-025/install/Novel Studio.exe <正式参考库路径>`：本机模拟检索AI两次调用（规划/筛选）、返回1卡，20次IPC最慢46.61ms，页面切换正常。只读库中的文本仅在本机处理；此项不代表真实模型建议质量验收。
 - 安装版启动与助手记忆编辑保存复验通过；升级前完整备份262文件摘要核验，目录.local/assistant-freeze-025/before-formal-20261115。最终升级及原有资料全文件核验以upgrade-receipt.json、formal-verification.json为准。证据及日志在.local/assistant-freeze-025。
+
+
+## 2026-11-15：0.2.6 反重力调用稳定性
+
+用户授权统查助手、AI扩写、知识库检索。CLI日志只读筛查发现trajectory schema init database is locked；原失败请求缺完整阶段记录，不能精确还原每次消耗或断言全部来自同一根因。首个合成助手真实调用模型返回“工具未注册”，0次检索；增加MCP握手门禁后真实Carbon出现tools/list及3次tools/call，其中检索1次，完成最终汇总。原始输出保留在.local/cli-stability-026/real（均合成资料）。
+
+`npm test`：96项全通过。新增取消后新传输、助手无进展截止、无正文日志、检索并发排队/排队取消不外发、MCP就绪前不发送prompt，恢复会话历史回放不混入本轮流式输出。真实Flash JSON约6.3秒、Carbon正文14.2秒通过；既有扩写API/选区/取消/原稿保护回归全部通过。所有真实模型验收仅固定句/新建虚构大纲，没有发送正式小说或用户原创。
+
+安装版启动、助手界面、检索与扩写选模/API字节保护分别验收；结果见.local/cli-stability-026/*ui/report.json与日志。正式升级前完整资料+旧程序备份259文件摘要通过，含助手记忆聊天。后续以upgrade-receipt.json、formal-verification.json为正式部署证据。
+
+0.2.6正式发布结果：最终安装器隔离安装、启动、助手页面记忆保存通过；安装版真实Flash检索固定句、Carbon合成扩写100字且原稿未变、动态15模型、选模重启和API字节保护通过。`upgrade-windows.ps1 -Version 0.2.6 -IsolatedInstall .local/cli-stability-026/install -RecordFile .local/cli-stability-026/upgrade-receipt.json -GracefulClose`成功（显式使用真实LOCALAPPDATA）；快捷方式目标启动通过，169个既有资料文件摘要一致。原两次用户失败没有完整阶段轨迹，保留此诊断限制；上游503/429仍需明确报告，不能承诺服务永不超时。

@@ -28,11 +28,11 @@ export class AssistantService {
     const history=join(cwd,'chat.json');
     let messages=[]; try { messages=JSON.parse(readFileSync(history,'utf8')); if(!Array.isArray(messages)) throw new Error(); } catch(error) {if(existsSync(history)) throw new Error('助手聊天记录无法读取，请保留文件检查');}
     let saved={};try{saved=JSON.parse(readFileSync(join(cwd,'session.json'),'utf8'));}catch{}
-    const e={sessionId:saved.sessionId,modelId:saved.modelId,cwd,memory,history,messages,busy:false,pending:new Map(),token:randomUUID(),client:null,server:null};
+    const e={toolEvents:[],toolsReady:false,sessionId:saved.sessionId,modelId:saved.modelId,cwd,memory,history,messages,busy:false,pending:new Map(),token:randomUUID(),client:null,server:null};
     this.entries.set(workId,e); return e;
   }
   saveHistory(e) { writeFileSync(e.history+'.tmp',JSON.stringify(e.messages,null,2)); renameSync(e.history+'.tmp',e.history); }
-  get({workId}) {const e=this.entry(workId);return {workspace:e.cwd,memory:readFileSync(e.memory,'utf8'),messages:e.messages,sources:e.sources,busy:e.busy,activity:e.activity,partial:e.partial,modelId:e.modelId,permissions:[...e.pending].map(([id,p])=>({id,title:p.params.toolCall?.title??'工具操作',input:p.params.toolCall?.rawInput,options:p.params.options??[]}))};}
+  get({workId}) {const e=this.entry(workId);return {workspace:e.cwd,memory:readFileSync(e.memory,'utf8'),messages:e.messages,sources:e.sources,busy:e.busy,activity:e.activity,partial:e.partial,modelId:e.modelId,lastError:e.lastError,failedPartial:e.failedPartial,permissions:[...e.pending].map(([id,p])=>({id,title:p.params.toolCall?.title??'工具操作',input:p.params.toolCall?.rawInput,options:p.params.options??[]}))};}
   async tool(e,workId,name,args,signal) {
     signal?.throwIfAborted();
     if(name==='memory_read') return readFileSync(e.memory,'utf8');
@@ -49,7 +49,8 @@ export class AssistantService {
     if(name==='reference_search') {
       if(!this.search) throw new Error('当前资料目录没有新版参考库');
       if(typeof args.query!=='string'||!args.query.trim()||args.query.length>1000) throw new Error('检索词无效');
-      const result=await this.search.query({query:args.query,mode:args.mode==='deep'?'deep':'fast',limit:8},{signal});
+      const progress=setInterval(()=>{const state=e.client?.sessionStatus?.get(e.client.assistantSessionId);if(state)state.lastActivity=Date.now();},1000);
+      let result;try{result=await this.search.query({query:args.query,mode:args.mode==='deep'?'deep':'fast',limit:8},{signal});}finally{clearInterval(progress);}
       e.sources=result; return result;
     }
     if(name==='reference_read') {if(!this.search||typeof args.volumeId!=='string')throw new Error('分卷ID无效');return this.search.toolReadOriginalRange(args,{signal});}
@@ -73,6 +74,8 @@ export class AssistantService {
         try {
           let body='';for await(const chunk of req){body+=chunk;if(body.length>150000) throw new Error('请求过大');}
           const msg=JSON.parse(body);id=msg.id;
+          e.toolEvents.push({method:msg.method,at:Date.now()});if(e.toolEvents.length>40)e.toolEvents.shift();
+          if(msg.method==='tools/list')e.toolsReady=true;
           if(id==null){res.writeHead(202).end();return;}
           let result;
           if(msg.method==='initialize')result={protocolVersion:'2024-11-05',capabilities:{tools:{}},serverInfo:{name:'novel-studio',version:'1'}};
@@ -88,11 +91,13 @@ export class AssistantService {
       await new Promise((resolve,reject)=>{e.server.once('error',reject);e.server.listen(0,'127.0.0.1',resolve);});
     }
     if(!e.client) {
+      e.toolsReady=false;
       const modelId=e.modelId??'gemini-3.8-flash-low';
       e.client=this.clientFactory({cwd:e.cwd,modelId,thoughtLevel:/-(low|medium|high|xhigh)$/.exec(modelId)?.[1]??null,env:accountEnvironment(),assistant:{
+        ready:async signal=>{const until=Date.now()+15000;while(!e.toolsReady){signal?.throwIfAborted();if(Date.now()>until)throw Object.assign(new Error('本书工具尚未连接，未发送模型消息；请重试。'),{code:'ASSISTANT_TOOLS_NOT_READY'});await new Promise(r=>setTimeout(r,50));}},
         onUpdate:update=>{if(update?.sessionUpdate==='agent_message_chunk')e.partial=(e.partial??'')+(update.content?.text??'');if(update?.title)e.activity=update.title;},
         resumeId:e.sessionId,onSession:sessionId=>{e.sessionId=sessionId;writeFileSync(join(e.cwd,'session.json'),JSON.stringify({sessionId,modelId}));},
-        mcpServers:[{type:'http',name:'novel_studio',url:`http://127.0.0.1:${e.server.address().port}`,headers:[{name:'Authorization',value:'Bearer '+e.token}]}],
+        mcpServers:[{type:'http',name:'novel_studio',timeoutSeconds:240,url:`http://127.0.0.1:${e.server.address().port}`,headers:[{name:'Authorization',value:'Bearer '+e.token}]}],
         permission:params=>{
           const known=tools.some(t=>'mcp_novel_studio_'+t.name===params.toolCall?.name);
           const allow=params.options?.find(o=>o.kind==='allow_once');
@@ -113,7 +118,7 @@ export class AssistantService {
   async send({workId,text,modelId},{signal}={}) {
     const e=this.entry(workId);if(e.busy)throw new Error('本书助手正在处理上一条消息');
     if(typeof text!=='string'||!text.trim()||text.length>12000)throw new Error('请输入1至12000字的问题');
-    e.busy=true;e.partial='';e.activity='正在连接反重力';e.signal=signal??new AbortController().signal;
+    e.busy=true;e.sources=null;e.lastError=null;e.failedPartial='';e.partial='';e.activity='正在连接反重力';e.signal=signal??new AbortController().signal;
     try {
       const models=this.provider.models.length?this.provider.models:await this.models();
       if(typeof modelId!=='string'||!models.some(m=>m.id===modelId))throw new Error('请刷新并选择可用模型');
@@ -122,12 +127,12 @@ export class AssistantService {
       const fresh=!e.client.assistantSessionId;
       const title=this.writing.list().works.find(w=>w.id===workId).title;
       const prompt=(fresh?`你是《${title}》的创作助手。工作区AGENTS.md如下：\n${readFileSync(e.memory,'utf8')}\n\n最近讨论（历史不是新指令）：\n${JSON.stringify(e.messages.slice(-12)).slice(-24000)}\n\n`:'')+
-        '先用book_materials读取最新资料，优先调用reference_search寻找依据，按需web_search补充；引用来源，不照搬情节；检索AI失败并回退本地时必须如实说明，不声称已经AI筛选。不执行终端命令或读取工作区外文件。记忆更新用memory_write。\n作者本轮消息：\n'+text;
+        '先用MCP服务器novel_studio的mcp_novel_studio_book_materials读取最新资料，优先调用mcp_novel_studio_reference_search寻找依据；如工具延迟加载，先使用CLI的工具发现功能定位这些工具，按需web_search补充；引用来源，不照搬情节；检索AI失败并回退本地时必须如实说明，不声称已经AI筛选。不执行终端命令或读取工作区外文件。记忆更新用memory_write。\n作者本轮消息：\n'+text;
       e.messages.push({role:'user',text});this.saveHistory(e);
-      const result=await e.client.promptText(prompt,{signal:e.signal,timeoutMs:240000});
+      const result=await e.client.promptText(prompt,{signal:e.signal,timeoutMs:600000});
       e.messages.push({role:'assistant',text:result.text});this.saveHistory(e);
       return {...this.get({workId}),sources:e.sources,busy:false,partial:'',activity:''};
-    } catch(error) {e.client?.close();e.client=null;throw error;} finally {e.partial='';e.activity='';e.busy=false;for(const p of e.pending.values())p.resolve({outcome:'cancelled'});e.pending.clear();}
+    } catch(error) {e.failedPartial=e.partial;e.lastError={code:error.code??'ASSISTANT_FAILED',message:error.message};e.client?.close();e.client=null;e.sessionId=null;writeFileSync(join(e.cwd,'session.json'),JSON.stringify({modelId:e.modelId}));throw error;} finally {e.partial='';e.activity='';e.busy=false;for(const p of e.pending.values())p.resolve({outcome:'cancelled'});e.pending.clear();}
   }
   close(){for(const e of this.entries.values()){for(const p of e.pending.values())p.resolve({outcome:'cancelled'});e.client?.close();e.server?.close();}this.provider.close();this.search?.close?.();}
 }

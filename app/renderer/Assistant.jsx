@@ -31,6 +31,8 @@ export function Assistant({active,openCard,openEvidence}) {
         <button disabled={busy} onClick={()=>api('assistant.memory',{workId,text:memory}).catch(setError)}>保存记忆</button>
         <button disabled={busy} onClick={()=>{setMemory(state.memory);}}>载入最新记忆</button>
       </details>
+      {state.lastError&&<p className="notice danger">本轮未完成：{state.lastError.message}</p>}
+      {state.failedPartial&&<details><summary>本轮未完成的输出（未作为正式回复保存）</summary><pre style={{whiteSpace:'pre-wrap'}}>{state.failedPartial}</pre></details>}
       <div role="log" aria-label="助手讨论记录">{state.messages.map((m,i)=><article key={i} style={{padding:'12px 0',borderBottom:'1px solid var(--border,#ddd)'}}><strong>{m.role==='user'?'你':'创作助手'}</strong><ReactMarkdown components={{a:({children,href})=><span>{children}（{href}）</span>}}>{m.text}</ReactMarkdown></article>)}</div>
       {busy&&<div role="status"><p>{state.activity||'正在思考…'}</p><ReactMarkdown>{state.partial||''}</ReactMarkdown></div>}
       {state.permissions?.map(p=><aside key={p.id} className="notice"><strong>反重力请求：{p.title}</strong><pre style={{whiteSpace:'pre-wrap'}}>{JSON.stringify(p.input,null,2)}</pre>{p.options.filter(o=>o.kind!=='allow_always').map(o=><button key={o.optionId} onClick={()=>api('assistant.permission',{workId,id:p.id,optionId:o.optionId}).catch(setError)}>{o.name}</button>)}<button onClick={()=>api('assistant.permission',{workId,id:p.id}).catch(setError)}>拒绝</button></aside>)}

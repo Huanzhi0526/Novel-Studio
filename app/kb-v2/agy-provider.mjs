@@ -2,7 +2,7 @@ import { execFile } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { AgyFlashClient, resolveAgyExecutable, resolveWindowsSystemProxy } from './agy-client.mjs';
+import { AgyFlashClient, awaitWithSignal, resolveAgyExecutable, resolveWindowsSystemProxy } from './agy-client.mjs';
 import { fail } from '../main/store.mjs';
 
 const defaults = { version: 1, source: 'auto', modelId: 'gemini-3.8-flash-low' };
@@ -45,6 +45,7 @@ export class AgyRetrievalProvider {
     this.client = null;
     this.clientModel = null;
     this.active = false;
+    this.requestLane = Promise.resolve();
     this.writes = Promise.resolve();
     this.discovery = null;
   }
@@ -112,6 +113,11 @@ export class AgyRetrievalProvider {
   }
 
   async complete(messages, options, signal) {
+    const job=this.requestLane.catch(()=>{}).then(()=>{signal?.throwIfAborted();return this.runComplete(messages,options,signal);});
+    this.requestLane=job;return awaitWithSignal(job,signal);
+  }
+
+  async runComplete(messages, options, signal) {
     await this.writes;
     if (this.active) fail('AGY_BUSY', '已有反重力请求进行中，请稍候或取消。');
     const { modelId } = this.read();

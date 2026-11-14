@@ -123,3 +123,11 @@ test('expansion and retrieval use independent selections and plain prose client 
   assert.equal(options.outputMode, 'text');
   assert.notEqual(expansion.filename, retrieval.filename);
 });
+
+test('parallel retrieval calls queue and cancelling a queued request never sends it',async t=>{
+ let active=0,peak=0,calls=0;
+ const {provider}=setup(t,{clientFactory:()=>({close(){},complete:async()=>{calls++;active++;peak=Math.max(peak,active);await new Promise(r=>setTimeout(r,25));active--;return 'ok';}})});
+ const c=new AbortController();
+ const a=provider.complete([],{},undefined),b=provider.complete([],{},c.signal),d=provider.complete([],{},undefined);
+ c.abort();await assert.rejects(b,{name:'AbortError'});assert.equal(await a,'ok');assert.equal(await d,'ok');assert.equal(peak,1);assert.equal(calls,2);
+});

@@ -1,5 +1,5 @@
-import { execFileSync, spawn } from 'node:child_process';
-import { existsSync, mkdirSync, readdirSync, realpathSync } from 'node:fs';
+import { execFile, execFileSync, spawn } from 'node:child_process';
+import { appendFileSync, statSync, renameSync, existsSync, mkdirSync, readdirSync, realpathSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -133,6 +133,16 @@ export function resolveWindowsSystemProxy(baseEnv = process.env) {
   }
 }
 
+export function awaitWithSignal(promise, signal) {
+  if(!signal)return promise;
+  if(signal.aborted){promise.catch(()=>{});return Promise.reject(signal.reason??cancellationError());}
+  return new Promise((resolve,reject)=>{
+    const abort=()=>{signal.removeEventListener('abort',abort);reject(signal.reason??cancellationError());};
+    signal.addEventListener('abort',abort,{once:true});
+    promise.then(value=>{signal.removeEventListener('abort',abort);resolve(value);},error=>{signal.removeEventListener('abort',abort);reject(error);});
+  });
+}
+
 export class AgyFlashClient {
   constructor({
     executable = null,
@@ -160,6 +170,8 @@ export class AgyFlashClient {
     this.assistant = assistant;
     this.sessionStatus = new Map();
     this.child = null;
+    this.stopping = Promise.resolve();
+    this.inFlight = false;
     this.seq = 0;
     this.pending = new Map();
     this.sessionChunks = new Map();
@@ -182,11 +194,16 @@ export class AgyFlashClient {
     const base = { ...(this.customEnv ?? process.env) };
     delete base.ELECTRON_RUN_AS_NODE;
     const winProxy = resolveWindowsSystemProxy(base);
-    return { ...base, ...winProxy };
+    const merged={...base,...winProxy};
+    const bypass=[merged.NO_PROXY,merged.no_proxy,'127.0.0.1','localhost','::1'].filter(Boolean).join(',');
+    merged.NO_PROXY=bypass;merged.no_proxy=bypass;
+    return merged;
   }
 
   async #ensureStarted(signal) {
+    await this.stopping;
     signal?.throwIfAborted();
+    if(this.closed)throw new Error('反重力客户端已关闭');
     if (this.child && !this.child.killed && this.readyPromise) {
       return await this.readyPromise;
     }
@@ -219,7 +236,8 @@ export class AgyFlashClient {
         if (msg.method === 'session/update') {
           const sid = msg.params?.sessionId;
           const upd = msg.params?.update;
-          this.assistant?.onUpdate?.(upd);
+          if(this.sessionChunks.has(sid))this.assistant?.onUpdate?.(upd);
+          const live=this.sessionStatus.get(sid);if(live)live.lastActivity=Date.now();
           if (sid && upd?.sessionUpdate === 'agent_message_chunk' && typeof upd?.content?.text === 'string') {
             const list = this.sessionChunks.get(sid);
             if (list) {
@@ -254,7 +272,7 @@ export class AgyFlashClient {
         } else if (!msg.method && this.pending.has(msg.id)) {
           const p = this.pending.get(msg.id);
           this.#clearPending(msg.id, p);
-          if (msg.error) p.reject(new Error(JSON.stringify(msg.error)));
+          if (msg.error) {const text=JSON.stringify(msg.error);p.reject(Object.assign(new Error(/database is locked/i.test(text)?'反重力会话数据库被占用，请停止旧请求后重试。':text),{code:/database is locked/i.test(text)?'AGY_SESSION_LOCKED':'AGY_RPC'}));}
           else p.resolve(msg.result);
         }
       }
@@ -309,7 +327,9 @@ export class AgyFlashClient {
     }
     if (child && !child.killed) {
       try { child.stdin.end(); } catch {}
-      try { child.kill(); } catch {}
+      if(process.platform==='win32'&&Number.isInteger(child.pid)) {
+        this.stopping=new Promise(resolve=>execFile('taskkill.exe',['/PID',String(child.pid),'/T','/F'],{windowsHide:true,timeout:5000},()=>{try{child.kill();}catch{}resolve();}));
+      } else {try { child.kill(); } catch {}}
     }
   }
 
@@ -345,6 +365,7 @@ export class AgyFlashClient {
               }) + '\n');
             } catch {}
           }
+          this.#killCurrentChild(signal.reason ?? cancellationError());
           rejectPromise(signal.reason ?? cancellationError());
         };
         signal.addEventListener('abort', entry.onAbort, { once: true });
@@ -366,7 +387,7 @@ export class AgyFlashClient {
       let sessionId;
       if (this.assistant?.resumeId && this.agentCapabilities.loadSession) {
         try { await this.#rpc('session/load', { ...params, sessionId: this.assistant.resumeId }, {timeoutMs:this.sessionNewTimeoutMs,signal}); sessionId=this.assistant.resumeId; }
-        catch(error) { if(signal?.aborted) throw error; this.assistant.resumeId=null; }
+        catch(error) { this.assistant.resumeId=null;if(signal?.aborted||['AGY_TIMEOUT','AGY_SESSION_LOCKED'].includes(error.code))throw error; }
       }
       if(!sessionId) ({sessionId}=await this.#rpc('session/new',params,{timeoutMs:this.sessionNewTimeoutMs,signal,resetOnTimeout:true}));
       if(this.assistant) { this.assistant.resumeId=sessionId; this.assistant.onSession?.(sessionId); }
@@ -381,6 +402,7 @@ export class AgyFlashClient {
           throw new Error(`Expected thought_level=${this.thoughtLevel}, got ${actualThought}`);
         }
       }
+      await this.assistant?.ready?.(signal);
       return sessionId;
     } catch (err) {
       if (!signal?.aborted) {
@@ -412,10 +434,20 @@ export class AgyFlashClient {
   /**
    * Run a fresh, isolated 1-turn prompt on Gemini 3.8 Flash (low thought level).
    */
-  async promptText(promptString, { signal, timeoutMs = 90_000 } = {}) {
+  record(event,extra={}) {try{mkdirSync(this.cwd,{recursive:true});const path=join(this.cwd,'cli-events.jsonl');if(existsSync(path)&&statSync(path).size>262144)renameSync(path,path+'.previous');appendFileSync(path,JSON.stringify({at:new Date().toISOString(),event,modelId:this.modelId,...extra})+'\n');}catch{}}
+
+  async promptText(promptString, options = {}) {
+    if(this.inFlight)throw Object.assign(new Error('同一反重力客户端已有请求进行中'),{code:'AGY_BUSY'});
+    this.inFlight=true;const start=Date.now();this.record('start');
+    try{const result=await this.runPrompt(promptString,options);this.record('complete',{durationMs:Date.now()-start});return result;}
+    catch(error){this.record('failed',{durationMs:Date.now()-start,code:error.code??error.name??'ERROR'});this.#killCurrentChild(error);throw error;}
+    finally{this.inFlight=false;}
+  }
+
+  async runPrompt(promptString, { signal, timeoutMs = 90_000, idleTimeoutMs = 150_000 } = {}) {
     signal?.throwIfAborted();
     if (this.warmupPromise) {
-      await this.warmupPromise.catch(() => {});
+      await awaitWithSignal(this.warmupPromise.catch(()=>{}),signal);
     }
     signal?.throwIfAborted();
     let sessionId = this.assistantSessionId ?? this.prewarmedSessionId;
@@ -423,12 +455,17 @@ export class AgyFlashClient {
       this.prewarmedSessionId = null;
     } else {
       this.prewarmedSessionId = null;
-      sessionId = await this.#createConfiguredSession(signal);
+      try{sessionId=await this.#createConfiguredSession(signal);}catch(error){
+        if(!['AGY_SESSION_LOCKED'].includes(error.code)||signal?.aborted)throw error;
+        if(this.assistant)this.assistant.resumeId=null;this.#killCurrentChild();this.record('retry-session-setup');
+        sessionId=await this.#createConfiguredSession(signal);
+      }
     }
 
     if (this.assistant) this.assistantSessionId = sessionId;
     this.sessionChunks.set(sessionId, []);
-    this.sessionStatus.set(sessionId, { capacity: false, timer: null });
+    this.sessionStatus.set(sessionId, { capacity: false, timer: null, lastActivity:Date.now() });
+    const idleTimer=this.assistant?setInterval(()=>{const state=this.sessionStatus.get(sessionId);if(state&&Date.now()-state.lastActivity>idleTimeoutMs)this.#killCurrentChild(Object.assign(new Error('反重力长时间没有输出或工具进展，已停止本轮；保留聊天与记忆。'),{code:'AGY_IDLE_TIMEOUT'}));},Math.min(1000,idleTimeoutMs)):null;
     try {
       const fullPrompt = this.assistant ? promptString : [
         this.outputMode === 'text'
@@ -463,6 +500,7 @@ export class AgyFlashClient {
       }
       return { text, usage: u, sessionId, stopReason: result?.stopReason };
     } finally {
+      clearInterval(idleTimer);
       clearTimeout(this.sessionStatus.get(sessionId)?.timer);
       this.sessionStatus.delete(sessionId);
       this.sessionChunks.delete(sessionId);

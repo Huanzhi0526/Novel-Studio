@@ -14,16 +14,18 @@ export class AssistantSearch {
   }
   toolReadOriginalRange(args,{signal}={}) {return this.run('read',args,{signal});}
   run(method,args,{signal,vectors,embeddingError}={}) {
-    signal?.throwIfAborted();
+    const owned=new AbortController();
+    signal=signal?AbortSignal.any([signal,owned.signal]):owned.signal;
+    signal.throwIfAborted();
     return new Promise((resolve,reject)=>{
       const worker=new Worker(this.workerURL,{workerData:{filename:this.search.reference.filename,method,args,vectors,embeddingError,ai:method==='query'&&Boolean(this.retrieval),modelId:this.search.embedding?.id}});
       let settled=false;
       const finish=(error,value)=>{
-        if(settled)return;settled=true;clearTimeout(timer);signal?.removeEventListener('abort',abort);
+        if(settled)return;settled=true;clearTimeout(timer);owned.abort(error??new Error('任务已完成'));signal?.removeEventListener('abort',abort);
         this.active.delete(worker);void worker.terminate();error?reject(error):resolve(value);
       };
       const abort=()=>finish(signal.reason??new Error('检索已取消'));
-      const timer=setTimeout(()=>finish(new Error('参考检索超过等待上限，已停止；可缩小问题后重试。')),this.retrieval?210000:60000);
+      const timer=setTimeout(()=>finish(new Error('参考检索超过等待上限，已停止；可缩小问题后重试。')),this.retrieval?150000:60000);
       worker.on('message',async message=>{
         if(message.kind==='complete'||message.kind==='embed') {
           try {const text=await (message.kind==='embed'?this.search.encode(message.texts,signal,message.query):this.retrieval.completeForSearch(message.messages,message.options,signal));if(!settled)worker.postMessage({id:message.id,text});}
