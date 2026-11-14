@@ -8,14 +8,14 @@
 .topbar.reference-toolbar {
   flex: 0 0 auto;
   flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 6px 18px;
-  min-height: 64px;
-  padding: 10px var(--reference-gutter);
+  justify-content: space-between;
+  gap: 6px 16px;
+  min-height: 48px;
+  padding: 6px var(--reference-gutter);
 }
 
 .reference-toolbar h1 { font-size: var(--fs-h2); white-space: nowrap; }
-.reference-toolbar .reference-import { margin-inline-start: auto; white-space: nowrap; }
+.reference-toolbar .reference-import { white-space: nowrap; }
 .reference-page > .notice { margin: 8px var(--reference-gutter) 0; }
 
 .studio .reference-page > .conversation {

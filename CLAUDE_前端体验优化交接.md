@@ -202,11 +202,11 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | P2-4 | 设置页模型来源与兼容 API 混排、两个保存按钮易混、缺少当前生效摘要、顶栏标题重复 | 不易判断当前实际生效的模型来源 | 顶部增加生效摘要，拆分为“模型来源”与“兼容 API 配置”卡片，去重顶栏，补创作助手跳转说明 | 未开始 |
 | P2-5 | 助手记忆在狭小下拉浮层编辑，“载入最新记忆”无未保存保护，“重新开始讨论”用原生 confirm 且紧挨发送 | 长记忆难编辑、易误覆盖或误清空讨论 | 改为右侧抽屉/面板并检测未保存修改；新增原生 `<dialog>` 确认框 `ConfirmDialog`；重开讨论移入 `⋯` 菜单 | 未开始 |
 | P2-6 | 写作右侧大纲/角色/设定速查预览直接显示 Markdown 源码 | 标题与列表符号干扰对照阅读 | 使用受限白名单 `react-markdown`（`skipHtml`）渲染资料预览，章节对照保持纯文本 | 已完成（B6，见 §9.3） |
-| P2-7 | 卡片弹窗标题写“知识卡”重复层级、证据全折叠、紧凑卡“查看完整卡片”像小标题且易被遮罩压住 | 查卡与核证原文多一步操作 | 弹窗直接以卡名为标题、眉题写作品与类别，默认展开前 3 条证据；紧凑卡底部右侧改为“展开全文 →” | 未开始 |
-| P2-8 | 写作 364px 侧栏中 KB v2 模式按钮与“接口设置”挤压换行，两条外传说明占高 | 侧栏检索视野局促 | 侧栏模式按钮显示短名（保留完整可访问名称/title），接口设置改图标按钮，合并外传提示 | 未开始 |
+| P2-7 | 卡片弹窗标题写“知识卡”重复层级、证据全折叠、紧凑卡“查看完整卡片”像小标题且易被遮罩压住 | 查卡与核证原文多一步操作 | 弹窗直接以卡名为标题、眉题写作品与类别，默认展开前 3 条证据；紧凑卡底部右侧改为“展开全文 →” | 已完成（B8，见 §9.3） |
+| P2-8 | 写作 364px 侧栏中 KB v2 模式按钮与“接口设置”挤压换行，两条外传说明占高 | 侧栏检索视野局促 | 侧栏模式按钮显示短名（保留完整可访问名称/title），接口设置改图标按钮，合并外传提示 | 已完成（B8，见 §9.3） |
 | P2-9（D2） | 参考检索 Enter 发送，创作助手 Ctrl+Enter 发送 | 跨面板输入习惯割裂 | 统一 `sendIntent`：Enter 发送、Shift+Enter 换行、Ctrl/⌘+Enter 兼容发送、IME 组字保护 | 已完成（`8bebfa8`） |
 | P2-10（D3） | 参考检索默认 `fast`（AI），且切页后参考库模式与已选作品重置 | 每次打开默认指向外传模式，跨页对照丢失位置 | v2 默认 `local`（会话内保留切换，重启回 `local`）；App 层保持参考库视图状态与书架滚动位置 | 已完成（`afbe4fe`） |
-| P2-11 | 参考库、创作助手、设置页顶栏高度与标题层级不一致 | 跨页切换跳跃感明显 | 提取 `PageHeader` 统一 48px 页头，压缩助手页头，去除设置页重复顶栏 | 未开始 |
+| P2-11 | 参考库、创作助手、设置页顶栏高度与标题层级不一致 | 跨页切换跳跃感明显 | 提取 `PageHeader` 统一 48px 页头，压缩助手页头，去除设置页重复顶栏 | 进行中（B8 已完成 `PageHeader` 与参考库接入，B9/B10 接续） |
 | P2-12 | CodeMirror 查找替换面板 12px 紧凑排布 | 查找框输入局促 | `.cm-search` 控件统一 `--fs-ui`、30px 最小高度与语义色变量 | 已完成（B5，见 §9.3） |
 | P2-13 | 光标在括号提示内未全选时“AI 扩写”直接禁用，弹窗“生成预览”无主按钮样式 | 扩写触发门槛不直观 | 新增只读辅助函数 `enclosingExpansionPair`，提供“选中提示”快捷选中按钮；“生成预览”补主按钮样式 | 已完成（B6，见 §9.3） |
 | P2-14（D5） | 夜写纸张时周边栏位仍为亮色，缺少独立整站深色模式 | 夜间写作眩光对比强烈 | 新增 `appearance`（`light`/`dark`/`system`）与全套语义色变量，五主题适配深色且与纸张独立 | 已完成（B7，见 §9.3） |
@@ -380,13 +380,39 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 - 行为差异：外观偏好新增独立于写作纸张的“浅色 / 深色 / 跟随系统”明暗模式，5 套主题均可在深色界面的同时自由搭配白纸/米纸/护眼/夜写纸张；原生控件、滚动条、弹窗遮罩、知识卡标签与报错条随明暗切换自适应。
 - 组件旧→新映射：`preferences-model.mjs` 新增 `appearances` 常量；`App.jsx` 新增 `useResolvedAppearance` hook。
 - 依赖、IPC、偏好存储键、权限变化：无（`studio.preferences.v1` 新增向后兼容 `appearance` 字段，默认 `'light'`）。
-- 提交：B7 单一提交（`feat(ui): independent dark appearance with semantic color tokens`）。
+- 提交：`32b197b`（`feat(ui): independent dark appearance with semantic color tokens`）。
 - 验证：
   - `npm run build && npm test`（2026-11-15 04:58）：PASS（113 / 113 通过，含新增 `appearance` 规范化/持久化单测）。
   - `node --disable-warning=ExperimentalWarning scripts/qa-desktop.mjs`（2026-11-15 05:00）：PASS（`.local/desktop-qa-R8DSBV`）。
   - `node --disable-warning=ExperimentalWarning scripts/qa-visual.mjs`（2026-11-15 05:00）：PASS（`.local/visual-qa-nevIpS`）。
   - `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B7`（2026-11-15 05:02）：PASS（0 页面错误，`sub12=[]`，`b7WhitePaperInDarkUi` 确认深色界面下白纸保持 `rgb(255, 255, 255)` / `rgb(35, 36, 40)`；Chromium 实测 5 主题深色对比度：`inkOnBg=13.35`、`inkOnPanel=12.14`、`mutedOnBg=6.82`、`mutedOnPanel=6.20`、`accentInkOnAccent=7.41–12.32`、`linkOnPanel=7.07–7.99`、`accentOnSoft=5.46–8.53`、`accentOnChrome=5.94–9.55`，全部达标；截图 `.local/claude-frontend-ux/B7-1794690142065/`）。
 - 仍有问题与下一步：Phase 2（B5–B7）已全部完成并交付 `@verifier` 独立复核；等待核验通过后由 Phase 3 继续 B8–B11。
+
+#### B8：参考检索与卡片、页头统一（P2-7、P2-8、P2-11）
+
+- 时间与目标：2026-11-15 05:08–05:13；统一 `PageHeader` 48px 页头并接入参考库，改进 `CardEditor` 与 `Card` 弹窗层级、默认展开前 3 条证据，优化紧凑卡“展开全文 →”与 364px 侧栏检索控件排布。
+- 发现/决定与取舍：
+  1. `CardEditor` 改为以卡名（`live?.title ?? card.title`）作弹窗标题，眉题显示 `作品名 · 类型标签`；`Card` 新增 `headless` 参数隐藏弹窗内重复 `<h3>` 与作品名，但保留 `.knowledge-card > .card-kicker > .pill` 色标节点（满足视觉识别与 `qa-card-markdown.mjs:118` 读取分类色值）且不额外新增 `<p>`（保持 `qa-card-viewer.mjs:43` 的段落计数为 1）。
+  2. 弹窗内 `collapseEvidence` 改为默认直接展示前 3 条 `.evidence-link`（置于 `<div className="card-evidence">`），超过 3 条部分放入 `<details className="evidence-more"><summary>另有 N 处</summary>...</details>`。同步调整两份 QA 的旧折叠前置步骤：
+     - `scripts/qa-card-viewer.mjs` L44–46：原 L44 断言弹窗内 `.evidence-link` 初始隐藏（`isVisible() === false`）且 L46 点击 `^原文证据` 展开；因 B8 已默认展开前 3 条证据，改为等待并断言首条 `.evidence-link` 直接可见后点击跳转原文；保留全部证据高亮（`[data-highlighted=yes]`）、返回弹窗、取消编辑、保存修改及窄窗无溢出断言。
+     - `scripts/qa-card-markdown.mjs` L125：原 L125 点击 `^原文证据` 展开折叠；因 B8 已默认展开前 3 条证据，改为等待首条 `.evidence-link` 可见后直接点击跳转；保留全部 Markdown 渲染、标签色值、XSS 拦截、证据返回与紧凑卡计数断言。
+  3. 紧凑卡底部的“查看完整卡片”改为右对齐链接按钮 `展开全文 →`，包裹在 `<div className="card-expand-row">` 中置于 `<CardContent />` 外部、渐隐遮罩下方，不压遮罩也不影响 `.card-content` 内 `strong`/`h2` 计数；证据链接统一 `var(--fs-meta)`（12px）并去掉旧 `<small>{range.volume_title}</small>` 副标题，保留完整 `title` 提示。
+  4. `Conversation.jsx` 独立页 KB v2 标题改为 `参考检索`（保留 `<section aria-label={sidebar ? '参考检索侧栏' : '参考库检索'}>` 与作品数副标题）；`sidebar` 为真时模式按钮显示短名 `本地 / 快速 / 深度`（保留 `aria-label` 与 `title` 完整说明）、“接口设置”改为图标按钮（保留 `aria-label="接口设置"` 与 `title="接口设置"`），并将两条 v2 外传与耗时说明合并为单条 `<small className="retrieval-disclosure">`。
+  5. `ui.jsx` 新增 `PageHeader({ title, subtitle, actions })`（48px 高度，左 `<h1>` 右操作），`Reference.jsx` 接入并保留 `检索` / `书架` 分段开关与 `参考书架` 标题。
+- 实际变更：修改 `app/renderer/ui.jsx`、`app/renderer/Reference.jsx`、`app/renderer/Conversation.jsx`、`app/renderer/app.css`、`app/renderer/card-content.css`、`app/renderer/reference-bookshelf.css`、`scripts/qa-card-viewer.mjs`、`scripts/qa-card-markdown.mjs` 与 `.local/claude-frontend-ux/audit-screens.mjs`。
+- 行为差异：卡片弹窗直接显示卡名与前 3 条原文证据；紧凑卡“展开全文 →”位于右侧遮罩外；写作侧栏检索模式按钮与图标设置单行排布；参考库页头统一为 48px。
+- 组件旧→新映射：`app/renderer/ui.jsx` 新增 `PageHeader`；`Card` 新增可选参数 `headless`。
+- 依赖、IPC、偏好存储键、权限变化：无。
+- 提交：B8 提交（`feat(ui): clearer card dialog, compact card actions and sidebar search controls`，具体 hash 于 B9 开头补录）。
+- 验证：
+  - `npm run build && npm test`（2026-11-15 05:10）：PASS（113 / 113 通过）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-card-viewer.mjs`（2026-11-15 05:10）：PASS（`.local/card-viewer-qa-VsP2yk`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-card-markdown.mjs`（2026-11-15 05:10）：PASS（`.local/card-markdown-qa-DEFEq4`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-retrieval.mjs`（2026-11-15 05:11）：PASS（`.local/retrieval-qa-Ch8cOG`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-workspace-ui.mjs`（2026-11-15 05:11）：PASS（`.local/workspace-ui-drSMbu`）。
+  - `node --disable-warning=ExperimentalWarning scripts/qa-visual.mjs`（2026-11-15 05:11）：PASS（`.local/visual-qa-VvHAAv`）。
+  - `node --disable-warning=ExperimentalWarning .local/claude-frontend-ux/audit-screens.mjs B8`（2026-11-15 05:12）：PASS（0 页面错误，`sub12=[]`，3 窗口无溢出，364px 侧栏短名/单条披露/弹窗去重与前 3 条证据可见断言全过，截图 `.local/claude-frontend-ux/B8-1794690737490/`）。
+- 仍有问题与下一步：进入 B9（创作助手页头压缩、记忆抽屉面板与未保存保护、原生 `ConfirmDialog`）。
 
 ### 9.4 验证与截图台账
 
@@ -402,6 +428,7 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 | B5 字号标尺、D1 默认宽度、专注列宽与无溢出 | `npm test` (109/109) + `qa-writing-workflow` + `qa-writing-regressions` + `qa-desktop` + `qa-visual` + `audit-screens.mjs B5` | PASS | `.local/writing-workflow-c2G8UD`、`.local/writing-regressions-IXZP0I`、`.local/desktop-qa-R4mLCd`、`.local/visual-qa-A0QzYE`、`.local/claude-frontend-ux/B5-1794688476117/` | 仅合成资料；`sub12=[]` 且 3 种窗口尺寸均无横向溢出 |
 | B6 写作页结构、可收起侧栏、历史/资料预览与选中提示 | `npm test` (112/112) + `qa-writing-workflow` + `qa-writing-regressions` + `qa-expansion` + `qa-desktop` + `qa-visual` + `audit-screens.mjs B6` | PASS | `.local/writing-workflow-1Bp77A`、`.local/writing-regressions-eLvgDX`、`.local/expansion-qa-p50yJF`、`.local/desktop-qa-FlTCQt`、`.local/visual-qa-5S4Koo`、`.local/claude-frontend-ux/B6-1794689626584/` | 仅合成资料与本地模拟扩写服务；`sub12=[]`、3 种尺寸及折叠侧栏均无横向溢出 |
 | B7 整站深色界面、5 主题适配与 WCAG 对比度 | `npm test` (113/113) + `qa-desktop` + `qa-visual` + `audit-screens.mjs B7` | PASS | `.local/desktop-qa-R8DSBV`、`.local/visual-qa-nevIpS`、`.local/claude-frontend-ux/B7-1794690142065/` | 仅合成资料；`app/main` 未改致冷启动首帧前存在短暂白闪；5 主题深色 WCAG 抽检全部达标 |
+| B8 参考检索与卡片、页头统一 | `npm test` (113/113) + `qa-card-viewer` + `qa-card-markdown` + `qa-retrieval` + `qa-workspace-ui` + `qa-visual` + `audit-screens.mjs B8` | PASS | `.local/card-viewer-qa-VsP2yk`、`.local/card-markdown-qa-DEFEq4`、`.local/retrieval-qa-Ch8cOG`、`.local/workspace-ui-drSMbu`、`.local/visual-qa-VvHAAv`、`.local/claude-frontend-ux/B8-1794690737490/` | 仅合成/fixture 资料；`sub12=[]` 且 3 种窗口尺寸均无横向溢出 |
 
 ### 9.5 最终合并交接（停写时填写）
 

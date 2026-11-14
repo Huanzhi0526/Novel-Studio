@@ -32,7 +32,7 @@
 .card-tag-label { flex: 0 0 auto; min-width: 4em; font-size: var(--fs-meta); color: var(--muted); }
 .card-tag-items { display: inline-flex; flex: 1; flex-wrap: wrap; gap: 5px; min-width: 0; }
 .card-tag { display: inline-block; max-width: 100%; padding: 2px 7px; border-radius: 5px; color: var(--tag-ink); background: var(--tag-tint); font-size: var(--fs-meta); line-height: 1.6; }
-.card-compact .card-content { max-height: 10rem; overflow: hidden; margin-bottom: 10px; }
+.card-compact .card-content { max-height: 10rem; overflow: hidden; margin-bottom: 6px; }
 .card-compact .card-content-clipped { mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent); }
 .card-compact .card-content :is(h2, h3) { margin-top: 11px; }
 

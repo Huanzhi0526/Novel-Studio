@@ -74,34 +74,47 @@ export function Modal({ title, eyebrow, children, close, wide = false, className
   </div>;
 }
 
-export function Card({ card, openCard, openEvidence, compact = false, collapseEvidence = false }) {
+export function PageHeader({ title, subtitle, actions, className = '' }) {
+  return <header className={`topbar page-header ${className}`.trim()}>
+    <div className="page-header-main">
+      <h1 className="topbar-title">{title}</h1>
+      {subtitle && <span className="page-header-subtitle">{subtitle}</span>}
+    </div>
+    {actions && <div className="page-header-actions">{actions}</div>}
+  </header>;
+}
+
+export function Card({ card, openCard, openEvidence, compact = false, collapseEvidence = false, headless = false }) {
   const evidence = openEvidence ? card.evidence.map((range, index) => <button key={index} type="button" className="evidence-link"
     onClick={() => openEvidence(card, range)}
     title={range.section && range.volume_title ? `${range.volume_title} · ${range.section}` : range.volume_title ?? '查看原文'}>
     <Icon name="arrow" size={13} />
     <span className="evidence-title">[{index + 1}] {range.section || range.volume_title || '查看原文'}</span>
-    {range.section && range.volume_title && <small>{range.volume_title}</small>}
   </button>) : [];
-  const links = openEvidence && <div className="evidence-links">
-    {compact ? evidence.slice(0, 2) : evidence}
-    {compact && evidence.length > 2 && <details className="evidence-more">
-      <summary>另有 {evidence.length - 2} 处原文证据</summary>
-      {evidence.slice(2)}
+  const visibleLimit = collapseEvidence ? 3 : compact ? 2 : Infinity;
+  const hiddenCount = Math.max(0, evidence.length - visibleLimit);
+  const links = openEvidence && evidence.length > 0 && <div className="evidence-links">
+    {evidence.slice(0, visibleLimit)}
+    {hiddenCount > 0 && <details className="evidence-more">
+      <summary>{collapseEvidence ? `另有 ${hiddenCount} 处` : `另有 ${hiddenCount} 处原文证据`}</summary>
+      {evidence.slice(visibleLimit)}
     </details>}
   </div>;
-  return <article className={`knowledge-card ${compact ? 'card-compact' : ''}`} data-category={card.category}>
+  return <article className={`knowledge-card ${compact ? 'card-compact' : ''} ${headless ? 'card-headless' : ''}`.trim()} data-category={card.category}>
     <div className="card-kicker">
       <span className="pill">{card.v2_badge ?? categories[card.category]}</span>
       {card.claim_type === 'interpretation' && <span className="pill amber">分析推断</span>}
-      {card.work_title && <span>{card.work_title}</span>}
+      {!headless && card.work_title && <span>{card.work_title}</span>}
     </div>
-    <h3>{openCard ? <button type="button" className="text-button" onClick={() => openCard(card)}>{card.title}</button> : card.title}</h3>
+    {!headless && <h3>{openCard ? <button type="button" className="text-button" onClick={() => openCard(card)}>{card.title}</button> : card.title}</h3>}
     <CardContent content={card.content} compact={compact} />
     {compact && openCard && card.content.length > 100 &&
-      <button className="text-button" type="button" onClick={() => openCard(card)}>查看完整卡片</button>}
-    {collapseEvidence && openEvidence ? <details className="card-evidence">
-      <summary>原文证据（{evidence.length}）</summary>
+      <div className="card-expand-row">
+        <button className="text-button card-expand-link" type="button" onClick={() => openCard(card)}>展开全文 →</button>
+      </div>}
+    {collapseEvidence && openEvidence && evidence.length > 0 ? <div className="card-evidence">
+      <div className="card-evidence-title">原文证据（{evidence.length}）</div>
       {links}
-    </details> : links}
+    </div> : links}
   </article>;
 }

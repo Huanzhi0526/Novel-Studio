@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { api, Card, categories, ErrorMessage, Icon, Modal, structureTypes } from './ui.jsx';
+import { api, Card, categories, ErrorMessage, Icon, Modal, PageHeader, structureTypes } from './ui.jsx';
 import { Conversation } from './Conversation.jsx';
 import { BookCover } from './BookCover.jsx';
 import './reference-bookshelf.css';
@@ -109,8 +109,7 @@ export function Reference({
   }
 
   return <div className="reference-page">
-    <header className="topbar reference-toolbar">
-      <h1 className="topbar-title">参考库</h1>
+    <PageHeader title="参考库" className="reference-toolbar" actions={<>
       <div className="segmented" role="group" aria-label="参考库页面">
         <button type="button" aria-pressed={mode === 'search'} onClick={() => setMode('search')}>检索</button>
         <button type="button" aria-pressed={mode === 'shelf'} onClick={() => {
@@ -119,7 +118,7 @@ export function Reference({
         }}>书架</button>
       </div>
       {!kbV2 && <button type="button" className="reference-import" onClick={() => setImporting(true)}><Icon name="plus" size={15} />导入标准结果包</button>}
-    </header>
+    </>} />
     <ErrorMessage error={error} />
     {notice && <div className="notice success">{notice}<button className="quiet" onClick={() => setNotice('')}>关闭</button></div>}
     {mode === 'search'
@@ -306,7 +305,10 @@ export function CardEditor({ card, works, close, openEvidence, onSaved, editable
       .catch(failure => { if (alive) setError(failure); });
     return () => { alive = false; };
   }, [card]);
-  return <Modal title={editing ? '编辑知识卡' : '知识卡'} eyebrow={card.work_title} close={close} wide
+  const categoryLabel = live?.v2_badge ?? categories[live?.category ?? card.category];
+  const eyebrow = [live?.work_title ?? card.work_title, categoryLabel].filter(Boolean).join(' · ');
+  const dialogTitle = editing ? '编辑知识卡' : (live?.title ?? card.title ?? '知识卡');
+  return <Modal title={dialogTitle} eyebrow={eyebrow} close={close} wide
     className={editing ? '' : 'card-reader'}
     actions={editable && !editing && live && <button type="button" className="quiet" onClick={() => setEditing(true)}><Icon name="edit" size={15} />编辑</button>}>
     <ErrorMessage error={error} />
@@ -316,7 +318,7 @@ export function CardEditor({ card, works, close, openEvidence, onSaved, editable
         onSaved(value.warnings);
       }} />
       : <>
-        <Card card={live} openEvidence={openEvidence} collapseEvidence />
+        <Card card={live} openEvidence={openEvidence} collapseEvidence headless />
         {!editable && <p className="muted card-readonly-note">此卡由参考库建库流程维护，在此只读。</p>}
       </>
       : !error && <p className="inline-status"><span className="spinner" />正在读取</p>}
