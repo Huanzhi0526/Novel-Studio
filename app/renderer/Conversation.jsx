@@ -135,7 +135,7 @@ export function Conversation({ state, works, openEvidence, openCard, sidebar = f
           {message.result?.reason && <p className="notice mini">{message.result.reason}</p>}
           {message.result?.synthesis && <div className="v2-synthesis"><strong>创作参考导读：</strong>{message.result.synthesis}</div>}
           {message.result && !message.result.hits.length && <p className="notice">没有找到匹配的参考条目。</p>}
-          {message.result?.hits.map(card => <Card key={`${card.work_id}/${card.card_id}`} card={card} compact openEvidence={openEvidence} openCard={openCard} />)}
+          <div className="result-grid">{message.result?.hits.map(card => <Card key={`${card.work_id}/${card.card_id}`} card={card} compact preview openEvidence={openEvidence} openCard={openCard} />)}</div>
           {message.result?.cursor && <button className="quiet" disabled={message.state === 'more'} onClick={() => run(message, message.result.cursor)}>
             {message.state === 'more' ? '正在加载…' : '加载更多'}
           </button>}
@@ -156,10 +156,10 @@ export function Conversation({ state, works, openEvidence, openCard, sidebar = f
       <div className="composer-foot">
         {kbV2 ? <div className="segmented v2-mode-switch" role="group" aria-label="KB v2 检索模式">
           <button type="button" aria-pressed={v2Mode === 'local'} aria-label="本地混合" onClick={() => setV2Mode('local')} title="毫秒级本地分词+语义向量混合检索">{sidebar ? '本地' : '本地混合'}</button>
-          <button type="button" aria-pressed={v2Mode === 'fast'} aria-label="AI 快速" onClick={() => setV2Mode('fast')} title="AI 具象化意图展开 + 多层候选精选导读">{sidebar ? '快速' : 'AI 快速'}</button>
-          <button type="button" aria-pressed={v2Mode === 'deep'} aria-label="AI 深度翻书" onClick={() => setV2Mode('deep')} title="Agent 多轮查场次/档案并翻阅原文核证细节">{sidebar ? '深度' : 'AI 深度翻书'}</button>
+          <button type="button" aria-pressed={v2Mode === 'fast'} aria-label="AI 快速" onClick={() => setV2Mode('fast')} title="AI 展开意图并精选；问题与候选摘录将发送至所选服务">{sidebar ? '快速' : 'AI 快速'}</button>
+          <button type="button" aria-pressed={v2Mode === 'deep'} aria-label="AI 深度翻书" onClick={() => setV2Mode('deep')} title="AI 多轮翻书核证；问题、候选摘录及所需参考原文将发送至所选服务">{sidebar ? '深度' : 'AI 深度翻书'}</button>
         </div> : <label className="retrieval-toggle"><input type="checkbox" checked={useAi} onChange={event => setUseAi(event.target.checked)} />
-          <span>外部 AI 辅助</span></label>}
+          <span title="问题和候选卡摘录将发送到所配服务">外部 AI 辅助</span></label>}
         <div className="composer-actions">
           {onSettings && (sidebar
             ? <button type="button" className="icon-button retrieval-settings-link" aria-label="接口设置" title="接口设置" onClick={onSettings}><Icon name="settings" size={15} /></button>
@@ -167,12 +167,7 @@ export function Conversation({ state, works, openEvidence, openCard, sidebar = f
           <button type="submit" className="send-button" aria-label="检索" disabled={!draft.trim() || running}><Icon name="send" size={17} /></button>
         </div>
       </div>
-      {kbV2 && v2Mode !== 'local' && <small className="retrieval-disclosure">
-        {v2Mode === 'deep'
-          ? '将发送问题、候选摘录及所需参考原文；AI 多轮翻书核证细节（默认 Flash 桥接约 25–45 秒）。'
-          : '将发送问题及候选摘录；AI 自动展开情境线索并归纳看点（默认 Flash 桥接约 15–25 秒，直连 API 约 4–8 秒）。'}
-      </small>}
-      {(!kbV2 && useAi) && <small className="retrieval-disclosure">问题和候选卡摘录将发送到所配服务。</small>}
+
     </form>
   </section>;
 }

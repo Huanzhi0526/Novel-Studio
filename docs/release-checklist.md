@@ -112,3 +112,8 @@ npm run package:source
 
 
 创作助手/写作侧栏改动增加 `node scripts/qa-assistant.mjs <隔离EXE>` 和 `node scripts/qa-assistant-experience.mjs <隔离EXE>`；长任务协议需验提交立即返回、领取/失败/取消、跨书隔离，并以合成数据做超过180秒的真实模型领取测试，不能仅用固定句连接成功证明整条流程稳定。
+
+
+## 助手/检索阅读布局改动
+
+运行`node scripts/qa-readability.mjs $testedExe`验证长/短表、短卡网格、全文入口、细滚动条和深色窄窗；采用合成资料、无外部模型请求。此脚本使用showInactive的可见窗口，以实际触发布局测量。`qa-assistant-experience.mjs`继续验证发送快捷键/草稿/记忆；`qa-assistant-layout.mjs`验证拖动与宽度记忆。全文Markdown和证据由`qa-card-markdown.mjs`、`qa-card-viewer.mjs`、`qa-retrieval.mjs`覆盖，别用短预览替代详情验收。

@@ -66,6 +66,7 @@ try {
   await query.press('Enter');
   await page.getByText('已通过外部 AI 拆解问题并筛选候选卡。', { exact: true }).waitFor({ timeout: 30000 });
   const card = page.locator('.knowledge-card').filter({ hasText: '水簾洞' }).first();
+  await card.locator('.evidence-more > summary').click();
   await card.locator('.evidence-link').first().click();
   await page.locator('[data-highlighted=yes]').first().waitFor();
   report.evidence = true;

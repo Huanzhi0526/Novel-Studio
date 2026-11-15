@@ -120,7 +120,7 @@ export function RetrievalPreferences({ kbV2, purpose = 'retrieval' }) {
               {variants.map(model => <option key={model.id} value={model.id}>{model.effort ?? '模型默认'}</option>)}
             </select>
           </label>
-          <small>列表来自本机 CLI，列出不代表逐个推理测试成功。{expand ? '额度不足或调用失败会保留原稿并显示原因，不自动换模型生成。' : '额度不足或调用失败会显示原因，并回退本地检索。'}</small>
+          <details className="provider-help"><summary>模型来源说明</summary><p>列表来自本机 CLI，列出不代表逐个推理测试成功。{expand ? '额度不足或调用失败会保留原稿并显示原因，不自动换模型生成。' : '额度不足或调用失败会显示原因，并回退本地检索。'}</p></details>
         </>}
         <div className="button-row">
           <button type="button" className="primary" disabled={Boolean(busy) || !dirty} onClick={() => run('save')}>保存模型来源</button>
@@ -128,7 +128,7 @@ export function RetrievalPreferences({ kbV2, purpose = 'retrieval' }) {
           {busy === 'test' && <button type="button" onClick={cancel}>取消测试</button>}
           {dirty && <button type="button" disabled={Boolean(busy)} onClick={() => { setDraft(saved); setNotice(null); }}>取消来源修改</button>}
         </div>
-        <small>连接测试只发送固定测试句。更换来源不会删除 API 配置；切回自动或兼容 API 后仍可继续使用。</small>
+        <details className="provider-help"><summary>连接测试说明</summary><p>连接测试只发送固定测试句。更换来源不会删除 API 配置；切回自动或兼容 API 后仍可继续使用。</p></details>
       </div> : <button type="button" onClick={() => setReload(value => value + 1)}>重试读取模型来源</button>}
       {busy && <p role="status">{busy === 'listModels' ? '正在读取账号可用模型…' : busy === 'test' ? '正在测试所选模型…' : '正在保存…'}</p>}
       {notice && <p className={`notice ${notice.error ? 'danger' : 'success'}`} role={notice.error ? 'alert' : 'status'}>{notice.text}</p>}

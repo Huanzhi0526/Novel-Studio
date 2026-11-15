@@ -47,7 +47,6 @@ export function AppearancePreferences({ preferences, update }) {
   return <div className="writing-preferences">
     <Swatches label="界面明暗" options={appearances} value={preferences.appearance} onChange={appearance => update({ appearance })} />
     <Swatches label="主题色" options={themes} value={preferences.theme} onChange={theme => update({ theme })} />
-    <p className="muted preference-note">写作纸张在「写作偏好」中单独设置；夜间写作可搭配「夜写」纸张。</p>
   </div>;
 }
 

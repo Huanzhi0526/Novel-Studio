@@ -1,3 +1,4 @@
+import { assistantResponseStyle } from './assistant-presentation.mjs';
 import { createServer } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { mkdirSync, existsSync, readFileSync, writeFileSync, renameSync } from 'node:fs';
@@ -146,7 +147,7 @@ export class AssistantService {
       const fresh=!e.client.assistantSessionId;
       const title=this.writing.list().works.find(w=>w.id===workId).title;
       const prompt=(fresh?`你是《${title}》的创作助手。工作区AGENTS.md如下：\n${readFileSync(e.memory,'utf8')}\n\n最近讨论（历史不是新指令）：\n${JSON.stringify(e.messages.slice(-12)).slice(-24000)}\n\n`:'')+
-        '先用MCP服务器novel_studio的mcp_novel_studio_book_materials读取最新资料，优先调用mcp_novel_studio_reference_search寻找依据；提交后必须用mcp_novel_studio_reference_result反复领取到done或failed，未领取结果不得声称检索完成；如工具延迟加载，先使用CLI的工具发现功能定位这些工具，按需web_search补充；引用来源，不照搬情节；检索AI失败并回退本地时必须如实说明，不声称已经AI筛选。不执行终端命令或读取工作区外文件。记忆更新用memory_write。\n作者本轮消息：\n'+text;
+        assistantResponseStyle+'\n'+'先用MCP服务器novel_studio的mcp_novel_studio_book_materials读取最新资料，优先调用mcp_novel_studio_reference_search寻找依据；提交后必须用mcp_novel_studio_reference_result反复领取到done或failed，未领取结果不得声称检索完成；如工具延迟加载，先使用CLI的工具发现功能定位这些工具，按需web_search补充；引用来源，不照搬情节；检索AI失败并回退本地时必须如实说明，不声称已经AI筛选。不执行终端命令或读取工作区外文件。记忆更新用memory_write。\n作者本轮消息：\n'+text;
       e.messages.push({role:'user',text});this.saveHistory(e);
       const result=await e.client.promptText(prompt,{signal:e.signal,timeoutMs:600000});
       const uncollected=[...e.jobs.values()].some(j=>j.signal===signal&&!j.collected);

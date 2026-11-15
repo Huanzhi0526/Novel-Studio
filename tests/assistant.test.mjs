@@ -29,7 +29,7 @@ test('book workspaces isolate memories and expose only current nondeleted materi
 test('assistant send persists discussion, recovers with recent context, and closes failed sessions',async t=>{
  const root=mkdtempSync(join(tmpdir(),'novel-assistant-')),store=new Store(join(root,'library.sqlite')),writing=new WritingService(store);
  const workId=writing.createWork({title:'合成书'}).id;let calls=0,closed=0;
- const svc=new AssistantService(writing,null,root,{clientFactory:()=>({promptText:async text=>{calls++;assert.match(text,/本轮消息/);if(calls===2)throw new Error('503');return {text:'合成建议'};},close:()=>closed++})});
+ const svc=new AssistantService(writing,null,root,{clientFactory:()=>({promptText:async text=>{calls++;assert.match(text,/本轮消息/);assert.match(text,/输出面向作者阅读/);if(calls===2)throw new Error('503');return {text:'合成建议'};},close:()=>closed++})});
  svc.models=async()=>[{id:'gemini-test-low'}];
  // No network or CLI in this test; exercise orchestration and persistence only.
  svc.start=async e=>{e.client??=svc.clientFactory();};

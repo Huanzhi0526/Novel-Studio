@@ -19,6 +19,8 @@
 | 构建和发布 | `scripts/setup-electron.mjs` 安装已锁定运行时，`start.mjs` 启动开发版，`build.mjs` 构建界面，`release.mjs` 和 `setup.nsi` 打包 Windows，`package-source.mjs` 输出可移交源码 ZIP。 |
 | Windows 图标 | `app/assets/app-icon.png` 为黑白钢笔尖母版及窗口图标，多尺寸 ICO 用于 Windows。打包时 `scripts/embed-windows-icon.ps1` 写入 Electron 可执行文件的副本，NSIS 同步安装器和卸载器图标。升级脚本通知桌面刷新快捷方式。若更新 Electron 后资源布局校验失败，应重新检查图标资源 ID 与语言。 |
 
+助手/检索阅读布局维护见[阅读体验说明](阅读体验优化.md)：assistant-markdown.mjs负责保守表格显示转换，assistant-presentation.mjs只追加输出格式指导；card-preview.mjs只生成对话摘录，不得写回原卡。统一滚动条与结果网格在app.css，专项脚本qa-readability支持隔离安装EXE。
+
 ## 资料和迁移
 
 - 源码 ZIP 用于开发。新机器解压后依次执行 `npm ci`、`npm run setup:electron` 和 `npm run build`，用 `npm start` 打开独立开发资料。核对生产问题时，应先复现于隔离资料。需要指定目录时使用 `NOVEL_STUDIO_DATA_DIR`，需要关键词模式时使用 `NOVEL_STUDIO_NO_MODEL=1`。

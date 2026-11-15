@@ -292,6 +292,7 @@ try {
     return { anchor, head };
   });
   const selectionBeforeReading = await writingSelection();
+  await sidebar.locator('.evidence-more > summary').first().click();
   const evidenceLink = sidebar.locator('.evidence-link').first();
   await evidenceLink.click();
   const reader = page.locator('.reader-workspace');

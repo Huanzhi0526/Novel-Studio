@@ -66,7 +66,7 @@ try {
   const side = page.locator('.assistant-compact');
   await side.getByLabel('助手问题').waitFor();
   assert.equal(await side.getByLabel('助手问题').inputValue(), '继续完善第二种方案。');
-  await side.getByText('Enter 发送 · Shift+Enter 换行', { exact: true }).waitFor();
+  assert.equal(await side.getByLabel('助手问题').getAttribute('title'), 'Enter 发送 · Shift+Enter 换行');
   assert.equal(await side.evaluate(el => el.scrollWidth <= el.clientWidth + 1), true);
   await side.locator('.assistant-scroll').evaluate(el => { el.scrollTop = 0; });
   await capture('sidebar.png');
@@ -75,7 +75,7 @@ try {
   await side.getByRole('button', { name: '关闭助手侧栏' }).click();
   await page.getByRole('button', { name: '创作助手', exact: true }).click();
   assert.equal(await main.getByLabel('助手问题').inputValue(), '侧栏中继续讨论，草稿应该保留。');
-  await main.getByText('Enter 发送 · Shift+Enter 换行', { exact: true }).waitFor();
+  assert.equal(await main.getByLabel('助手问题').getAttribute('title'), 'Enter 发送 · Shift+Enter 换行');
   await page.setViewportSize({ width: 980, height: 760 });
   await capture('narrow.png');
 

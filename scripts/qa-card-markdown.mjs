@@ -146,10 +146,11 @@ try {
     await query.fill('水帘洞');
     await query.press('Enter');
     const updated = page.getByRole('region', { name: '参考库检索' }).locator('.knowledge-card').filter({ has: page.getByRole('button', { name: '水簾洞', exact: true }) });
-    await updated.locator('strong').waitFor({ state: 'attached' });
-    assert.equal(await updated.locator('strong').count(), 1);
-    assert.equal(await updated.locator('h2').count(), 4);
-    await updated.locator('.card-content-clipped').waitFor({ state: 'attached' });
+    // Results now show an excerpt; the full Markdown/tag assertions above apply to the reader.
+    assert.equal(await updated.locator('.card-content').count(), 0);
+    await updated.locator('.card-preview-text').waitFor();
+    assert.ok((await updated.locator('.card-preview-text').textContent()).length <= 161);
+    assert.ok((await updated.boundingBox()).height < 320);
     assert.ok(await updated.evaluate(node => node.scrollWidth <= node.clientWidth + 1));
     await page.screenshot({ path: join(folder, 'search-narrow.png') });
     assert.deepEqual(failures, []);

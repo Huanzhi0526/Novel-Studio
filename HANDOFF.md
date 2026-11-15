@@ -2,6 +2,16 @@
 
 工作区 `D:\Vibe Coding\Novel Studio`。2026-11-12初始化本地Git，0.1.19基线371be17保留；2026-11-13已合并至main并正式升级0.2.0。此前无Git仓库的记录属于历史。本文记录当前状态，早期施工及逐轮验收保存在 [项目历史](docs/project-history.md)。
 
+## 0.2.10 已上线：滚动条、助手排版与检索卡预览（2026-11-15）
+
+- 用户要求简约滚动条、减少非必要注释小字、规范助手输出与改善检索卡阅读。本轮从main70c7fe0完成并发布0.2.10：统一原生6px扁平滚动条；常驻快捷键/发送说明改为悬停或说明面板，模型来源说明折叠，必要错误/未完成/未保存状态保留。
+- 助手每轮增加阅读格式要求，分幕方案优先分节；接入官方推荐remark-gfm4.0.1（MIT，锁文件同步），短表正常渲染，长表按原列内容转为有标题的分段，简单<br>安全换行；对明确列数匹配的挤成单行表格补显示换行。未知HTML沿用文本显示，不执行；图片不加载。只改显示输入，不重写历史chat.json，不改本书AGENTS.md，不清会话。真实模型是否始终遵守排版要求NOT_RUN，不宣称任意破损格式都可修复。实现与开源参考见docs/阅读体验优化.md。
+- 对话中的检索卡显示三行短摘录（最多160字加省略号），优先已返回的参考看点；宽窗网格并排，窄栏自动单列，全文与原文证据按需打开。原卡/证据身份、检索召回/排序/候选上限与实际cursor分页不改；仍由用户加载后续批次，不自动追加外部请求。详情弹窗保留完整Markdown。
+- 验证：npm run build和117项单测通过（新增长/短表、代码/转义、不丢未知HTML原句、卡预览不改原数据、每轮输出格式要求）；源程序qa-readability、qa-card-markdown、qa-card-viewer、qa-retrieval、qa-desktop通过。后四项既有全文/编辑/证据断言保留，结果页断言同步短预览。所有调用为本机模拟或合成/公版隔离资料，没有重发真实小说/原创或真实模型请求。
+- npm run package:windows生成最终包，隔离/S /NOSHORTCUT /D=.local/ux-readability-0210/install后，qa-installed-smoke、qa-readability、qa-assistant-experience、qa-assistant-layout全部通过。12张长卡宽窗三列，完整末尾可从弹窗读到；四幕长表分成4节、短表保留表格；滚动条6px，原聊天字节未变，0外部HTTP请求、0页面错误，深色窄窗和截图已目视自查。专项证据.local/ux-readability-0210/qa-jX1RWY；助手.local/assistant-027/experience-1794728051608，调宽.local/ux-layout-029/qa-1794728059677。
+- 正常退出后完整备份正式资料及0.2.9程序至.local/ux-readability-0210/before-formal-20261115，262文件（资料172/程序90）逐一SHA256核验。正式升级显式LOCALAPPDATA=C:\Users\78828\AppData\Local，pwsh -NoProfile -File scripts/upgrade-windows.ps1 -Version 0.2.10 -IsolatedInstall .local/ux-readability-0210/install -RecordFile .local/ux-readability-0210/upgrade-receipt.json -GracefulClose。正式与隔离安装摘要一致，桌面小说工作台目标独立启动通过；全部172个既有资料文件摘要不变，原稿/参考库/配置/聊天/记忆保持原状。证据upgrade-receipt.json、formal-verification.json及同目录日志。
+- 当前main源码/锁文件/正式安装resources/app/package.json均0.2.10；release交付安装器、源码ZIP和SHA256清单，最终文档完成后npm run package:source，验证ZIP完整、版本一致、全部打包文件与工作区字节一致。旧release、原文、模型及备份保留。已知深色冷启动短暂闪白仍未涉及；无运行中的后台任务，下一步由用户试用阅读体验。
+
 ## 0.2.9 已上线：自适应对话与可拖动写作侧栏（2026-11-15）
 
 - 用户反馈创作助手文字挤在中间、写作右侧栏不可调宽。本轮从main55a968f调整并发布0.2.9：去除助手消息/参考/进度的74ch居中上限，助手回复使用可用宽度、用户气泡靠右，消息与输入区保留自适应边距。

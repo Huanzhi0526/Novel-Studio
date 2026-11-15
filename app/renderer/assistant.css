@@ -286,7 +286,8 @@
 
 .assistant-prose h1,
 .assistant-prose h2,
-.assistant-prose h3 {
+.assistant-prose h3,
+.assistant-prose h4 {
   line-height: 1.5;
   margin: 1.5em 0 .7em;
   font-size: 1.12em;
@@ -309,8 +310,7 @@
   color: var(--muted);
 }
 
-.assistant-prose pre,
-.assistant-prose table {
+.assistant-prose pre {
   max-width: 100%;
   overflow: auto;
   display: block;
@@ -566,3 +566,15 @@
   max-width: none;
   margin: 0;
 }
+
+.assistant-composer-actions { justify-content: flex-end; margin-top: 8px; }
+.assistant-table-scroll { width: 100%; overflow-x: auto; margin: 1em 0; }
+.assistant-table-scroll table { width: 100%; border-collapse: collapse; font-size: .95em; line-height: 1.7; }
+.assistant-table-scroll :is(th, td) { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.assistant-table-scroll th { background: var(--bg); font-weight: 650; }
+.assistant-table-records { display: grid; gap: 14px; margin: 1em 0; }
+.assistant-table-record { border-left: 3px solid var(--border); padding: 2px 0 2px 18px; }
+.assistant-prose .assistant-table-record h4 { margin: 0 0 10px; font-size: 1em; }
+.assistant-prose .assistant-table-record p:last-child { margin-bottom: 0; }
+.assistant-usage { color: var(--muted); font-size: var(--fs-ui); line-height: 1.7; }
+.assistant-usage summary { cursor: pointer; }

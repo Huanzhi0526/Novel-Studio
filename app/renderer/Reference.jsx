@@ -319,7 +319,6 @@ export function CardEditor({ card, works, close, openEvidence, onSaved, editable
       }} />
       : <>
         <Card card={live} openEvidence={openEvidence} collapseEvidence headless />
-        {!editable && <p className="muted card-readonly-note">此卡由参考库建库流程维护，在此只读。</p>}
       </>
       : !error && <p className="inline-status"><span className="spinner" />正在读取</p>}
   </Modal>;

@@ -39,7 +39,7 @@
 
 .reference-page > .conversation .conversation-scope select { max-width: 270px; min-height: 31px; background: var(--panel); }
 .reference-page > .conversation .messages { padding-inline: var(--reference-inset); }
-.reference-page > .conversation .exchange { max-width: 820px; }
+.reference-page > .conversation .exchange { max-width: none; }
 .reference-page > .conversation .search-composer { margin: 8px var(--reference-inset) 18px; padding: 13px 15px 10px; border-radius: 12px; box-shadow: none; background: var(--panel); }
 .reference-page > .conversation .conversation-empty { max-width: 390px; padding: 30px 14px; }
 .reference-page > .conversation .empty-emblem { background: transparent; width: 42px; height: 42px; color: var(--muted); margin-bottom: 9px; }

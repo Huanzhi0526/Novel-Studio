@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { normalizeAssistantMarkdown, readableAssistantTables } from './assistant-markdown.mjs';
 import { api, Card, ConfirmDialog, ErrorMessage, Icon } from './ui.jsx';
 import { sendIntent } from './input-keys.mjs';
 import './assistant.css';
@@ -148,8 +150,8 @@ export function useAssistantController() {
 }
 
 const Markdown = ({ children }) => (
-  <ReactMarkdown components={{ a: ({ children, href }) => <span className="assistant-source-link">{children}<small>{href}</small></span> }}>
-    {children}
+  <ReactMarkdown remarkPlugins={[remarkGfm, readableAssistantTables]} components={{ table: ({ children }) => <div className="assistant-table-scroll"><table>{children}</table></div>, img: () => null, a: ({ children, href }) => <span className="assistant-source-link">{children}<small>{href}</small></span> }}>
+    {normalizeAssistantMarkdown(children)}
   </ReactMarkdown>
 );
 
@@ -339,6 +341,7 @@ export function Assistant({ active, controller: c, openCard, openEvidence, compa
             {models.length > 0 && !models.some(m => m.id === modelId) && <option value={modelId}>当前：{modelId}（刷新列表确认）</option>}
             {models.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
           </select></label>
+          <details className="assistant-usage"><summary>使用说明</summary><p>Enter 发送，Shift+Enter 换行。主动发送时，本书相关创作资料会交给所选模型；按需联网仅发送搜索词。</p></details>
           <button type="button" className="quiet assistant-refresh-models" disabled={busy} onClick={c.refreshModels}>刷新反重力模型</button>
           {state && <>
             <label className="assistant-memory-field"><span>本书任务与记忆</span>
@@ -385,12 +388,12 @@ export function Assistant({ active, controller: c, openCard, openEvidence, compa
       {!!state?.sources && <details className="assistant-references">
         <summary>本轮参考资料 <span>{state.sources.hits?.length ?? 0} 条</span></summary>
         {state.sources.reason && <p>{state.sources.reason}</p>}
-        {state.sources.hits?.map((card, i) => <Card key={i} card={card} compact collapseEvidence openCard={openCard} openEvidence={openEvidence} />)}
+        <div className="result-grid">{state.sources.hits?.map((card, i) => <Card key={i} card={card} compact preview collapseEvidence openCard={openCard} openEvidence={openEvidence} />)}</div>
       </details>}
     </div>
     <footer className="assistant-composer">
       <textarea
-        aria-label="助手问题"
+        aria-label="助手问题" title="Enter 发送 · Shift+Enter 换行"
         disabled={!workId}
         value={text}
         onChange={e => c.setText(e.target.value)}
@@ -403,12 +406,10 @@ export function Assistant({ active, controller: c, openCard, openEvidence, compa
         placeholder="描述想解决的情节，或接着推敲上一个方案…"
       />
       <div className="assistant-composer-actions">
-        <span>Enter 发送 · Shift+Enter 换行</span>
         {busy
           ? <button type="button" onClick={c.stop}>停止</button>
           : <button type="button" className="primary" disabled={!workId || !text.trim()} onClick={c.run}>发送 <Icon name="send" size={15} /></button>}
       </div>
-      <small className="assistant-privacy">主动发送后，相关创作资料交给所选模型；按需联网仅发送搜索词。</small>
     </footer>
     <ConfirmDialog
       open={Boolean(confirmConfig)}

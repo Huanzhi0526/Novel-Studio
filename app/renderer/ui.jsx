@@ -1,3 +1,4 @@
+import { cardPreview } from './card-preview.mjs';
 import React, { useEffect, useRef } from 'react';
 import { CardContent } from './CardContent.jsx';
 
@@ -145,35 +146,36 @@ export function PageHeader({ title, subtitle, actions, className = '' }) {
   </header>;
 }
 
-export function Card({ card, openCard, openEvidence, compact = false, collapseEvidence = false, headless = false }) {
+export function Card({ card, openCard, openEvidence, compact = false, preview = false, collapseEvidence = false, headless = false }) {
+  const short = preview && Boolean(openCard);
   const evidence = openEvidence ? card.evidence.map((range, index) => <button key={index} type="button" className="evidence-link"
     onClick={() => openEvidence(card, range)}
     title={range.section && range.volume_title ? `${range.volume_title} · ${range.section}` : range.volume_title ?? '查看原文'}>
     <Icon name="arrow" size={13} />
     <span className="evidence-title">[{index + 1}] {range.section || range.volume_title || '查看原文'}</span>
   </button>) : [];
-  const visibleLimit = collapseEvidence ? 3 : compact ? 2 : Infinity;
+  const visibleLimit = short ? 0 : collapseEvidence ? 3 : compact ? 2 : Infinity;
   const hiddenCount = Math.max(0, evidence.length - visibleLimit);
   const links = openEvidence && evidence.length > 0 && <div className="evidence-links">
     {evidence.slice(0, visibleLimit)}
     {hiddenCount > 0 && <details className="evidence-more">
-      <summary>{collapseEvidence ? `另有 ${hiddenCount} 处` : `另有 ${hiddenCount} 处原文证据`}</summary>
+      <summary>{short ? `${hiddenCount} 处原文` : collapseEvidence ? `另有 ${hiddenCount} 处` : `另有 ${hiddenCount} 处原文证据`}</summary>
       {evidence.slice(visibleLimit)}
     </details>}
   </div>;
-  return <article className={`knowledge-card ${compact ? 'card-compact' : ''} ${headless ? 'card-headless' : ''}`.trim()} data-category={card.category}>
+  return <article className={`knowledge-card ${compact ? 'card-compact' : ''} ${headless ? 'card-headless' : ''} ${short ? 'card-preview' : ''}`.trim()} data-category={card.category}>
     <div className="card-kicker">
       <span className="pill">{card.v2_badge ?? categories[card.category]}</span>
       {card.claim_type === 'interpretation' && <span className="pill amber">分析推断</span>}
-      {!headless && card.work_title && <span>{card.work_title}</span>}
+      {!headless && card.work_title && <span title={card.work_title}>{card.work_title}</span>}
     </div>
-    {!headless && <h3>{openCard ? <button type="button" className="text-button" onClick={() => openCard(card)}>{card.title}</button> : card.title}</h3>}
-    <CardContent content={card.content} compact={compact} />
-    {compact && openCard && card.content.length > 100 &&
+    {!headless && <h3>{openCard ? <button type="button" className="text-button" title={card.title} onClick={() => openCard(card)}>{card.title}</button> : card.title}</h3>}
+    <>{short ? <p className="card-preview-text">{cardPreview(card)}</p> : <CardContent content={card.content} compact={compact} />}</>
+    {compact && openCard && (short || card.content.length > 100) &&
       <div className="card-expand-row">
         <button className="text-button card-expand-link" type="button" onClick={() => openCard(card)}>展开全文 →</button>
       </div>}
-    {collapseEvidence && openEvidence && evidence.length > 0 ? <div className="card-evidence">
+    {!short && collapseEvidence && openEvidence && evidence.length > 0 ? <div className="card-evidence">
       <div className="card-evidence-title">原文证据（{evidence.length}）</div>
       {links}
     </div> : links}
