@@ -2,6 +2,10 @@
 
 所有命令从项目根目录运行。当前工作区为 `D:\Vibe Coding\Novel Studio`。新机器可以从源码 ZIP 解压后开始。已验证 Windows x64、PowerShell 7、Node.js 24.16.0 和 npm 11.13.0。转换器测试使用 Python 3，本机以 Python 3.10 复验。Windows 安装器使用 NSIS 3.13。
 
+## 仅文档维护
+
+先核对实际版本与引用入口，更新HANDOFF并区分当前/历史；代码和程序无变更时不自动升版本、构建安装器或重装，不为文档修改重跑外部模型。完成文档后运行npm run package:source，验证ZIP完整、版本一致和打包文件与工作区字节一致，重算该版本源码SHA；安装器SHA必须与此前回执一致。验收记录明确测试NOT_RUN及原因。原始历史原文可归档docs/history并从入口链接，不抹去原验收证据。
+
 ## 准备和源码验证
 
 1. 读 [README](../README.md)、[CONTEXT](../CONTEXT.md) 和 [HANDOFF](../HANDOFF.md)，确认本次改动范围、数据目录和已验版本。已有依赖的同一工作区可直接构建。首次解包或依赖变动后执行 `npm ci`。

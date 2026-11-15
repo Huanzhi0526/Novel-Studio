@@ -966,3 +966,9 @@ Automations工具已成功删除novel-studio，deleteStatus=deleted，不再自�
 - npm run package:windows生成最终包，隔离/S /NOSHORTCUT /D=.local/ux-readability-0210/install后，qa-installed-smoke、qa-readability、qa-assistant-experience、qa-assistant-layout全部通过。12张长卡宽窗三列，完整末尾可从弹窗读到；四幕长表分成4节、短表保留表格；滚动条6px，原聊天字节未变，0外部HTTP请求、0页面错误，深色窄窗和截图已目视自查。专项证据.local/ux-readability-0210/qa-jX1RWY；助手.local/assistant-027/experience-1794728051608，调宽.local/ux-layout-029/qa-1794728059677。
 - 正常退出后完整备份正式资料及0.2.9程序至.local/ux-readability-0210/before-formal-20261115，262文件（资料172/程序90）逐一SHA256核验。正式升级显式LOCALAPPDATA=C:\Users\78828\AppData\Local，pwsh -NoProfile -File scripts/upgrade-windows.ps1 -Version 0.2.10 -IsolatedInstall .local/ux-readability-0210/install -RecordFile .local/ux-readability-0210/upgrade-receipt.json -GracefulClose。正式与隔离安装摘要一致，桌面小说工作台目标独立启动通过；全部172个既有资料文件摘要不变，原稿/参考库/配置/聊天/记忆保持原状。证据upgrade-receipt.json、formal-verification.json及同目录日志。
 - 当前main源码/锁文件/正式安装resources/app/package.json均0.2.10；release交付安装器、源码ZIP和SHA256清单，最终文档完成后npm run package:source，验证ZIP完整、版本一致、全部打包文件与工作区字节一致。旧release、原文、模型及备份保留。已知深色冷启动短暂闪白仍未涉及；无运行中的后台任务，下一步由用户试用阅读体验。
+
+## 2026-11-15：0.2.10文档维护（不升级程序）
+
+- 当前代码基线d013f5c，未修改程序或正式资料。只读核对源码/锁文件/正式应用版本0.2.10，桌面快捷方式目标正确；安装器SHA仍EA9CC3B9F1243250999E435897DE902E947A89B41937501EE655F071AE07B927，与上轮升级回执一致。
+- 更新AGENTS/HANDOFF、README/CONTEXT、维护地图、助手/UI说明、主管提示词及Claude/方向评估的历史标记；整理前规则/术语/README/维护地图/接手提示词原文归档docs/history。补清旧ZIP与v2、单库与全资料备份、原117项结果与本轮文档核验的区别。
+- 本轮运行文档链接与入口核对、git diff --check、npm run package:source及ZIP完整/文件字节/版本检查，证据.local/docs-maintenance-20261115。代码单测、桌面操作、外部模型NOT_RUN（无代码变更），旧发布成绩不冒充重跑。当前源码ZIP/SHA同步，安装器不重打、不重装，旧发布件保留。
