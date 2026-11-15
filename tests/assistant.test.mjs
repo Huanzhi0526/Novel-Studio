@@ -94,3 +94,18 @@ test('retrieval failures are collectable with their code and visible in current-
  assert.equal(result.status,'failed');assert.equal(result.error.code,'TEST_TIMEOUT');
  assert.equal(service.get({workId}).retrievalJobs[0].error.message,'合成检索超时');assert.equal(e.sources,undefined);
 });
+
+
+test('MCP captures the turn at request start and cannot apply a late body to the next turn',async t=>{
+ const {request}=await import('node:http');
+ const root=mkdtempSync(join(tmpdir(),'assistant-late-body-')),store=new Store(join(root,'library.sqlite')),writing=new WritingService(store),workId=writing.createWork({title:'合成'}).id;
+ const service=new AssistantService(writing,null,root,{clientFactory:()=>({close(){}})});t.after(async()=>{await service.close();store.close();rmSync(root,{recursive:true,force:true});});
+ const e=service.entry(workId),old=new AbortController();e.signal=old.signal;await service.start(e,workId);
+ const body=JSON.stringify({jsonrpc:'2.0',id:7,method:'tools/call',params:{name:'memory_write',arguments:{text:'不应写入下一轮'}}});
+ const before=readFileSync(e.memory,'utf8');
+ const response=new Promise((resolve,reject)=>{
+  const req=request({hostname:'127.0.0.1',port:e.server.address().port,method:'POST',headers:{authorization:'Bearer '+e.token,'content-length':Buffer.byteLength(body)}},res=>{let text='';res.on('data',c=>text+=c);res.on('end',()=>resolve(JSON.parse(text)));});req.on('error',reject);req.write(body.slice(0,20));
+  setTimeout(()=>{old.abort();e.signal=new AbortController().signal;req.end(body.slice(20));},30);
+ });
+ assert.equal((await response).result.isError,true);assert.equal(readFileSync(e.memory,'utf8'),before);
+});

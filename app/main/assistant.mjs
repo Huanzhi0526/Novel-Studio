@@ -73,9 +73,11 @@ export class AssistantService {
         res.setHeader('Content-Type','application/json');
         if(req.headers.authorization!=='Bearer '+e.token) {res.writeHead(401).end('{}');return;}
         if(req.method!=='POST') {res.writeHead(405).end('{}');return;}
+        const requestSignal=e.signal,requestToken=e.token;
         let id=null;
         try {
           let body='';for await(const chunk of req){body+=chunk;if(body.length>150000) throw new Error('请求过大');}
+          if(requestToken!==e.token)throw new Error('旧传输请求已失效');
           const msg=JSON.parse(body);id=msg.id;
           e.toolEvents.push({method:msg.method,at:Date.now()});if(e.toolEvents.length>40)e.toolEvents.shift();
           if(msg.method==='tools/list')e.toolsReady=true;
@@ -85,7 +87,7 @@ export class AssistantService {
           else if(msg.method==='tools/list')result={tools};
           else if(msg.method==='ping')result={};
           else if(msg.method==='tools/call') {
-            try { const value=await this.tool(e,workId,msg.params.name,msg.params.arguments??{},e.signal);result={content:[{type:'text',text:JSON.stringify(value)}]}; }
+            try { const value=await this.tool(e,workId,msg.params.name,msg.params.arguments??{},requestSignal);result={content:[{type:'text',text:JSON.stringify(value)}]}; }
             catch(error){result={isError:true,content:[{type:'text',text:error.message}]};}
           } else throw new Error('不支持的MCP方法');
           res.end(JSON.stringify({jsonrpc:'2.0',id,result}));
