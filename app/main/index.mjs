@@ -129,7 +129,8 @@ async function modelOptions(preferVulkan = false) {
 }
 
 function register(writing, reference, imports, search, backup, expansion, retrieval) {
-  assistantService = new AssistantService(writing, useKbV2 ? new AssistantSearch(search, {retrieval}) : null, dataDir);
+  const readSearch = useKbV2 ? new AssistantSearch(search, {retrieval}) : null;
+  assistantService = new AssistantService(writing, readSearch, dataDir);
   const handlers = new Map();
   for (const name of ['get','send','models','memory','reset','permission']) handlers.set('assistant.'+name, assistantService[name].bind(assistantService));
   const expose = (prefix, service, methods) => {
@@ -142,7 +143,7 @@ function register(writing, reference, imports, search, backup, expansion, retrie
   expose('reference', reference, ['list', 'setHidden', 'getCard', 'listCards', 'editCard', 'read', 'asset']);
   expose('import', imports, ['preview', 'commit', 'cancel']);
   expose('search', search, ['prepare']);
-  handlers.set('search.query', retrieval.query.bind(retrieval));
+  handlers.set('search.query', (readSearch ?? retrieval).query.bind(readSearch ?? retrieval));
   for (const [name, method] of Object.entries({
     get: 'configGet', save: 'configSave', select: 'configSelect', remove: 'configRemove', test: 'configTest'
   })) {
@@ -219,6 +220,7 @@ function register(writing, reference, imports, search, backup, expansion, retrie
     imports.cancel();
     for (const request of requests.values()) request.abort(cancellation());
     try {
+      await readSearch?.close();
       return await backup.restore(filename);
     } finally {
       restoring = false;

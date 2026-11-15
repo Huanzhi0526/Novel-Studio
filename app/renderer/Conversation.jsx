@@ -24,7 +24,7 @@ export function useConversation() {
       if (current.current.get(message.id) !== requestId) return;
       setMessages(items => items.map(item => item.id === message.id ? {
         ...item, state: 'ready', result: {
-          ...result, hits: cursor ? [...item.result.hits, ...result.hits] : result.hits
+          ...result, synthesis: cursor ? item.result.synthesis : result.synthesis, hits: cursor ? [...item.result.hits, ...result.hits] : result.hits
         }
       } : item));
     } catch (error) {

@@ -41,7 +41,7 @@ const deepAgentPrompt = [
   '1. search_scenes: {"query":"具象场景描述","keywords":["词1","词2"],"workId":null,"limit":15} —— 搜全书顺序剧情场次账本（最适合找约会、装逼打脸、修罗场、日常互动、战斗转折等桥段）',
   '2. search_dossiers: {"query":"人设或设定描述","keywords":["词1"],"entityType":"character"|"world_rule"|null,"facetKind":"identity_appearance"|"persona_style"|"relationships"|"arc_highlights"|"core_mechanism"|"cost_constraints"|"narrative_application"|null,"workId":null,"limit":12} —— 搜人物与世界设定切面档案（查大小姐人设、性格反差、服饰造型档案、魔法代价等）',
   '3. search_passages: {"query":"具体描写画面","keywords":["连衣裙","制服","礼服"],"workId":null,"limit":12} —— 直接搜细粒度原文切片（最适合找服装穿搭、神态动作、特定道具台词等微观描写）',
-  '4. read_original_range: {"volumeId":"分卷ID","startOrdinal":100,"endOrdinal":135} —— 翻阅指定分卷的真实原文段落（最多45段），核实候选场次或切片里的真实写法与细节！',
+  '4. read_original_range: {"volumeId":"分卷ID","revisionId":"候选的revision_id","startOrdinal":100,"endOrdinal":135} —— 翻阅指定分卷的真实原文段落（最多45段），核实候选场次或切片里的真实写法与细节！',
   '',
   '工作策略（最多 3 轮工具调用，第 4 轮必须给出最终整理）：',
   '- 第 1 轮：把作者的提问拆解为具体情境与词汇，组合调用 search_scenes / search_dossiers / search_passages 广度铺开。',
@@ -54,7 +54,7 @@ const deepAgentPrompt = [
   '格式 B（完成检索并交付参考报告）：',
   '{"action":"final","synthesis":"3到6句话的深度创作参考导读（按设计流派/手法对比各书案例，结合你翻阅原文看到的细节给作者具体启发）","selections":[{"ref":"scene:12","takeaway":"结合原文核实后的具体参考看点（25-70字，点明写法妙处或具体细节）"}]}',
   '',
-  '硬性约束：selections 中的 ref 必须严格来自工具返回过的 ref（形如 scene:数字、facet:数字、passage:数字），最多选 18 条，去重排列，严禁编造不存在的 ref。'
+  '硬性约束：selections 中的 ref 必须严格来自工具返回过的 ref（形如 scene:数字、facet:数字、passage:数字、original:数字），最多选 18 条，去重排列，严禁编造不存在的 ref。'
 ].join('\n');
 
 export function sanitizeJsonStringLiterals(raw) {
@@ -182,6 +182,7 @@ export class RetrievalEngineV2 {
   completeForSearch(messages, options = {}, signal) { return this.#complete(messages, options, signal); }
 
   async #complete(messages, options = {}, signal) {
+    signal?.throwIfAborted();options.validate?.();
     if (this.customComplete) {
       return await this.customComplete(messages, options, signal);
     }
@@ -196,7 +197,7 @@ export class RetrievalEngineV2 {
         return await this.setting('complete', () => {
           if (generation !== this.search.reference.generation) fail('SEARCH_STALE', '资料库已变更，请重新搜索');
           if (JSON.stringify(this.config.read()) !== snapshot) fail('SEARCH_CONFIG_CHANGED', '检索配置已变更，请重试');
-          return messages;
+          options.validate?.();return messages;
         }, signal, options);
       }
     }
@@ -301,7 +302,7 @@ export class RetrievalEngineV2 {
       if (sourceSnapshot !== this.sourceProvider?.snapshot()) fail('SEARCH_CONFIG_CHANGED', '检索模型来源或模型已切换，请重新检索。');
     };
     const localBase=()=>this.search.query({ ...args, limit: args.limit ?? 12 }, { signal }).then(value => ({ value }), error => ({ error }));
-    const basePromise = args.lazyFallback ? null : localBase();
+    const basePromise = null; // Failure-only fallback; successful AI paths never pre-scan.
     try {
       const result = mode === 'fast'
         ? await this.#runFastMode(args, { signal })
@@ -311,6 +312,7 @@ export class RetrievalEngineV2 {
     } catch (error) {
       signal?.throwIfAborted();
       ensureSource();
+      if (['SEARCH_STALE','SEARCH_CONFIG_CHANGED','CANCELLED'].includes(error.code)) throw error;
       const local = await (basePromise ?? localBase());
       if (local.error) throw local.error;
       const base = local.value;
@@ -318,7 +320,7 @@ export class RetrievalEngineV2 {
       return {
         ...base,
         degraded: true,
-        reason: `AI ${mode === 'deep' ? '深度翻书' : '快速检索'}未完成，已自动回退本地三层混合检索。${hint}`
+        reason: `${base.degraded ? (base.reason??'')+' ' : ''}AI ${mode === 'deep' ? '深度翻书' : '快速检索'}未完成，已自动回退本地三层混合检索。${hint}`
       };
     }
   }
@@ -354,8 +356,8 @@ export class RetrievalEngineV2 {
     if (!recall.candidates.length) {
       return this.search.rankedPage(args, [], {
         mode: 'fast',
-        degraded: false,
-        reason: 'AI 快速检索已完成意图展开，未在当前范围找到匹配条目。',
+        degraded: recall.degraded,
+        reason: `${recall.reason?recall.reason+' ':''}AI 快速检索已完成意图展开，未在当前范围找到匹配条目。`,
         channels: recall.channels,
         synthesis: ''
       });
@@ -395,8 +397,8 @@ export class RetrievalEngineV2 {
 
     return this.search.rankedPage({ ...args, limit: args.limit ?? 12 }, selected, {
       mode: 'fast',
-      degraded: false,
-      reason: `AI 快速检索：已展开 ${cues.length} 组具象线索，从 ${compactList.length} 条三层候选中精选 ${selected.length} 条。`,
+      degraded: recall.degraded,
+      reason: `${recall.reason ? recall.reason + ' ' : ''}AI 快速检索：已展开 ${cues.length} 组具象线索，从 ${compactList.length} 条三层候选中精选 ${selected.length} 条。`,
       channels: recall.channels,
       synthesis: typeof curated.synthesis === 'string' ? curated.synthesis.trim() : ''
     });
@@ -431,6 +433,7 @@ export class RetrievalEngineV2 {
     let toolRounds = 0;
     let totalToolCalls = 0;
     let verifiedReads = 0;
+    const embeddingReasons=new Set();
 
     for (let step = 0; step < 4; step++) {
       signal?.throwIfAborted();
@@ -468,8 +471,8 @@ export class RetrievalEngineV2 {
 
         return this.search.rankedPage({ ...args, limit: args.limit ?? 14 }, selections, {
           mode: 'deep',
-          degraded: false,
-          reason: `AI 深度翻书完成：经 ${toolRounds} 轮检索（${totalToolCalls} 次查库、${verifiedReads} 次翻阅原文）返回 ${selections.length} 条参考。`,
+          degraded: embeddingReasons.size>0,
+          reason: `${[...embeddingReasons].join(' ')}AI 深度翻书完成：经 ${toolRounds} 轮检索（${totalToolCalls} 次查库、${verifiedReads} 次翻阅原文）返回 ${selections.length} 条参考。`,
           channels: { lexical: validRefs.size, semantic: verifiedReads },
           synthesis: typeof parsed.synthesis === 'string' ? parsed.synthesis.trim() : ''
         });
@@ -491,14 +494,17 @@ export class RetrievalEngineV2 {
         if (call.tool === 'search_scenes') {
           const res = await this.search.toolSearchScenes({ ...cArgs, scopedWorkIds }, signal);
           res.forEach(r => recordRef(r.ref));
+          if(this.search.lastRecall?.degraded)embeddingReasons.add(this.search.lastRecall.reason);
           observations.push({ tool: call.tool, hits: res });
         } else if (call.tool === 'search_dossiers') {
           const res = await this.search.toolSearchDossiers({ ...cArgs, scopedWorkIds }, signal);
           res.forEach(r => recordRef(r.ref));
+          if(this.search.lastRecall?.degraded)embeddingReasons.add(this.search.lastRecall.reason);
           observations.push({ tool: call.tool, hits: res });
         } else if (call.tool === 'search_passages') {
           const res = await this.search.toolSearchPassages({ ...cArgs, scopedWorkIds }, signal);
           res.forEach(r => recordRef(r.ref));
+          if(this.search.lastRecall?.degraded)embeddingReasons.add(this.search.lastRecall.reason);
           observations.push({ tool: call.tool, hits: res });
         } else if (call.tool === 'read_original_range') {
           const res = this.search.toolReadOriginalRange({ ...cArgs, scopedWorkIds });
@@ -507,14 +513,15 @@ export class RetrievalEngineV2 {
           if (!res.error && cArgs.volumeId && cArgs.startOrdinal) {
             const overlapping = this.search.db.prepare(`
               SELECT id FROM passage_chunks
-              WHERE volume_id=? AND end_ordinal>=? AND start_ordinal<=?
+              WHERE volume_id=? AND revision_id=? AND end_ordinal>=? AND start_ordinal<=?
               ORDER BY abs(start_ordinal - ?) LIMIT 1
-            `).get(cArgs.volumeId, Number(cArgs.startOrdinal), Number(cArgs.endOrdinal || cArgs.startOrdinal), Number(cArgs.startOrdinal));
+            `).get(res.volume_id, res.revision_id, res.range[0], res.range[1], res.range[0]);
             if (overlapping) {
               res.passage_ref = `passage:${overlapping.id}`;
               recordRef(res.passage_ref);
             }
           }
+          if(!res.error&&!res.passage_ref){const ref=`original:${verifiedReads}`;res.ref=ref;validRefs.set(ref,{unitType:'original',unitRow:{volumeId:res.volume_id,revisionId:res.revision_id,start:res.range[0],end:res.range[1]}});}
           observations.push({ tool: call.tool, result: res });
         } else {
           observations.push({ tool: call?.tool, error: '未知工具名' });

@@ -640,7 +640,18 @@ export class ReferenceStoreV2 {
   /**
    * Materialize a v2 unit ('facet' | 'scene' | 'passage') as a rich UI-compatible item.
    */
+  materializeReadRange({volumeId,revisionId,start,end},extra={}) {
+    const row=this.db.prepare(`SELECT v.work_id,w.title AS work_title,v.title AS volume_title,r.count
+      FROM revisions r JOIN volumes v USING(volume_id) JOIN works w USING(work_id)
+      WHERE r.volume_id=? AND r.revision_id=? AND w.deleted IS NULL`).get(volumeId,revisionId);
+    if(!row||!Number.isSafeInteger(start)||!Number.isSafeInteger(end)||start<1||end<start||end>row.count||end-start>44)return null;
+    const blocks=this.db.prepare("SELECT text FROM blocks WHERE volume_id=? AND revision_id=? AND ordinal BETWEEN ? AND ? AND kind='text' ORDER BY ordinal").all(volumeId,revisionId,start,end);
+    const identity=Buffer.from(JSON.stringify({volumeId,revisionId,start,end})).toString('base64url');
+    return {unit_key:'original:'+identity,card_id:'original:'+identity,v2_layer:'passage',v2_badge:'已核读原文',work_id:row.work_id,work_title:row.work_title,title:`${row.volume_title} · 原文段 ${start}–${end}`,category:'technique',claim_type:'fact',revision:1,creative_takeaway:extra.creative_takeaway??'',content:blocks.map(b=>b.text).join('\n\n'),evidence:[this.#resolveEvidenceRange(volumeId,revisionId,start,end)],aliases:[],related_card_ids:[]};
+  }
+
   materializeUnit(unitType, unitRow, extra = {}) {
+    if(unitType==='original')return this.materializeReadRange(unitRow,extra);
     if (unitType === 'scene') {
       const row = this.db.prepare(`
         SELECT s.*, w.title AS work_title, v.title AS volume_title
@@ -755,7 +766,10 @@ export class ReferenceStoreV2 {
 
   getCard({ workId, cardId }) {
     if (typeof cardId === 'string') {
-      if (cardId.startsWith('scene:')) {
+      if(cardId.startsWith('original:')){
+        let range;try{if(cardId.length>2000)throw new Error();range=JSON.parse(Buffer.from(cardId.slice(9),'base64url').toString('utf8'));}catch{fail('CARD_NOT_FOUND','原文范围标识无效');}
+        const card=this.materializeReadRange(range);if(card?.work_id===workId)return card;
+      }else if (cardId.startsWith('scene:')) {
         const sc = this.db.prepare('SELECT id FROM scenes WHERE work_id=? AND scene_id=?').get(workId, cardId.slice(6));
         if (sc) return this.materializeUnit('scene', sc.id);
       } else if (cardId.startsWith('facet:')) {

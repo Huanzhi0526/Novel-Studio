@@ -1,3 +1,4 @@
+import { awaitWithSignal } from './agy-client.mjs';
 import { randomUUID } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import { fail } from '../main/store.mjs';
@@ -44,7 +45,7 @@ export class SearchEngineV2 {
       return this.embedding.embed(texts, { signal, query });
     });
     this.embeddingLane = job;
-    const raw = await job;
+    const raw = await awaitWithSignal(job,signal);
     return raw.map(normalizeVector);
   }
 
@@ -138,7 +139,8 @@ export class SearchEngineV2 {
       for (const spec of specs) {
         while (true) {
           signal?.throwIfAborted();
-          const pending = this.db.prepare(spec.sql).all(modelId, batchSize);
+          const pending = this.readRows ? await this.readRows(spec.sql,[modelId,batchSize],signal) : this.db.prepare(spec.sql).all(modelId, batchSize);
+          signal?.throwIfAborted();
           if (!pending.length) break;
           const vecs = await this.encode(pending.map(spec.format), signal, false);
           this.reference.transaction(() => {
@@ -326,19 +328,20 @@ export class SearchEngineV2 {
     }
 
     const sorted = [...fused.values()].sort((a, b) => b.score - a.score);
+    this.lastRecall={degraded,reason};
     return { candidates: sorted.slice(0, totalLimit), degraded, reason, channels: channelStats };
   }
 
   /**
    * Standard UI-compatible query entry for Local Hybrid mode (and pagination).
    */
-  async query({ query, workIds = [], categories = [], limit = 12, cursor }, { signal } = {}) {
+  async query({ query, workIds = [], categories = [], limit = 12, cursor, mode = 'local' }, { signal } = {}) {
     const start = performance.now();
     signal?.throwIfAborted();
     const normalized = normalizeTextV2(query);
     if (!normalized) fail('SEARCH_QUERY', '请输入检索问题');
 
-    const key = JSON.stringify([normalized, workIds, categories]);
+    const key = JSON.stringify([normalized, workIds, categories, mode]);
     if (cursor) {
       const session = this.cursors.get(cursor);
       if (!session || session.key !== key || session.generation !== this.reference.generation) {
@@ -381,7 +384,7 @@ export class SearchEngineV2 {
 
   rankedPage({ query, workIds = [], categories = [], limit = 15 }, annotatedItems, metadata = {}) {
     const start = performance.now();
-    const key = JSON.stringify([normalizeTextV2(query), workIds, categories, metadata.mode || 'ai']);
+    const key = JSON.stringify([normalizeTextV2(query), workIds, categories, metadata.mode ?? 'local']);
     const session = {
       items: annotatedItems,
       key,
@@ -457,6 +460,7 @@ export class SearchEngineV2 {
         work: row.work_title,
         volume: row.volume_title,
         volume_id: row.volume_id,
+        revision_id: row.revision_id,
         chapter: row.chapter_title,
         title: row.title,
         setting: row.setting_context,
@@ -529,6 +533,7 @@ export class SearchEngineV2 {
         work: row.work_title,
         volume: row.volume_title,
         volume_id: row.volume_id,
+        revision_id: row.revision_id,
         chapter: row.chapter_title,
         range: [row.start_ordinal, row.end_ordinal],
         text: row.text.slice(0, 650)
@@ -536,12 +541,12 @@ export class SearchEngineV2 {
     }).filter(Boolean);
   }
 
-  toolReadOriginalRange({ volumeId, startOrdinal, endOrdinal, scopedWorkIds = [] }) {
+  toolReadOriginalRange({ volumeId, revisionId, startOrdinal, endOrdinal, scopedWorkIds = [] }) {
     const rev = this.db.prepare(`
       SELECT r.revision_id, r.count, v.work_id, v.title AS volume_title, w.title AS work_title
       FROM revisions r JOIN volumes v USING(volume_id) JOIN works w USING(work_id)
-      WHERE r.volume_id=? AND w.deleted IS NULL ORDER BY r.imported DESC LIMIT 1
-    `).get(volumeId);
+      WHERE r.volume_id=? AND (? IS NULL OR r.revision_id=?) AND w.deleted IS NULL ORDER BY r.imported DESC, r.revision_id LIMIT 1
+    `).get(volumeId, revisionId ?? null, revisionId ?? null);
     if (!rev) return { error: '找不到指定分卷' };
     if (scopedWorkIds?.length && !scopedWorkIds.includes(rev.work_id)) {
       return { error: '该分卷不在当前限定的检索书目范围内' };
@@ -554,9 +559,11 @@ export class SearchEngineV2 {
       ORDER BY ordinal
     `).all(volumeId, rev.revision_id, s, e);
     return {
+      work_id: rev.work_id,
       work: rev.work_title,
       volume: rev.volume_title,
       volume_id: volumeId,
+      revision_id: rev.revision_id,
       range: [s, e],
       paragraphs: blocks.map(b => `[p${String(b.ordinal).padStart(6, '0')}] ${b.text}`)
     };
