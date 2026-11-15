@@ -812,9 +812,11 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
     await withEditorLocked(async () => {
       await doSave(false);
       setMarks(await api('writing.deleteMark', { id: activeId, markId }));
+      clearTimeout(markUndoTimer.current);
+      setDeletedMarkUndo(null);
       if (removed && !removed.invalid && typeof removed.start === 'number' && typeof removed.end === 'number' && removed.start < removed.end) {
         clearTimeout(markUndoTimer.current);
-        setDeletedMarkUndo({ docId: activeId, mark: removed });
+        setDeletedMarkUndo({ docId: activeId, mark: removed, body: textRef.current });
         markUndoTimer.current = setTimeout(() => {
           markUndoTimer.current = null;
           setDeletedMarkUndo(null);
@@ -830,6 +832,7 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
     setDeletedMarkUndo(null);
     await withEditorLocked(async () => {
       await doSave(true);
+      if (textRef.current !== item.body) throw new Error('正文已经改变，未恢复旧位置的标记；请重新选择文字创建标记。');
       const next = await api('writing.addMark', {
         id: activeId,
         expectedRevision: baseRevision.current,

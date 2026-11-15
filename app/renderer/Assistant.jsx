@@ -33,7 +33,7 @@ export function useAssistantController() {
     const epoch = ++syncEpoch.current;
     try {
       const v = await api('assistant.get', { workId: id });
-      if (current.current === id && syncEpoch.current >= epoch) {
+      if (current.current === id && syncEpoch.current === epoch) {
         setState(v);
         if (initial) {
           setMemory(v.memory);
@@ -137,8 +137,10 @@ export function useAssistantController() {
       }
     },
     reset: () => {
-      api('assistant.reset', { workId }).then(v => {
-        syncEpoch.current++;
+      const book = workId;
+      const epoch = ++syncEpoch.current;
+      api('assistant.reset', { workId: book }).then(v => {
+        if (current.current !== book || syncEpoch.current !== epoch) return;
         setState(v);
       }).catch(setError);
     }
@@ -164,9 +166,7 @@ const MessageList = React.memo(function MessageList({ messages }) {
   if (a === b) return true;
   if ((a?.length ?? 0) !== (b?.length ?? 0)) return false;
   if (!a?.length) return true;
-  const lastA = a[a.length - 1];
-  const lastB = b[b.length - 1];
-  return lastA.role === lastB.role && lastA.text === lastB.text;
+  return a.every((message, index) => message.role === b[index].role && message.text === b[index].text);
 });
 
 export function Assistant({ active, controller: c, openCard, openEvidence, compact = false, boundWorkId, onClose }) {
