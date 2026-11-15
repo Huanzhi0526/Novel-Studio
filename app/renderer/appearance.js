@@ -1,0 +1,1 @@
+try { const p=JSON.parse(localStorage.getItem('studio.preferences.v1')||'{}');const dark=p.appearance==='dark'||p.appearance==='system'&&matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.style.backgroundColor=dark?'#14191f':'#ffffff';document.documentElement.style.colorScheme=dark?'dark':'light';}catch{}

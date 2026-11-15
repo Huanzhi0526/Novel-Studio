@@ -19,6 +19,8 @@ export function useAssistantController() {
   const request = useRef(null);
   const current = useRef(workId);
   const syncEpoch = useRef(0);
+  const stateVersion = useRef(null);
+  const stateSnapshot=useRef(null);stateSnapshot.current=state;
   current.current = workId;
   const busy = pending || Boolean(state?.busy);
 
@@ -36,7 +38,7 @@ export function useAssistantController() {
     try {
       const v = await api('assistant.get', { workId: id });
       if (current.current === id && syncEpoch.current === epoch) {
-        setState(v);
+        stateVersion.current=v.messageVersion;setState(v);
         if (initial) {
           setMemory(v.memory);
           if (v.modelId) setModelId(v.modelId);
@@ -52,7 +54,7 @@ export function useAssistantController() {
   useEffect(() => { void refreshWorks(); }, [refreshWorks]);
 
   useEffect(() => {
-    syncEpoch.current++;
+    syncEpoch.current++;stateVersion.current=null;
     setState(null);
     setError(null);
     if (!workId) return;
@@ -61,7 +63,7 @@ export function useAssistantController() {
       try {
         const v = await api('assistant.get', { workId });
         if (live) {
-          setState(v);
+          stateVersion.current=v.messageVersion;setState(v);
           setMemory(v.memory);
           if (v.modelId) setModelId(v.modelId);
         }
@@ -75,18 +77,22 @@ export function useAssistantController() {
 
   useEffect(() => {
     if (!workId || !busy) return;
-    let live = true;
+    let live = true,timer;
     async function poll() {
-      const epoch = syncEpoch.current;
+      const epoch = ++syncEpoch.current;
       try {
-        const v = await api('assistant.get', { workId });
-        if (live && epoch === syncEpoch.current) setState(v);
+        const v = await api('assistant.get', { workId, messageVersion: stateVersion.current,sourceVersion:stateSnapshot.current?.sourceVersion,partialOffset:stateSnapshot.current?.partial?.length??0,requestId:stateSnapshot.current?.requestId });
+        if (live && current.current===workId && epoch === syncEpoch.current) {
+          stateVersion.current=v.messageVersion;
+          setState(previous=>({...previous,...v,partial:v.partialTail==null?v.partial:v.partialReset?v.partialTail:(previous?.partial??'')+v.partialTail}));
+        }
       } catch (e) {
-        if (live) setError(e);
-      }
+        if (live && epoch===syncEpoch.current) setError(e);
+      } finally {if(live)timer=setTimeout(poll,1000);}
     }
-    const timer = setInterval(() => void poll(), 1000);
-    return () => { live = false; clearInterval(timer); };
+    timer=setTimeout(poll,1000);
+    return () => { live = false; clearTimeout(timer); };
+
   }, [workId, busy]);
 
   async function run() {
@@ -101,7 +107,7 @@ export function useAssistantController() {
       const v = await api('assistant.send', { workId: book, text: sent, modelId, requestId: id });
       syncEpoch.current++;
       if (current.current === book) {
-        setState(v);
+        stateVersion.current=v.messageVersion;setState(v);
         setMemory(v.memory);
       }
       setDrafts(d => (d[book] === sent ? { ...d, [book]: '' } : d));
@@ -111,7 +117,7 @@ export function useAssistantController() {
         setError(e);
         try {
           const v = await api('assistant.get', { workId: book });
-          if (current.current === book) setState(v);
+          if (current.current === book) stateVersion.current=v.messageVersion;setState(v);
         } catch {}
       }
     } finally {
@@ -143,7 +149,7 @@ export function useAssistantController() {
       const epoch = ++syncEpoch.current;
       api('assistant.reset', { workId: book }).then(v => {
         if (current.current !== book || syncEpoch.current !== epoch) return;
-        setState(v);
+        stateVersion.current=v.messageVersion;setState(v);
       }).catch(setError);
     }
   };
@@ -173,6 +179,8 @@ const MessageList = React.memo(function MessageList({ messages }) {
 
 export function Assistant({ active, controller: c, openCard, openEvidence, compact = false, boundWorkId, onClose }) {
   const { works, workId, state, models, modelId, error, busy, text, memory } = c;
+  const painted=useRef(state);if(active)painted.current=state;
+  const visibleState=active?state:painted.current;
   const scroll = useRef(null);
   const follow = useRef(true);
   const wasActive = useRef(false);
@@ -367,12 +375,12 @@ export function Assistant({ active, controller: c, openCard, openEvidence, compa
         <p>结合本书大纲与设定，先找参考，再一起推敲人物的选择和情节的因果。</p>
         {workId && <button onClick={() => c.setText('这里想给男主设置一个困境，同时推进他与女主的关系。请结合本书设定给我几个方案，并说明参考依据。')}>试试：设计一个推动关系的困境</button>}
       </div>}
-      <MessageList messages={state?.messages} />
+      <MessageList messages={visibleState?.messages} />
       {busy && <div className="assistant-progress" role="status">
         <span className="assistant-pulse" />{activity || '正在连接与准备资料…'}
         {state?.retrievalJobs?.filter(j => j.status === 'running').map(j => <small key={j.id}>检索AI处理中 · {Math.round(j.elapsedMs / 1000)}秒</small>)}
       </div>}
-      {busy && state?.partial && <article className="assistant-message">
+      {active && busy && state?.partial && <article className="assistant-message">
         <div className="assistant-message-label">正在整理 · 尚未完成</div>
         <div className="assistant-prose"><Markdown>{state.partial}</Markdown></div>
       </article>}

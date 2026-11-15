@@ -1,9 +1,9 @@
 import { AssistantSearch } from './assistant-search.mjs';
 import { AssistantService } from './assistant.mjs';
-import { app, BrowserWindow, dialog, ipcMain, Menu, protocol, safeStorage, session, shell } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, Menu, nativeTheme, protocol, safeStorage, session, shell } from 'electron';
 import { randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync } from 'node:fs';
-import { readFile, stat, writeFile } from 'node:fs/promises';
+import { readFile, stat, writeFile, rename } from 'node:fs/promises';
 import { basename, extname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BackupService } from './backup.mjs';
@@ -24,6 +24,7 @@ const appDir = fileURLToPath(new URL('../../', import.meta.url));
 const dataDir = resolve(process.env.NOVEL_STUDIO_DATA_DIR || join(process.env.LOCALAPPDATA || app.getPath('appData'), 'Novel Studio'));
 const contentTypes = {
   '/index.html': 'text/html; charset=utf-8',
+  '/appearance.js': 'text/javascript; charset=utf-8',
   '/app.js': 'text/javascript; charset=utf-8',
   '/app.css': 'text/css; charset=utf-8'
 };
@@ -138,7 +139,7 @@ function register(writing, reference, imports, search, backup, expansion, retrie
   };
   expose('writing', writing, [
     'list', 'searchWork', 'open', 'preview', 'createWork', 'createVolume', 'createDoc', 'rename', 'move',
-    'stage', 'save', 'addMark', 'deleteMark', 'history', 'restoreHistory', 'trash', 'restore'
+    'stage', 'save', 'checkpoint', 'addMark', 'deleteMark', 'history', 'restoreHistory', 'trash', 'restore'
   ]);
   expose('reference', reference, ['list', 'setHidden', 'getCard', 'listCards', 'editCard', 'read', 'asset']);
   expose('import', imports, ['preview', 'commit', 'cancel']);
@@ -192,6 +193,16 @@ function register(writing, reference, imports, search, backup, expansion, retrie
     await writeFile(filename, text, 'utf8');
     return true;
   });
+  let appearanceWrites=Promise.resolve();
+  handlers.set('app.appearance',({appearance})=>{
+    appearanceWrites=appearanceWrites.catch(()=>{}).then(async()=>{
+    if(!['dark','light','system'].includes(appearance))fail('IPC_INPUT','外观设置无效');
+    const dark=appearance==='dark'||appearance==='system'&&nativeTheme.shouldUseDarkColors;
+    window?.setBackgroundColor(dark?'#14191f':'#ffffff');
+    const filename=join(dataDir,'window-appearance.json'),temp=filename+'.tmp';
+    await writeFile(temp,JSON.stringify({appearance}));await rename(temp,filename);return true;
+    });return appearanceWrites;
+  });
   handlers.set('app.info', () => ({
     dataDir, model: embedding.id, modelConfigured: Boolean(embedding.modelPath),
     embeddingMode: embedding.activeBackendMode,
@@ -204,7 +215,12 @@ function register(writing, reference, imports, search, backup, expansion, retrie
   });
   handlers.set('backup.export', async () => {
     const filename = await chooseDestination(`Novel Studio ${new Date().toLocaleDateString('sv-SE')}.zip`, 'zip', '工作台备份');
-    return filename ? backup.export(filename) : null;
+    if(!filename)return null;
+    if(restoring)fail('BACKUP_BUSY','资料维护正在进行');
+    restoring=true;
+    for(const request of requests.values())request.abort(cancellation());
+    try{await readSearch?.close();return await backup.export(filename);}
+    finally{restoring=false;}
   });
   handlers.set('backup.restore', async () => {
     const filename = await chooseFile('工作台备份', ['zip']);
@@ -221,6 +237,7 @@ function register(writing, reference, imports, search, backup, expansion, retrie
     for (const request of requests.values()) request.abort(cancellation());
     try {
       await readSearch?.close();
+      
       return await backup.restore(filename);
     } finally {
       restoring = false;
@@ -248,7 +265,7 @@ function register(writing, reference, imports, search, backup, expansion, retrie
     if (event.sender !== window?.webContents || event.senderFrame?.url !== appUrl || !handlers.has(method)) {
       return { ok: false, error: { code: 'IPC_METHOD', message: '操作不可用' } };
     }
-    if (restoring && method !== 'request.cancel' && method !== 'expand.cancel') return { ok: false, error: { code: 'RESTORING', message: '正在恢复资料，请稍候' } };
+    if (restoring && method !== 'request.cancel' && method !== 'expand.cancel') return { ok: false, error: { code: 'RESTORING', message: '正在维护资料，请稍候' } };
     let controller;
     let id;
     try {
@@ -320,8 +337,11 @@ async function launch() {
       new RetrievalService(search, store, join(dataDir, 'retrieval-api.json'), safeStorage));
   }
   Menu.setApplicationMenu(null);
+  let startupAppearance='light';
+  try{const saved=JSON.parse(await readFile(join(dataDir,'window-appearance.json'),'utf8'));if(['light','dark','system'].includes(saved.appearance))startupAppearance=saved.appearance;}catch{}
+  const startupDark=startupAppearance==='dark'||startupAppearance==='system'&&nativeTheme.shouldUseDarkColors;
   window = new BrowserWindow({
-    width: 1460, height: 930, minWidth: 880, minHeight: 600, show: false, backgroundColor: '#ffffff',
+    width: 1460, height: 930, minWidth: 880, minHeight: 600, show: false, backgroundColor: startupDark?'#14191f':'#ffffff',
     title: '个人小说写作工作台',
     icon: join(appDir, 'app', 'assets', 'app-icon.png'),
     webPreferences: {
@@ -357,14 +377,14 @@ if (!app.requestSingleInstanceLock()) {
     window?.focus();
   });
   app.on('window-all-closed', () => app.quit());
-  app.on('will-quit', () => {
-    for (const request of requests.values()) request.abort(cancellation());
-    void embedding?.close();
-    agyClient?.close();
-    expansionProvider?.close();
-    assistantService?.close();
-    storeV2?.close();
-    store?.close();
+  let drained=false;
+  app.on('will-quit',event=>{
+    if(drained)return;
+    event.preventDefault();
+    for(const request of requests.values())request.abort(cancellation());
+    void Promise.allSettled([embedding?.close(),agyClient?.close(),expansionProvider?.close(),assistantService?.close()]).then(()=>{
+      storeV2?.close();store?.close();drained=true;app.quit();
+    });
   });
   launch().catch(error => {
     dialog.showErrorBox('工作台启动失败', error.message);

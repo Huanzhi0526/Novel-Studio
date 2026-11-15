@@ -366,6 +366,7 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
     const task = async () => {
       if (id !== currentId.current || (!dirty.current && !boundary)) return;
       const expectedRevision = baseRevision.current;
+      if(!dirty.current && boundary)return api('writing.checkpoint',{id,expectedRevision});
       const text = textRef.current;
       const editGroups = edits.current.slice();
       setSaving(true); setStatus('保存中…');

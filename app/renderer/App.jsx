@@ -185,7 +185,9 @@ function App() {
   useEffect(() => savePreferences(preferences), [preferences]);
   useEffect(() => {
     document.documentElement.style.colorScheme = resolvedAppearance;
-  }, [resolvedAppearance]);
+    document.documentElement.style.backgroundColor=resolvedAppearance==='dark'?'#14191f':'#ffffff';
+    void api('app.appearance',{appearance:preferences.appearance}).catch(()=>{});
+  }, [resolvedAppearance,preferences.appearance]);
 
   function updatePreferences(patch) {
     setPreferences(current => normalizePreferences({ ...current, ...patch }));

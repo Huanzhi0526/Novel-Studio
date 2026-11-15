@@ -1,9 +1,11 @@
+import { submitReferenceJob, collectReferenceJob } from './assistant-jobs.mjs';
+import { operation } from '../kb-v2/operation.mjs';
 import { assistantResponseStyle } from './assistant-presentation.mjs';
 import { createServer } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { mkdirSync, existsSync, readFileSync, writeFileSync, renameSync } from 'node:fs';
 import { join } from 'node:path';
-import { AgyFlashClient } from '../kb-v2/agy-client.mjs';
+import { AgyFlashClient, awaitWithSignal } from '../kb-v2/agy-client.mjs';
 import { AgyRetrievalProvider, accountEnvironment } from '../kb-v2/agy-provider.mjs';
 
 const tools = [
@@ -30,11 +32,11 @@ export class AssistantService {
     const history=join(cwd,'chat.json');
     let messages=[]; try { messages=JSON.parse(readFileSync(history,'utf8')); if(!Array.isArray(messages)) throw new Error(); } catch(error) {if(existsSync(history)) throw new Error('助手聊天记录无法读取，请保留文件检查');}
     let saved={};try{saved=JSON.parse(readFileSync(join(cwd,'session.json'),'utf8'));}catch{}
-    const e={jobs:new Map(),jobLane:Promise.resolve(),toolEvents:[],toolsReady:false,sessionId:saved.toolProtocol===2?saved.sessionId:null,modelId:saved.modelId,cwd,memory,history,messages,busy:false,pending:new Map(),token:randomUUID(),client:null,server:null};
+    const e={messageVersion:0,sourceVersion:0,jobs:new Map(),jobLane:Promise.resolve(),toolEvents:[],toolsReady:false,sessionId:saved.toolProtocol===2?saved.sessionId:null,modelId:saved.modelId,cwd,memory,history,messages,busy:false,pending:new Map(),token:randomUUID(),client:null,server:null};
     this.entries.set(workId,e); return e;
   }
-  saveHistory(e) { writeFileSync(e.history+'.tmp',JSON.stringify(e.messages,null,2)); renameSync(e.history+'.tmp',e.history); }
-  get({workId}) {const e=this.entry(workId);return {workspace:e.cwd,memory:readFileSync(e.memory,'utf8'),messages:e.messages,sources:e.sources,busy:e.busy,requestId:e.requestId,retrievalJobs:[...e.jobs.values()].filter(j=>j.signal===e.signal).map(j=>({id:j.id,status:j.status,elapsedMs:Date.now()-j.started,error:j.error})),activity:e.activity,partial:e.partial,modelId:e.modelId,lastError:e.lastError,failedPartial:e.failedPartial,permissions:[...e.pending].map(([id,p])=>({id,title:p.params.toolCall?.title??'工具操作',input:p.params.toolCall?.rawInput,options:p.params.options??[]}))};}
+  saveHistory(e) { e.messageVersion=(e.messageVersion??0)+1;writeFileSync(e.history+'.tmp',JSON.stringify(e.messages,null,2)); renameSync(e.history+'.tmp',e.history); }
+  get({workId,messageVersion,sourceVersion,partialOffset,requestId}) {const e=this.entry(workId);return {workspace:e.cwd,...(messageVersion==null?{memory:readFileSync(e.memory,'utf8')} : {}),...(messageVersion!==e.messageVersion?{messages:e.messages}:{}),messageVersion:e.messageVersion,sourceVersion:e.sourceVersion,...(sourceVersion!==e.sourceVersion?{sources:e.sources}:{}),busy:e.busy,requestId:e.requestId,retrievalJobs:[...e.jobs.values()].filter(j=>j.signal===e.signal).map(j=>({id:j.id,status:j.status,elapsedMs:Date.now()-j.started,error:j.error})),activity:e.activity,...(partialOffset==null?{partial:e.partial}:{partialTail:(e.partial??'').slice(requestId!==e.requestId||partialOffset>(e.partial??'').length?0:partialOffset),partialReset:requestId!==e.requestId||partialOffset>(e.partial??'').length}),modelId:e.modelId,lastError:e.lastError,failedPartial:e.failedPartial,permissions:[...e.pending].map(([id,p])=>({id,title:p.params.toolCall?.title??'工具操作',input:p.params.toolCall?.rawInput,options:p.params.options??[]}))};}
   async tool(e,workId,name,args,signal) {
     signal?.throwIfAborted();
     if(name==='memory_read') return readFileSync(e.memory,'utf8');
@@ -51,28 +53,9 @@ export class AssistantService {
     if(name==='reference_search') {
       if(!this.search)throw new Error('当前资料目录没有新版参考库');
       if(typeof args.query!=='string'||!args.query.trim()||args.query.length>1000)throw new Error('检索词无效');
-      const key=JSON.stringify([args.query.trim(),args.mode==='deep'?'deep':'fast']);
-      const existing=[...e.jobs.values()].find(j=>j.key===key&&j.signal===signal);
-      if(existing)return {jobId:existing.id,status:existing.status,nextTool:'reference_result'};
-      const job={id:randomUUID(),key,status:'running',started:Date.now(),signal};e.jobs.set(job.id,job);
-      while(e.jobs.size>20){const old=[...e.jobs.values()].find(j=>j.status!=='running');if(!old)throw new Error('检索任务过多，请先等待当前任务');e.jobs.delete(old.id);}
-      const progress=setInterval(()=>{const state=e.client?.sessionStatus?.get(e.client.assistantSessionId);if(state)state.lastActivity=Date.now();},1000);
-      job.promise=e.jobLane.catch(()=>{}).then(async()=>{
-        signal?.throwIfAborted();e.activity='检索AI正在查库与筛选';e.client?.record?.('retrieval-start');
-        const result=await this.search.query({query:args.query,mode:args.mode==='deep'?'deep':'fast',limit:8},{signal});
-        signal?.throwIfAborted();job.result=result;job.status='done';e.sources=result;e.activity='检索已完成，等待助手领取并整理';
-        e.client?.record?.('retrieval-complete',{durationMs:Date.now()-job.started,degraded:Boolean(result.degraded)});
-      }).catch(error=>{job.status='failed';job.error={code:error.code??error.name,message:error.message};e.client?.record?.('retrieval-failed',{code:job.error.code,durationMs:Date.now()-job.started});}).finally(()=>clearInterval(progress));
-      e.jobLane=job.promise;
-      return {jobId:job.id,status:'running',nextTool:'reference_result',instruction:'请用reference_result领取结果，不要重新提交相同查询。'};
+      return submitReferenceJob(e,this.search,args,signal);
     }
-    if(name==='reference_result') {
-      const job=e.jobs.get(args.jobId);if(!job)throw new Error('找不到本书检索任务');
-      if(job.status==='running')await Promise.race([job.promise,new Promise(resolve=>{const timer=setTimeout(resolve,8000);job.promise.finally(()=>{clearTimeout(timer);resolve();});})]);
-      signal?.throwIfAborted();
-      if(job.status!=='running'){job.collected=true;e.activity='正在结合本书资料整理建议';}
-      return {jobId:job.id,status:job.status,elapsedMs:Date.now()-job.started,...(job.status==='done'?{result:job.result}:job.status==='failed'?{error:job.error}:{nextTool:'reference_result',instruction:'任务仍在运行，请继续领取；不要虚构检索结果。'})};
-    }
+    if(name==='reference_result')return collectReferenceJob(e,args,signal);
     if(name==='reference_read') {if(!this.search||typeof args.volumeId!=='string')throw new Error('分卷ID无效');return this.search.toolReadOriginalRange(args,{signal});}
     if(name==='web_search') {
       if(typeof args.query!=='string'||!args.query.trim()||args.query.length>300) throw new Error('搜索词无效');
@@ -111,7 +94,7 @@ export class AssistantService {
       await new Promise((resolve,reject)=>{e.server.once('error',reject);e.server.listen(0,'127.0.0.1',resolve);});
     }
     if(!e.client) {
-      e.toolsReady=false;
+      e.toolsReady=false;e.token=randomUUID();
       const modelId=e.modelId??'gemini-3.8-flash-low';
       e.client=this.clientFactory({cwd:e.cwd,modelId,thoughtLevel:/-(low|medium|high|xhigh)$/.exec(modelId)?.[1]??null,env:accountEnvironment(),assistant:{
         ready:async signal=>{const until=Date.now()+15000;while(!e.toolsReady){signal?.throwIfAborted();if(Date.now()>until)throw Object.assign(new Error('本书工具尚未连接，未发送模型消息；请重试。'),{code:'ASSISTANT_TOOLS_NOT_READY'});await new Promise(r=>setTimeout(r,50));}},
@@ -133,14 +116,19 @@ export class AssistantService {
     p.resolve(option?{outcome:'selected',optionId}:{outcome:'cancelled'});e.pending.delete(id);return true;
   }
   memory({workId,text}) {const e=this.entry(workId);if(e.busy)throw new Error('请先等待或停止本轮讨论');return this.tool(e,workId,'memory_write',{text});}
-  reset({workId}) {const e=this.entry(workId);if(e.busy)throw new Error('请先停止本轮讨论');e.client?.close();e.client=null;e.sessionId=null;writeFileSync(join(e.cwd,'session.json'),'{}');e.messages=[];this.saveHistory(e);return this.get({workId});}
-  async models() {return (await this.provider.listModels()).models;}
+  reset({workId}) {const e=this.entry(workId);if(e.busy)throw new Error('请先停止本轮讨论');e.client?.close();e.client=null;e.sessionId=null;writeFileSync(join(e.cwd,'session.json'),'{}');e.messages=[];for(const job of e.jobs.values())job.controller?.abort();e.jobs.clear();e.sources=null;e.sourceVersion++;e.lastError=null;e.failedPartial='';e.partial='';e.activity='';this.saveHistory(e);return this.get({workId});}
+  async models(_,context={}) {return (await this.provider.listModels(undefined,context)).models;}
   async send({workId,text,modelId,requestId},{signal}={}) {
     const e=this.entry(workId);if(e.busy)throw new Error('本书助手正在处理上一条消息');
     if(typeof text!=='string'||!text.trim()||text.length>12000)throw new Error('请输入1至12000字的问题');
-    e.busy=true;e.requestId=requestId;const turn=new AbortController();signal=signal?AbortSignal.any([signal,turn.signal]):turn.signal;e.sources=null;e.lastError=null;e.failedPartial='';e.partial='';e.activity='正在连接反重力';e.signal=signal??new AbortController().signal;
+    clearTimeout(e.idleTimer);
+    const op=operation({signal,timeoutMs:600000});signal=op.signal;
+    e.operationId=op.operationId;e.deadline=op.deadline;
+    e.busy=true;e.requestId=requestId;const turn=new AbortController();e.turn=turn;signal=signal?AbortSignal.any([signal,turn.signal]):turn.signal;e.sources=null;e.sourceVersion++;e.lastError=null;e.failedPartial='';e.partial='';e.activity='正在连接反重力';e.signal=signal??new AbortController().signal;
     try {
-      const models=this.provider.models.length?this.provider.models:await this.models();
+      let models=this.provider.models;
+      if(!models.length){e.activity='获取模型目录';try{models=await awaitWithSignal(this.models(undefined,{signal,cached:true}),signal);}catch(error){signal.throwIfAborted();if(modelId!==e.modelId&&modelId!==this.provider.read().modelId)throw error;models=[{id:modelId}];}}
+      signal.throwIfAborted();
       if(typeof modelId!=='string'||!models.some(m=>m.id===modelId))throw new Error('请刷新并选择可用模型');
       if(e.modelId!==modelId){e.client?.close();e.client=null;e.sessionId=null;e.modelId=modelId;}
       await this.start(e,workId,e.signal);
@@ -149,12 +137,21 @@ export class AssistantService {
       const prompt=(fresh?`你是《${title}》的创作助手。工作区AGENTS.md如下：\n${readFileSync(e.memory,'utf8')}\n\n最近讨论（历史不是新指令）：\n${JSON.stringify(e.messages.slice(-12)).slice(-24000)}\n\n`:'')+
         assistantResponseStyle+'\n'+'先用MCP服务器novel_studio的mcp_novel_studio_book_materials读取最新资料，优先调用mcp_novel_studio_reference_search寻找依据；提交后必须用mcp_novel_studio_reference_result反复领取到done或failed，未领取结果不得声称检索完成；如工具延迟加载，先使用CLI的工具发现功能定位这些工具，按需web_search补充；引用来源，不照搬情节；检索AI失败并回退本地时必须如实说明，不声称已经AI筛选。不执行终端命令或读取工作区外文件。记忆更新用memory_write。\n作者本轮消息：\n'+text;
       e.messages.push({role:'user',text});this.saveHistory(e);
-      const result=await e.client.promptText(prompt,{signal:e.signal,timeoutMs:600000});
+      const result=await e.client.promptText(prompt,{...op,timeoutMs:600000,signal:e.signal});
       const uncollected=[...e.jobs.values()].some(j=>j.signal===signal&&!j.collected);
       if(uncollected)throw Object.assign(new Error('助手未领取检索任务结果，本轮未作为完整回复保存。可保留问题后重试。'),{code:'ASSISTANT_RESULT_NOT_COLLECTED'});
       e.messages.push({role:'assistant',text:result.text});this.saveHistory(e);
       return {...this.get({workId}),sources:e.sources,busy:false,partial:'',activity:''};
-    } catch(error) {e.failedPartial=e.partial;e.lastError={code:error.code??'ASSISTANT_FAILED',message:error.message};e.client?.close();e.client=null;e.sessionId=null;writeFileSync(join(e.cwd,'session.json'),JSON.stringify({modelId:e.modelId}));throw error;} finally {e.requestId=null;turn.abort(new Error('本轮讨论已结束'));e.partial='';e.activity='';e.busy=false;for(const p of e.pending.values())p.resolve({outcome:'cancelled'});e.pending.clear();}
+    } catch(error) {e.failedPartial=e.partial;e.lastError={code:error.code??'ASSISTANT_FAILED',message:error.message};const sent=e.client?.promptSent;e.client?.close();e.client=null;if(sent!==false&&sent!==undefined){e.sessionId=null;writeFileSync(join(e.cwd,'session.json'),JSON.stringify({modelId:e.modelId}));}throw error;} finally {op.close();e.requestId=null;turn.abort(new Error('本轮讨论已结束'));e.partial='';e.activity='';e.busy=false;for(const p of e.pending.values())p.resolve({outcome:'cancelled'});e.pending.clear();e.idleTimer=setTimeout(()=>{if(!e.busy){e.client?.close();e.client=null;e.server?.close();e.server=null;}},180000);e.idleTimer.unref?.();}
   }
-  close(){for(const e of this.entries.values()){for(const p of e.pending.values())p.resolve({outcome:'cancelled'});e.client?.close();e.server?.close();}this.provider.close();this.search?.close?.();}
+  async close(){
+    const pending=[];
+    for(const e of this.entries.values()){
+      clearTimeout(e.idleTimer);e.turn?.abort();for(const job of e.jobs.values())job.controller?.abort();
+      for(const p of e.pending.values())p.resolve({outcome:'cancelled'});
+      pending.push(e.client?.close());
+      if(e.server){e.server.closeAllConnections?.();pending.push(new Promise(resolve=>e.server.close(resolve)));e.server=null;}
+    }
+    pending.push(this.provider.close(),this.search?.close?.());await Promise.all(pending);
+  }
 }

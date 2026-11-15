@@ -244,6 +244,14 @@ export class WritingService {
     ).run(id, id);
   }
 
+  checkpoint({id,expectedRevision}) {
+    const row=this.doc(id);this.checkRevision(row,expectedRevision);
+    return this.store.transaction(()=>{
+      if(row.revision>0)this.snapshot(id,row.revision,row.body,Date.now());
+      return {revision:row.revision,marks:this.marks(id)};
+    });
+  }
+
   save({ id, expectedRevision, text, edits, boundary: atBoundary = false }) {
     assertText(text);
     const row = this.doc(id);

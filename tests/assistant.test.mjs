@@ -29,7 +29,7 @@ test('book workspaces isolate memories and expose only current nondeleted materi
 test('assistant send persists discussion, recovers with recent context, and closes failed sessions',async t=>{
  const root=mkdtempSync(join(tmpdir(),'novel-assistant-')),store=new Store(join(root,'library.sqlite')),writing=new WritingService(store);
  const workId=writing.createWork({title:'合成书'}).id;let calls=0,closed=0;
- const svc=new AssistantService(writing,null,root,{clientFactory:()=>({promptText:async text=>{calls++;assert.match(text,/本轮消息/);assert.match(text,/输出面向作者阅读/);if(calls===2)throw new Error('503');return {text:'合成建议'};},close:()=>closed++})});
+ const svc=new AssistantService(writing,null,root,{clientFactory:()=>({promptText:async (text,options)=>{assert.equal(options.timeoutMs,600000);calls++;assert.match(text,/本轮消息/);assert.match(text,/输出面向作者阅读/);if(calls===2)throw new Error('503');return {text:'合成建议'};},close:()=>closed++})});
  svc.models=async()=>[{id:'gemini-test-low'}];
  // No network or CLI in this test; exercise orchestration and persistence only.
  svc.start=async e=>{e.client??=svc.clientFactory();};
@@ -64,7 +64,7 @@ test('long retrieval submits immediately, deduplicates per turn, and can be coll
  t.after(()=>{service.close();store.close();rmSync(root,{recursive:true,force:true});});
  const e=service.entry(a),signal=new AbortController().signal;
  const first=await Promise.race([service.tool(e,a,'reference_search',{query:'合成问题'},signal),new Promise((_,reject)=>setTimeout(()=>reject(new Error('submission blocked')),500))]);
- assert.equal(first.status,'running');assert.equal(calls,1);
+ assert.equal(first.status,'queued');assert.equal(calls,1);
  const duplicate=await service.tool(e,a,'reference_search',{query:'合成问题'},signal);assert.equal(duplicate.jobId,first.jobId);assert.equal(calls,1);
  await assert.rejects(service.tool(service.entry(b),b,'reference_result',{jobId:first.jobId}));
  release({hits:[],degraded:false});const done=await service.tool(e,a,'reference_result',{jobId:first.jobId},signal);

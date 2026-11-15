@@ -12,3 +12,5 @@ await build({
   minify: true, legalComments: 'linked', logLevel: 'info'
 });
 await copyFile(new URL('../app/renderer/index.html', import.meta.url), new URL('../dist/index.html', import.meta.url));
+
+await copyFile(new URL('../app/renderer/appearance.js', import.meta.url), new URL('../dist/appearance.js', import.meta.url));
