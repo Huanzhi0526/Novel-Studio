@@ -3,7 +3,7 @@
 ## 接手入口与当前基线
 
 - 工作区`D:\Vibe Coding\Novel Studio`；先读[HANDOFF当前快照](HANDOFF.md)、[产品术语](CONTEXT.md)、[维护地图](docs/maintenance.md)、[发布清单](docs/release-checklist.md)及[最新验收](docs/acceptance.md)。接手提示词在[这里](docs/开发与运维接管提示词.md)。
-- 2026-11-15已发布0.2.10，当前main包含Claude方案、Gemini前端实现及Codex复核补修；源码/锁文件/正式安装应用版本一致。实际仍须核对package.json、package-lock.json、正式resources/app/package.json，快捷方式目标另记，不能用Electron EXE版本代替应用版本。
+- 2026-11-15正式已发布0.2.10；稳定性优化源码候选0.2.11（本轮隔离验收，不代表正式升级），状态见HANDOFF顶部。0.2.10/main包含Claude方案、Gemini前端实现及Codex复核补修；候选开发期间源码/正式版本可不同，须分别记录。实际仍须核对package.json、package-lock.json、正式resources/app/package.json，快捷方式目标另记，不能用Electron EXE版本代替应用版本。
 - 原创、参考检索、主动AI扩写、按书创作助手职责分开。正式参考为独立KB v2；旧九类卡/ZIP流程为兼容历史，不能套用到v2生产流程。历史书库统计和覆盖结论以HANDOFF注明的时点与检查范围为准。
 
 ## 数据与执行边界
@@ -24,7 +24,7 @@
 
 ## 常用命令与交付
 
-- npm run build；npm test；npm start。桌面验收使用scripts/qa-*.mjs并按变更选择，传入隔离安装EXE时仍用隔离资料。qa-readability、qa-assistant-experience、qa-assistant-layout覆盖当前阅读与侧栏；qa-card-markdown/card-viewer/retrieval覆盖详情与证据。
+- npm run build；npm test；npm start。稳定性入口scripts/qa-stability.mjs、qa-cli-stability.mjs、qa-stability-frames.mjs；真实合成抽验qa-real-stability.mjs需显式NOVEL_STUDIO_REAL_QA=1，会消耗账号额度。桌面验收使用scripts/qa-*.mjs并按变更选择，传入隔离安装EXE时仍用隔离资料。qa-readability、qa-assistant-experience、qa-assistant-layout覆盖当前阅读与侧栏；qa-card-markdown/card-viewer/retrieval覆盖详情与证据。
 - Windows打包npm run package:windows，本机NSIS在.local/nsis-official/nsis-3.13/makensis.exe；按发布清单完成隔离安装、正常备份、正式升级与资料摘要保护核验，再交安装器、源码ZIP及SHA清单。
 - 每阶段同步HANDOFF和相关验收，区分实现/验证/提交/部署与NOT_RUN。文档维护不自动升版本或重装：同步当前源码包与SHA，安装器摘要保持不变。文档内旧时点结论明确标历史，不当现库或质量证明。
 

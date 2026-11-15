@@ -1,6 +1,6 @@
 # 维护地图
 
-2026-11-15整理，生产基线0.2.10/main。当前版本、证据与待办以[HANDOFF](../HANDOFF.md)顶部为准；产品术语在[CONTEXT](../CONTEXT.md)，操作在[README](../README.md)，构建部署在[发布清单](release-checklist.md)。旧版流程与夜间日志已[原文归档](history/maintenance-20261115-整理前.md)，不是当前任务。
+2026-11-15整理，正式0.2.10；稳定性源码候选0.2.11。当前版本、证据与待办以[HANDOFF](../HANDOFF.md)顶部为准；产品术语在[CONTEXT](../CONTEXT.md)，操作在[README](../README.md)，构建部署在[发布清单](release-checklist.md)。旧版流程与夜间日志已[原文归档](history/maintenance-20261115-整理前.md)，不是当前任务。
 
 ## 代码入口
 
@@ -14,10 +14,10 @@
 | 检索AI | app/kb-v2/retrieval-v2.mjs：fast/deep；Conversation.jsx显示问题、筛选、结果和分页。 |
 | CLI来源/传输 | app/kb-v2/agy-provider.mjs、agy-client.mjs；RetrievalPreferences.jsx配置检索/扩写用途各自来源。 |
 | 创作助手 | app/main/assistant.mjs管理按书会话/MCP/记忆/检索任务，Assistant.jsx提供共享controller与两个入口。 |
-| 助手参考worker | assistant-search.mjs、assistant-search-worker.mjs：只读查库、流式向量评分、异步转交embedding及检索AI。 |
+| 三入口只读检索worker | assistant-search.mjs、assistant-search-worker.mjs：普通参考页/写作侧栏/助手共用一个有界FIFO，最多一个重扫描；只读查库、精确向量评分、异步桥接embedding/AI。长期worker保留游标，取消/库或配置变化后旧游标显式失效。 |
 | 阅读格式/卡片 | assistant-presentation.mjs为每轮提示格式指导，assistant-markdown.mjs只转显示；ui.jsx、card-preview.mjs、CardContent.jsx保留短预览/完整卡分工，Reference.jsx负责详情与原文阅读。 |
 | AI扩写 | ExpansionDialog.jsx、app/main/expansion.mjs、expansion-provider.mjs：选区、有限上下文、预览与采纳；来源独立。 |
-| 数据库备份 | app/main/store.mjs、backup.mjs：原创库与双库一致备份恢复、失败回退；不含配置或助手文件。 |
+| 数据库备份/昂贵读取 | app/main/store.mjs、backup.mjs：原创库与双库一致备份恢复、失败回退；sqlite-tasks.mjs/sqlite-worker.mjs执行快照/校验/原创查找/索引读取，主进程保留独占换库与单写者。不含配置或助手文件。 |
 | Windows发布 | scripts/build.mjs、release.mjs、setup.nsi、package-source.mjs、upgrade-windows.ps1；图标用app/assets及embed-windows-icon.ps1。 |
 | 旧版兼容 | app/main/protocol.mjs、reference.mjs、search.mjs、retrieval.mjs及拆书规范包；不能当当前v2导入/检索实现。 |
 
@@ -66,3 +66,11 @@ worker须单独打包ESM bundle并带createRequire banner；仅源代码单测�
 ### 扫描外部交付与标记原文
 
 旧九类ZIP流程使用scripts/scan-book-reviews.ps1按ZIP SHA跳过已判定包；仅在用户通知对应兼容交付时适用。接收、验收、导入和索引分别记录，不将脚本存在或外部Agent报告写成独立验收通过。
+
+## 0.2.11稳定性维护入口
+
+- agy-client.mjs提供异步EXE/系统代理发现；operation.mjs统一操作ID、总截止与可取消启动FIFO，启动槽只覆盖初始化/建会话，不跨生成和工具等待持有。provider提交时固定配置，出队与prompt发送前校验，已发出的生成不自动重放。旧同步发现导出仅留兼容，不用于正常发送路径。
+- 普通与助手查询均用AssistantSearch的有界队列（20项），worker保留24个分页状态；库/模型配置变动或线程退出使旧游标过期。不静默退回主线程全量扫描。备份维护窗口暂停新操作，abort后await检索/SQLite任务句柄退出再换库。应用退出也先完成持有资源的回收。
+- assistant-jobs.mjs分离本轮queued/running任务，入队前检查容量，book/turn/job同时约束领取。sourceVersion/messageVersion及partial尾部减少忙时轮询；单飞完成后再延迟1秒，闲置不轮询，活动视图处理重Markdown。
+- writing.checkpoint仅传id和expectedRevision，服务端建立原有历史边界；有脏稿仍走stage/save全文与版本/标记保护。主题首帧用appearance.js读取既有偏好，window-appearance.json只保存light/dark/system供原生窗口背景使用。
+- 复跑命令与真实范围见[本轮记录](audits/20261115/实施与验收记录.md)。正式0.2.10与源码候选0.2.11分开，未通过本轮升级正式应用。真实模型抽验只使用新造合成作品/固定句，不扩大旧正文外发许可。
