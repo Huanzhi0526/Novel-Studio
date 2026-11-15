@@ -1,12 +1,12 @@
 # 个人小说写作工作台
 
-Windows本地小说写作软件，包含原创写作、参考检索、主动AI扩写和按书创作助手。当前正式版 **0.2.10**（2026-11-15）；近期参考库记录为86部，属于此前入库核验时点，本轮文档维护未重新盘库。
+Windows本地小说写作软件，包含原创写作、参考检索、主动AI扩写和按书创作助手。当前正式版 **0.2.11**（2026-11-15）；近期参考库记录为86部，属于此前入库核验时点，本轮文档维护未重新盘库。
 
 开发接手从[协作规则](AGENTS.md)、[当前交接](HANDOFF.md)开始；[维护地图](docs/maintenance.md)定位代码，[发布清单](docs/release-checklist.md)说明隔离验收和升级。
 
 ## 安装与资料
 
-- 当前安装包：release/NovelStudio-0.2.10-x64-Setup.exe；源码包与SHA256清单使用同版本文件名。安装包由本机生成、未签名，升级前正常退出以完成保存。
+- 当前安装包：release/NovelStudio-0.2.11-x64-Setup.exe；源码包与SHA256清单使用同版本文件名。安装包由本机生成、未签名，升级前正常退出以完成保存。
 - 正式程序：`%LOCALAPPDATA%\Programs\Novel Studio`；正式资料：`%LOCALAPPDATA%\Novel Studio`。本机分别为`C:\Users\78828\AppData\Local\Programs\Novel Studio`与`C:\Users\78828\AppData\Local\Novel Studio`。
 - 原创使用library.sqlite，正式参考使用独立reference-v2.sqlite；配置、加密凭证以及assistant-books聊天/记忆也在资料目录，不能只备份一个数据库就当全资料备份。
 - 本机离线语义模型由正式embedding.json引用项目.local/model，Vulkan运行库位于正式资料runtime/llama-cpp-vulkan，保留CPU回退。已有向量无需因程序或文档更新重算。迁机时另带模型与原文资源，按实际配置核对路径，见[本地模型说明](model/README.md)。
