@@ -579,3 +579,6 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 - 本轮仅审查并合并代码，不改版本号、不重打release、不升级正式程序。源码package版本仍0.2.7但包含未发布前端；正式安装0.2.7仍为此前界面。后续发布须另做版本/打包/安装版检查与备份升级。
 - 已知非阻断项：深色冷启动首帧可能闪白（主进程backgroundColor未改）；失效标记仍不支持删除撤销；有效标记删除后若正文变动则明确拒绝旧位置恢复。
 - 合并方式：保留Gemini提交历史和Codex补修，main使用--no-ff合并feat/claude-frontend-ux；实际合并提交见git log。开发/测试进程已结束，不恢复后台任务或外部派工。
+
+
+合并落地核验：main合并提交 `b28bcdc`。合并后在主工作区再次执行 `npm run build`、`npm test`（113/113），并通过 `git diff --exit-code feat/claude-frontend-ux -- app scripts tests package.json package-lock.json` 确认代码一致。日志 `.local/ux-merge-review/main-build.txt`、`main-tests.txt`。正式程序未升级。
