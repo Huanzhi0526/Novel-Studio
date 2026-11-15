@@ -1,3 +1,4 @@
+import { awaitWithSignal } from '../kb-v2/agy-client.mjs';
 import { spawn } from 'node:child_process';
 import { randomUUID, randomBytes } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
@@ -59,7 +60,7 @@ export class EmbeddingProvider {
     this.#clearIdleTimer();
     this.activeCalls += 1;
     try {
-      await this.#start();
+      await awaitWithSignal(this.#start(),signal).catch(error=>{if(signal?.aborted)throw err('EMBED_ABORTED','Embedding request was cancelled',true);throw error;});
       if (signal?.aborted) throw err('EMBED_ABORTED', 'Embedding request was cancelled', true);
       if (this.backend === 'llama.cpp') {
         try {
@@ -67,7 +68,7 @@ export class EmbeddingProvider {
         } catch (firstErr) {
           if (!signal?.aborted && !this.closed && /^(ECONNRESET|ECONNREFUSED|EPIPE|EMBED_WORKER_IO)$/.test(String(firstErr?.code ?? ''))) {
             this.#unloadIdleWorker();
-            await this.#start();
+            await awaitWithSignal(this.#start(),signal).catch(error=>{if(signal?.aborted)throw err('EMBED_ABORTED','Embedding request was cancelled',true);throw error;});
             return await this.#embedLlama(texts, { signal, query });
           }
           throw firstErr;
@@ -91,6 +92,7 @@ export class EmbeddingProvider {
       });
     } finally {
       this.activeCalls = Math.max(0, this.activeCalls - 1);
+      if(!this.activeCalls && !this.ready && signal?.aborted)this.#unloadIdleWorker();
       this.#scheduleIdleUnload();
     }
   }
@@ -164,7 +166,7 @@ export class EmbeddingProvider {
         await this.#spawnLlamaOnce(this.runtimePath, this.extraArgs);
         this.activeBackendMode = this.extraArgs.some(a => a === '--device' || a === '-ngl' || a === '--gpu-layers') ? 'gpu' : 'cpu';
       } catch (primaryErr) {
-        if (!this.closed && this.fallbackRuntimePath && this.fallbackRuntimePath !== this.runtimePath) {
+        if (!this.closed && this.activeCalls>0 && this.fallbackRuntimePath && this.fallbackRuntimePath !== this.runtimePath) {
           this.runtimePath = this.fallbackRuntimePath;
           this.extraArgs = stripGpuArgs(this.extraArgs);
           await this.#spawnLlamaOnce(this.runtimePath, this.extraArgs);
@@ -352,8 +354,10 @@ function localRequest(baseUrl, pathname, { method = 'GET', headers = {}, body, s
   return new Promise((resolve, reject) => {
     const target = new URL(pathname, baseUrl);
     const request = http.request({ hostname: target.hostname, port: Number(target.port), path: target.pathname, method, headers, signal, agent: false }, (response) => {
-      const chunks = [];
-      response.on('data', (chunk) => chunks.push(chunk));
+      const chunks = [];let size=0;
+      response.on('error',reject);
+      response.on('aborted',()=>reject(err('EMBED_WORKER_IO','Local embedding response interrupted')));
+      response.on('data', chunk=>{size+=chunk.length;if(size>32*1024*1024)response.destroy(err('EMBED_PROTOCOL','Local embedding response too large'));else chunks.push(chunk);});
       response.on('end', () => resolve({ statusCode: response.statusCode ?? 0, body: Buffer.concat(chunks).toString('utf8') }));
     });
     request.setTimeout(timeoutMs, () => request.destroy(err('EMBED_TIMEOUT', `Local request exceeded ${timeoutMs} ms`, true)));

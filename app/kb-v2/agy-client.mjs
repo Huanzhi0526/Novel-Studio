@@ -1,3 +1,5 @@
+import { access, readdir, realpath } from 'node:fs/promises';
+import { operation, startupLane } from './operation.mjs';
 import { execFile, execFileSync, spawn } from 'node:child_process';
 import { appendFileSync, statSync, renameSync, existsSync, mkdirSync, readdirSync, realpathSync } from 'node:fs';
 import { homedir } from 'node:os';
@@ -63,6 +65,23 @@ export function separateAgyStatus(text) {
   return { text: clean, capacity, quota, interrupted: statuses.some(line => /^Your previous turn/u.test(line)) };
 }
 
+// Inspect only the bounded status prefix until prose arrives. Final output is
+// parsed once from original chunks, so arbitrary split boundaries lose no text.
+export class AgyStatusAccumulator {
+  constructor(){this.pending='';this.capacity=false;this.quota=false;this.hasText=false;}
+  push(chunk){
+    if(!this.hasText){
+      const text=this.pending+chunk,lines=text.split('\n');this.pending=lines.pop();
+      for(const line of lines){const status=separateAgyStatus(line+'\n');this.capacity ||= status.capacity;this.quota ||= status.quota;this.hasText ||= Boolean(status.text);}
+      const tail=this.pending.trimStart();
+      if(tail&&!tail.startsWith('⚠')||tail.length>8192)this.hasText=true;
+      else if(tail){const status=separateAgyStatus(tail);this.capacity ||= status.capacity;this.quota ||= status.quota;}
+      if(this.hasText)this.pending='';
+    }
+    return {text:this.hasText,capacity:this.capacity,quota:this.quota};
+  }
+}
+
 function upstreamError(model, kind) {
   const error = new Error(kind === 'capacity'
     ? `反重力 ${model} 服务端容量不足（503），短暂重试后仍未响应。请稍后重试或手动选择其他模型。`
@@ -93,6 +112,13 @@ export function resolveWindowsSystemProxy(baseEnv = process.env) {
       ['query', 'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings'],
       { encoding: 'utf8', windowsHide: true, timeout: 2500 }
     );
+    return parseWindowsProxy(out,baseEnv);
+  } catch {
+    return {};
+  }
+}
+
+function parseWindowsProxy(out,baseEnv) {
     const enableMatch = /^\s*ProxyEnable\s+REG_DWORD\s+(0x[0-9a-fA-F]+|\d+)/m.exec(out);
     if (!enableMatch || Number(enableMatch[1]) === 0) return {};
     const serverMatch = /^\s*ProxyServer\s+REG_SZ\s+(.+)$/m.exec(out);
@@ -128,9 +154,36 @@ export function resolveWindowsSystemProxy(baseEnv = process.env) {
       }
     }
     return resolved;
-  } catch {
-    return {};
+}
+
+export async function resolveWindowsSystemProxyAsync(baseEnv=process.env,signal) {
+  if(process.platform!=='win32'||baseEnv.HTTPS_PROXY||baseEnv.https_proxy||baseEnv.HTTP_PROXY||baseEnv.http_proxy||baseEnv.ALL_PROXY||baseEnv.all_proxy)return {};
+  return new Promise((resolve,reject)=>execFile('reg.exe',['query','HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings'],
+    {encoding:'utf8',windowsHide:true,timeout:2500,signal},(error,out)=>{
+      if(signal?.aborted)return reject(signal.reason);
+      resolve(error?{}:parseWindowsProxy(out,baseEnv));
+    }));
+}
+
+const executableCache=new Map();
+export async function resolveAgyExecutableAsync(env=process.env,{refresh=false,signal}={}) {
+  const local=env.LOCALAPPDATA||join(env.USERPROFILE||homedir(),'AppData','Local');
+  const key=JSON.stringify([local,env.NOVEL_STUDIO_AGY_BIN,env.PATH]);
+  const exists=async path=>{try{await access(path);return true;}catch{return false;}};
+  signal?.throwIfAborted();
+  const cached=executableCache.get(key);
+  if(!refresh&&cached&&await exists(cached))return cached;
+  const candidates=[env.NOVEL_STUDIO_AGY_BIN,join(local,'agy','bin','agy.exe'),join(local,'Programs','agy','bin','agy.exe'),join(local,'Programs','antigravity','bin','agy.exe')].filter(Boolean);
+  for(const path of candidates)if(await exists(path)){const result=await realpath(path);executableCache.set(key,result);return result;}
+  for(const name of await readdir(join(local,'Packages')).catch(()=>[])) {
+    signal?.throwIfAborted();const path=join(local,'Packages',name,'LocalCache','Local','agy','bin','agy.exe');
+    if(await exists(path)){executableCache.set(key,path);return path;}
   }
+  for(const dir of (env.PATH||'').split(';')) {
+    signal?.throwIfAborted();const path=join(dir.trim(),'agy.exe');
+    if(dir.trim()&&await exists(path)){executableCache.set(key,path);return path;}
+  }
+  return candidates[0];
 }
 
 export function awaitWithSignal(promise, signal) {
@@ -157,7 +210,7 @@ export class AgyFlashClient {
     capacityGraceMs = 20_000,
     assistant = null
   } = {}) {
-    this.executable = executable || resolveAgyExecutable(env ?? process.env);
+    this.executable = executable;
     this.cwd = cwd;
     this.modelId = modelId;
     this.thoughtLevel = thoughtLevel;
@@ -190,10 +243,10 @@ export class AgyFlashClient {
     };
   }
 
-  #buildChildEnv() {
+  async #buildChildEnv(signal) {
     const base = { ...(this.customEnv ?? process.env) };
     delete base.ELECTRON_RUN_AS_NODE;
-    const winProxy = resolveWindowsSystemProxy(base);
+    const winProxy = await resolveWindowsSystemProxyAsync(base,signal);
     const merged={...base,...winProxy};
     const bypass=[merged.NO_PROXY,merged.no_proxy,'127.0.0.1','localhost','::1'].filter(Boolean).join(',');
     merged.NO_PROXY=bypass;merged.no_proxy=bypass;
@@ -201,16 +254,19 @@ export class AgyFlashClient {
   }
 
   async #ensureStarted(signal) {
-    await this.stopping;
+    await awaitWithSignal(this.stopping,signal);
     signal?.throwIfAborted();
     if(this.closed)throw new Error('反重力客户端已关闭');
     if (this.child && !this.child.killed && this.readyPromise) {
       return await this.readyPromise;
     }
+    this.executable = this.executable ?? await resolveAgyExecutableAsync(this.customEnv ?? process.env,{signal});
+    const childEnv=await this.#buildChildEnv(signal);
+    signal?.throwIfAborted();
     mkdirSync(this.cwd, { recursive: true });
     const child = this.spawnImpl(this.executable, ['acp', '--sandbox', '--include-default-customizations=false'], {
       cwd: this.cwd,
-      env: this.#buildChildEnv(),
+      env: childEnv,
       windowsHide: true,
       stdio: ['pipe', 'pipe', 'pipe']
     });
@@ -227,6 +283,7 @@ export class AgyFlashClient {
     child.stdout.on('data', chunk => {
       if (this.child !== child) return;
       buf += chunk;
+      if(buf.length>4*1024*1024){this.#killCurrentChild(Object.assign(new Error('CLI响应帧过大'),{code:'AGY_FRAME_LIMIT'}));return;}
       let idx;
       while ((idx = buf.indexOf('\n')) >= 0) {
         const line = buf.slice(0, idx);
@@ -241,8 +298,11 @@ export class AgyFlashClient {
           if (sid && upd?.sessionUpdate === 'agent_message_chunk' && typeof upd?.content?.text === 'string') {
             const list = this.sessionChunks.get(sid);
             if (list) {
+              if(!list.length)this.record('first-output',{operationId:this.operation?.operationId,parentId:this.operation?.parentId,firstOutputMs:Date.now()-this.startedAt});
               list.push(upd.content.text);
-              const status = separateAgyStatus(list.join(''));
+              const stateBefore=this.sessionStatus.get(sid);
+              if(stateBefore){stateBefore.bytes=(stateBefore.bytes??0)+upd.content.text.length;if(stateBefore.bytes>8*1024*1024){this.#killCurrentChild(Object.assign(new Error('CLI回复过大'),{code:'AGY_OUTPUT_LIMIT'}));return;}}
+              const status = stateBefore?.parser.push(upd.content.text) ?? {text:false};
               const state = this.sessionStatus.get(sid);
               if (state) {
                 state.capacity ||= status.capacity;
@@ -272,7 +332,7 @@ export class AgyFlashClient {
         } else if (!msg.method && this.pending.has(msg.id)) {
           const p = this.pending.get(msg.id);
           this.#clearPending(msg.id, p);
-          if (msg.error) {const text=JSON.stringify(msg.error);p.reject(Object.assign(new Error(/database is locked/i.test(text)?'反重力会话数据库被占用，请停止旧请求后重试。':text),{code:/database is locked/i.test(text)?'AGY_SESSION_LOCKED':'AGY_RPC'}));}
+          if (msg.error) {const text=JSON.stringify(msg.error);p.reject(Object.assign(new Error(/database is locked/i.test(text)?'反重力会话数据库被占用，请停止旧请求后重试。':'反重力协议请求失败，请检查服务状态。'),{code:/database is locked/i.test(text)?'AGY_SESSION_LOCKED':'AGY_RPC'}));}
           else p.resolve(msg.result);
         }
       }
@@ -280,8 +340,7 @@ export class AgyFlashClient {
 
     const onProcessDown = reason => {
       if (this.child !== child) return;
-      const detail = this.stderrTail.trim() ? ` (${this.stderrTail.trim().slice(-200)})` : '';
-      const err = new Error(`默认 Gemini Flash 桥接进程退出: ${reason}${detail}`);
+      const err = Object.assign(new Error('反重力桥接进程退出，请保留草稿后重试。'),{code:'AGY_PROCESS_EXIT'});
       this.child = null;
       this.readyPromise = null;
       this.warmupPromise = null;
@@ -344,7 +403,8 @@ export class AgyFlashClient {
         return;
       }
       const id = ++this.seq;
-      const entry = { resolve: resolvePromise, reject: rejectPromise, timer: null, signal, onAbort: null };
+      const rpcStart=Date.now();this.record('stage-start',{stage:method,operationId:this.operation?.operationId,parentId:this.operation?.parentId});
+      const entry = { resolve: value=>{this.record('stage-complete',{stage:method,durationMs:Date.now()-rpcStart,operationId:this.operation?.operationId,parentId:this.operation?.parentId});resolvePromise(value);}, reject: rejectPromise, timer: null, signal, onAbort: null };
       entry.timer = setTimeout(() => {
         const capacity = this.sessionStatus.get(params?.sessionId)?.capacity && !this.sessionStatus.get(params?.sessionId)?.recovered;
         const failure = capacity ? upstreamError(this.modelId, 'capacity')
@@ -381,8 +441,10 @@ export class AgyFlashClient {
   }
 
   async #createConfiguredSession(signal) {
+    this.phase='initialize';
     await this.#ensureStarted(signal);
     try {
+      this.phase='session';
       const params = { cwd: this.cwd, mcpServers: this.assistant?.mcpServers ?? [] };
       let sessionId;
       if (this.assistant?.resumeId && this.agentCapabilities.loadSession) {
@@ -391,6 +453,7 @@ export class AgyFlashClient {
       }
       if(!sessionId) ({sessionId}=await this.#rpc('session/new',params,{timeoutMs:this.sessionNewTimeoutMs,signal,resetOnTimeout:true}));
       if(this.assistant) { this.assistant.resumeId=sessionId; this.assistant.onSession?.(sessionId); }
+      this.phase='model';
       await this.#rpc('session/set_model', { sessionId, modelId: this.modelId }, { timeoutMs: 15_000, signal, resetOnTimeout: true });
       // Some catalogue entries (e.g. Orchestrator) expose no effort suffix.
       if (this.thoughtLevel) {
@@ -402,6 +465,7 @@ export class AgyFlashClient {
           throw new Error(`Expected thought_level=${this.thoughtLevel}, got ${actualThought}`);
         }
       }
+      this.phase='tools';
       await this.assistant?.ready?.(signal);
       return sessionId;
     } catch (err) {
@@ -434,17 +498,26 @@ export class AgyFlashClient {
   /**
    * Run a fresh, isolated 1-turn prompt on Gemini 3.8 Flash (low thought level).
    */
-  record(event,extra={}) {try{mkdirSync(this.cwd,{recursive:true});const path=join(this.cwd,'cli-events.jsonl');if(existsSync(path)&&statSync(path).size>262144)renameSync(path,path+'.previous');appendFileSync(path,JSON.stringify({at:new Date().toISOString(),event,modelId:this.modelId,...extra})+'\n');}catch{}}
+  record(event,extra={}) {
+    try {
+      const fields={};for(const key of ['operationId','parentId','durationMs','stage','code','cold','promptSent','degraded','queueLength','firstOutputMs'])if(extra[key]!==undefined)fields[key]=extra[key];
+      mkdirSync(this.cwd,{recursive:true});const path=join(this.cwd,'cli-events.jsonl');
+      if(existsSync(path)&&statSync(path).size>262144)renameSync(path,path+'.previous');
+      appendFileSync(path,JSON.stringify({at:new Date().toISOString(),event,modelId:this.modelId,...fields})+'\n');
+    }catch{}
+  }
+
 
   async promptText(promptString, options = {}) {
     if(this.inFlight)throw Object.assign(new Error('同一反重力客户端已有请求进行中'),{code:'AGY_BUSY'});
-    this.inFlight=true;const start=Date.now();this.record('start');
-    try{const result=await this.runPrompt(promptString,options);this.record('complete',{durationMs:Date.now()-start});return result;}
-    catch(error){this.record('failed',{durationMs:Date.now()-start,code:error.code??error.name??'ERROR'});this.#killCurrentChild(error);throw error;}
-    finally{this.inFlight=false;}
+    const op=operation(options);this.operation=op;this.phase='queue';this.promptSent=false;
+    this.inFlight=true;const start=Date.now();this.startedAt=start;this.record('start',{operationId:op.operationId,parentId:op.parentId,cold:!this.child});
+    try{const result=await this.runPrompt(promptString,{...options,...op});this.record('complete',{durationMs:Date.now()-start,promptSent:this.promptSent,operationId:op.operationId,parentId:op.parentId});return result;}
+    catch(error){if(error.code==='AGY_TIMEOUT')error.message=`反重力 ${this.modelId} 请求超时（总等待期限，${this.phase}），已停止。`;error.details={...error.details,stage:this.phase,promptSent:this.promptSent,operationId:op.operationId};this.record('failed',{durationMs:Date.now()-start,code:error.code??error.name??'ERROR',stage:this.phase,promptSent:this.promptSent,operationId:op.operationId,parentId:op.parentId});this.#killCurrentChild(error);throw error;}
+    finally{op.close();this.operation=null;this.inFlight=false;}
   }
 
-  async runPrompt(promptString, { signal, timeoutMs = 90_000, idleTimeoutMs = 150_000 } = {}) {
+  async runPrompt(promptString, { signal, timeoutMs = 90_000, idleTimeoutMs = 150_000, validate } = {}) {
     signal?.throwIfAborted();
     if (this.warmupPromise) {
       await awaitWithSignal(this.warmupPromise.catch(()=>{}),signal);
@@ -455,16 +528,16 @@ export class AgyFlashClient {
       this.prewarmedSessionId = null;
     } else {
       this.prewarmedSessionId = null;
-      try{sessionId=await this.#createConfiguredSession(signal);}catch(error){
+      try{sessionId=await startupLane.run(()=>this.#createConfiguredSession(signal),signal);}catch(error){
         if(!['AGY_SESSION_LOCKED'].includes(error.code)||signal?.aborted)throw error;
         if(this.assistant)this.assistant.resumeId=null;this.#killCurrentChild();this.record('retry-session-setup');
-        sessionId=await this.#createConfiguredSession(signal);
+        sessionId=await startupLane.run(()=>this.#createConfiguredSession(signal),signal);
       }
     }
 
     if (this.assistant) this.assistantSessionId = sessionId;
     this.sessionChunks.set(sessionId, []);
-    this.sessionStatus.set(sessionId, { capacity: false, timer: null, lastActivity:Date.now() });
+    this.sessionStatus.set(sessionId, { capacity: false, timer: null, lastActivity:Date.now(),parser:new AgyStatusAccumulator() });
     const idleTimer=this.assistant?setInterval(()=>{const state=this.sessionStatus.get(sessionId);if(state&&Date.now()-state.lastActivity>idleTimeoutMs)this.#killCurrentChild(Object.assign(new Error('反重力长时间没有输出或工具进展，已停止本轮；保留聊天与记忆。'),{code:'AGY_IDLE_TIMEOUT'}));},Math.min(1000,idleTimeoutMs)):null;
     try {
       const fullPrompt = this.assistant ? promptString : [
@@ -474,6 +547,8 @@ export class AgyFlashClient {
         promptString
       ].join('\n\n');
 
+      signal?.throwIfAborted();validate?.();this.phase='generation';this.promptSent=true;
+      this.record('prompt-sent',{operationId:this.operation?.operationId,parentId:this.operation?.parentId});
       const result = await this.#rpc(
         'session/prompt',
         { sessionId, prompt: [{ type: 'text', text: fullPrompt }] },
@@ -515,7 +590,7 @@ export class AgyFlashClient {
       const tag = m.role === 'system' ? '[SYSTEM INSTRUCTIONS]' : m.role === 'assistant' ? '[PREVIOUS ASSISTANT OUTPUT]' : '[USER INPUT]';
       return `${tag}\n${m.content}`;
     }).join('\n\n---\n\n');
-    const { text } = await this.promptText(formatted, { signal, timeoutMs: options.timeoutMs ?? 90_000 });
+    const { text } = await this.promptText(formatted, { ...options, signal, timeoutMs: options.timeoutMs ?? 90_000 });
     return text;
   }
 
@@ -526,5 +601,6 @@ export class AgyFlashClient {
       p.reject(new Error('AgyFlashClient closed'));
     }
     this.#killCurrentChild();
+    return this.stopping;
   }
 }

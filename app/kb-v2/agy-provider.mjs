@@ -1,8 +1,9 @@
+import { operation } from './operation.mjs';
 import { execFile } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { AgyFlashClient, awaitWithSignal, resolveAgyExecutable, resolveWindowsSystemProxy } from './agy-client.mjs';
+import { AgyFlashClient, awaitWithSignal, resolveAgyExecutableAsync, resolveWindowsSystemProxyAsync } from './agy-client.mjs';
 import { fail } from '../main/store.mjs';
 
 const defaults = { version: 1, source: 'auto', modelId: 'gemini-3.8-flash-low' };
@@ -31,6 +32,10 @@ export function accountEnvironment(env = process.env) {
   return copy;
 }
 
+// Catalogue metadata is shared across purposes; sessions, credentials and choices are not.
+const catalogues=new WeakMap();
+function catalogueMap(run){if(!catalogues.has(run))catalogues.set(run,new Map());return catalogues.get(run);}
+
 export class AgyRetrievalProvider {
   constructor(directory, { run = execFile, clientFactory = options => new AgyFlashClient(options), env = process.env, purpose = 'retrieval' } = {}) {
     this.purpose = purpose;
@@ -38,7 +43,7 @@ export class AgyRetrievalProvider {
     this.filename = join(directory, purpose === 'expand' ? 'expansion-provider.json' : 'retrieval-provider.json');
     this.cwd = join(directory, purpose === 'expand' ? 'agy-expansion-work' : 'agy-retrieval-work');
     this.env = accountEnvironment(env);
-    this.executable = resolveAgyExecutable(this.env);
+    this.executable = this.env.NOVEL_STUDIO_AGY_BIN ?? join(this.env.LOCALAPPDATA ?? '', 'agy', 'bin', 'agy.exe');
     this.run = run;
     this.clientFactory = clientFactory;
     this.models = [];
@@ -70,27 +75,42 @@ export class AgyRetrievalProvider {
     return { ...this.read(), available: existsSync(this.executable), models: this.models };
   }
 
-  async listModels(_, { signal } = {}) {
-    if (this.discovery) return this.discovery;
-    this.executable = resolveAgyExecutable(this.env);
-    if (!existsSync(this.executable)) fail('AGY_NOT_INSTALLED', '未找到反重力 CLI，请先安装并使用 Google 账号登录。');
-    mkdirSync(this.cwd, { recursive: true });
-    this.discovery = new Promise((resolve, reject) => {
-      this.run(this.executable, ['models'], {
-        cwd: this.cwd, windowsHide: true, timeout: 30000, maxBuffer: 256 * 1024,
-        encoding: 'utf8', signal, env: { ...this.env, ...resolveWindowsSystemProxy(this.env) }
-      }, (error, stdout) => {
-        if (error) {
-          if (signal?.aborted) return reject(signal.reason ?? error);
-          return reject(Object.assign(new Error('无法获取反重力模型列表，请检查 CLI 登录、网络或额度后重试。'), { code: 'AGY_MODELS' }));
-        }
-        const models = parseAgyModels(stdout);
-        if (!models.length) return reject(Object.assign(new Error('CLI 未返回可用的 Gemini 模型，请检查账号权限。'), { code: 'AGY_MODELS_EMPTY' }));
-        this.models = models;
-        resolve(this.get());
-      });
-    }).finally(() => { this.discovery = null; });
-    return this.discovery;
+  async prepare(signal,{refresh=false}={}) {
+    const executable=await resolveAgyExecutableAsync(this.env,{refresh,signal});
+    signal?.throwIfAborted();
+    if(this.executable!==executable){if(!this.active)this.close(false);this.models=[];this.executable=executable;}
+    if(!existsSync(executable))fail('AGY_NOT_INSTALLED','未找到反重力CLI，请先安装并登录。');
+    return executable;
+  }
+
+  async listModels(_, { signal, cached=false } = {}) {
+    if(this.discovery)return this.waitDiscovery(signal);
+    const key=JSON.stringify([this.executable,this.env.USERPROFILE,this.env.LOCALAPPDATA]);
+    const cache=catalogueMap(this.run),previous=cache.get(key);
+    if(cached&&previous?.models&&Date.now()-previous.at<60000){this.models=previous.models;return this.get();}
+    const controller=new AbortController();
+    // Shared discovery has independent waiters; cancellation abandons this caller.
+    this.discovery=(async()=>{
+      await this.prepare(controller.signal,{refresh:true});
+      mkdirSync(this.cwd,{recursive:true});
+      const proxy=await resolveWindowsSystemProxyAsync(this.env,controller.signal);
+      return new Promise((resolve,reject)=>this.run(this.executable,['models'],{
+        cwd:this.cwd,windowsHide:true,timeout:30000,maxBuffer:256*1024,encoding:'utf8',signal:controller.signal,env:{...this.env,...proxy}
+      },(error,stdout)=>{
+        if(error)return reject(Object.assign(new Error('无法获取反重力模型列表，请检查登录、网络或额度。'),{code:'AGY_MODELS'}));
+        const models=parseAgyModels(stdout);
+        if(!models.length)return reject(Object.assign(new Error('CLI未返回可用模型。'),{code:'AGY_MODELS_EMPTY'}));
+        this.models=models;cache.set(key,{models,at:Date.now()});resolve(this.get());
+      }));
+    })().finally(()=>{this.discovery=null;this.discoveryController=null;});
+    this.discoveryController=controller;
+    return this.waitDiscovery(signal);
+  }
+
+  async waitDiscovery(signal){
+    this.discoveryWaiters=(this.discoveryWaiters??0)+1;
+    try{return await awaitWithSignal(this.discovery,signal);}
+    finally{if(--this.discoveryWaiters===0&&this.discovery)this.discoveryController?.abort();}
   }
 
   save({ source, modelId }) {
@@ -105,33 +125,48 @@ export class AgyRetrievalProvider {
         renameSync(temp, this.filename);
       } finally { rmSync(temp, { force: true }); }
       // Let an in-flight request finish; its settings snapshot will reject stale results.
-      if (!this.active) this.close();
+      if (!this.active) this.close(false);
       return this.get();
     });
     this.writes = job;
     return job;
   }
 
-  async complete(messages, options, signal) {
-    const job=this.requestLane.catch(()=>{}).then(()=>{signal?.throwIfAborted();return this.runComplete(messages,options,signal);});
-    this.requestLane=job;return awaitWithSignal(job,signal);
+  async complete(messages, options={}, signal) {
+    if((this.queued??0)>=20)fail('AGY_BUSY','模型请求队列已满，请等待或取消。');
+    const snapshot=this.snapshot();
+    const ensure=()=>{signal?.throwIfAborted();if(snapshot!==this.snapshot())fail('SEARCH_CONFIG_CHANGED','模型配置已变化，旧请求未发送。');options.validate?.();};
+    const op=operation({...options,signal});
+    try {
+    await awaitWithSignal(this.writes,op.signal);
+    this.queued=(this.queued??0)+1;
+    const job=this.requestLane.catch(()=>{}).then(()=>{op.signal.throwIfAborted();ensure();return this.runComplete(messages,{...options,...op,validate:ensure},op.signal);});
+    this.requestLane=job;job.finally(()=>this.queued--).catch(()=>{});
+    return await awaitWithSignal(job,op.signal);
+    }finally{op.close();}
   }
 
   async runComplete(messages, options, signal) {
     await this.writes;
     if (this.active) fail('AGY_BUSY', '已有反重力请求进行中，请稍候或取消。');
+    options.validate?.();
     const { modelId } = this.read();
+    if(this.models.length&&!this.models.some(m=>m.id===modelId))fail('AGY_MODEL_UNKNOWN','当前目录已无所选模型，请刷新并重新选择。');
+    await this.prepare(signal);
+    await awaitWithSignal(this.stopping??Promise.resolve(),signal);
+    options.validate?.();
     if (!existsSync(this.executable)) fail('AGY_NOT_INSTALLED', '未找到反重力 CLI，请先安装并登录。');
-    if (!this.client || this.clientModel !== modelId) {
-      this.close();
+    if (!this.client || this.clientModel !== modelId || this.client.executable && this.client.executable !== this.executable) {
+      this.close(false);
       this.client = this.clientFactory({ executable: this.executable, cwd: this.cwd, modelId,
         outputMode: this.purpose === 'expand' ? 'text' : 'json',
         thoughtLevel: /-(low|medium|high|xhigh|max)$/u.exec(modelId)?.[1] ?? null, env: this.env });
       this.clientModel = modelId;
     }
+    clearTimeout(this.idleTimer);
     this.active = true;
     try { return await this.client.complete(messages, options, signal); }
-    finally { this.active = false; }
+    finally { this.active = false;this.idleTimer=setTimeout(()=>this.close(false),180000);this.idleTimer.unref?.(); }
   }
 
   async test(_, { signal } = {}) {
@@ -142,5 +177,5 @@ export class AgyRetrievalProvider {
     return { ok: true, modelId: this.read().modelId };
   }
 
-  close() { this.client?.close(); this.client = null; this.clientModel = null; }
+  close(discovery=true) { clearTimeout(this.idleTimer); if(discovery)this.discoveryController?.abort();this.stopping=Promise.all([this.stopping,this.client?.close()]).then(()=>{});this.client=null;this.clientModel=null;return this.stopping; }
 }

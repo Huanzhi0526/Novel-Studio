@@ -345,9 +345,7 @@ async function launch() {
     if (process.env.NOVEL_STUDIO_TEST_HIDDEN !== '1') window.show();
   });
   await window.loadURL(appUrl);
-  if (useKbV2) {
-    if (embedding?.modelPath) void embedding.embed(['预热'], { query: true }).catch(() => {});
-  }
+  // Embedding starts on demand through SearchEngineV2.encode; no competing warmup.
 }
 
 if (!app.requestSingleInstanceLock()) {

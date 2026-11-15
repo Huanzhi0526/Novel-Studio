@@ -58,13 +58,13 @@ test('chosen model and effort reach ACP client; switching replaces client only b
   await provider.listModels();
   await provider.save({ source: 'agy', modelId: 'gemini-4-hydrogen-xhigh' });
   const request = provider.complete([], {}, undefined);
-  await new Promise(resolve => setImmediate(resolve));
+  while(!release)await new Promise(resolve => setTimeout(resolve,5));
   assert.equal(clients[0].options.thoughtLevel, 'xhigh');
   await provider.save({ source: 'agy', modelId: 'gemini-pro-orchestrator' });
   assert.equal(clients[0].closed, false);
   release('first'); await request;
-  const second = provider.complete([], {}, undefined);
-  await new Promise(resolve => setImmediate(resolve));
+  release=null;const second = provider.complete([], {}, undefined);
+  while(!release)await new Promise(resolve => setTimeout(resolve,5));
   assert.equal(clients[0].closed, true);
   assert.equal(clients[1].options.modelId, 'gemini-pro-orchestrator');
   assert.equal(clients[1].options.thoughtLevel, null);
