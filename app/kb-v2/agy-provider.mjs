@@ -1,4 +1,4 @@
-import { operation } from './operation.mjs';
+import { operation, startupLane } from './operation.mjs';
 import { execFile } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -89,20 +89,22 @@ export class AgyRetrievalProvider {
     const cache=catalogueMap(this.run),previous=cache.get(key);
     if(cached&&previous?.models&&Date.now()-previous.at<60000){this.models=previous.models;return this.get();}
     const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(Object.assign(new Error('获取模型目录超过总等待上限'),{code:'AGY_MODELS_TIMEOUT'})),30000);
     // Shared discovery has independent waiters; cancellation abandons this caller.
     this.discovery=(async()=>{
       await this.prepare(controller.signal,{refresh:true});
       mkdirSync(this.cwd,{recursive:true});
       const proxy=await resolveWindowsSystemProxyAsync(this.env,controller.signal);
-      return new Promise((resolve,reject)=>this.run(this.executable,['models'],{
+      return startupLane.run(()=>new Promise((resolve,reject)=>this.run(this.executable,['models'],{
         cwd:this.cwd,windowsHide:true,timeout:30000,maxBuffer:256*1024,encoding:'utf8',signal:controller.signal,env:{...this.env,...proxy}
       },(error,stdout)=>{
+        if(controller.signal.aborted)return reject(controller.signal.reason);
         if(error)return reject(Object.assign(new Error('无法获取反重力模型列表，请检查登录、网络或额度。'),{code:'AGY_MODELS'}));
         const models=parseAgyModels(stdout);
         if(!models.length)return reject(Object.assign(new Error('CLI未返回可用模型。'),{code:'AGY_MODELS_EMPTY'}));
         this.models=models;cache.set(key,{models,at:Date.now()});resolve(this.get());
-      }));
-    })().finally(()=>{this.discovery=null;this.discoveryController=null;});
+      })),controller.signal);
+    })().finally(()=>{clearTimeout(timer);this.discovery=null;this.discoveryController=null;});
     this.discoveryController=controller;
     return this.waitDiscovery(signal);
   }

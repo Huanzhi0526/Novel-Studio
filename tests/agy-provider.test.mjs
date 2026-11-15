@@ -131,3 +131,11 @@ test('parallel retrieval calls queue and cancelling a queued request never sends
  const a=provider.complete([],{},undefined),b=provider.complete([],{},c.signal),d=provider.complete([],{},undefined);
  c.abort();await assert.rejects(b,{name:'AbortError'});assert.equal(await a,'ok');assert.equal(await d,'ok');assert.equal(peak,1);assert.equal(calls,2);
 });
+
+
+test('model discovery queues behind conflicting session startup and queued cancellation never spawns models',async t=>{
+ const {startupLane}=await import('../app/kb-v2/operation.mjs');let release,calls=0;
+ const blocker=startupLane.run(()=>new Promise(resolve=>release=resolve));while(!release)await new Promise(resolve=>setImmediate(resolve));
+ const {provider}=setup(t,{run:(_exe,_args,_options,done)=>{calls++;done(null,catalogue);}}),controller=new AbortController();
+ const job=provider.listModels(undefined,{signal:controller.signal}),assertion=assert.rejects(job,{name:'AbortError'});controller.abort();await assertion;release();await blocker;await startupLane.tail.catch(()=>{});await provider.discovery?.catch(()=>{});assert.equal(calls,0);
+});
