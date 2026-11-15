@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { api, Card, categories, ErrorMessage, Icon } from './ui.jsx';
+import { sendIntent } from './input-keys.mjs';
 
 export function useConversation() {
   const [draft, setDraft] = useState('');
   const [filters, setFilters] = useState({ workIds: [], categories: [] });
   const [useAi, setUseAi] = useState(false);
-  const [v2Mode, setV2Mode] = useState('fast');
+  const [v2Mode, setV2Mode] = useState('local');
   const [messages, setMessages] = useState([]);
   const current = useRef(new Map());
   const [running, setRunning] = useState(false);
@@ -86,7 +87,7 @@ export function Conversation({ state, works, openEvidence, openCard, sidebar = f
 
   return <section className={`conversation ${sidebar ? 'conversation-sidebar' : ''}`} aria-label={sidebar ? '参考检索侧栏' : '参考库检索'}>
     <header className="conversation-head">
-      <div className="conversation-heading"><h2>{sidebar ? '参考检索' : (kbV2 ? '创作参考检索 (KB v2)' : '查找知识卡')}</h2>
+      <div className="conversation-heading"><h2>{sidebar || kbV2 ? '参考检索' : '查找知识卡'}</h2>
         {!sidebar && <span>{works.filter(work => work.deleted == null).length} 部参考作品</span>}</div>
       <div className="button-row">
         {messages.length > 0 && <button type="button" className="quiet" onClick={clear}>清空</button>}
@@ -99,10 +100,15 @@ export function Conversation({ state, works, openEvidence, openCard, sidebar = f
         <option value="">全部作品</option>
         {works.filter(work => work.deleted == null).map(work => <option key={work.work_id} value={work.work_id}>{work.title}</option>)}
       </select></label>
-      <label><span>类别</span><select aria-label="筛选卡片类别" value={filters.categories[0] ?? ''}
+      <label><span>{kbV2 ? '侧重' : '类别'}</span><select aria-label={kbV2 ? '检索侧重' : '筛选卡片类别'} value={filters.categories[0] ?? ''}
         onChange={event => setFilters({ ...filters, categories: event.target.value ? [event.target.value] : [] })}>
-        <option value="">全部类别</option>
-        {Object.entries(categories).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+        {kbV2
+          ? [['', '不限'], ['character', '人物与设定'], ['event', '剧情场次'], ['technique', '原文描写']].map(([key, label]) =>
+            <option key={key} value={key}>{label}</option>)
+          : <>
+            <option value="">全部类别</option>
+            {Object.entries(categories).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+          </>}
       </select></label>
     </div>
     <div className="messages" ref={list} aria-live="polite">
@@ -142,28 +148,31 @@ export function Conversation({ state, works, openEvidence, openCard, sidebar = f
       <textarea id={sidebar ? 'sidebar-query' : 'library-query'} placeholder={kbV2 ? '自然语言提问：例如“有哪些约会情节？”“有哪些服装设计与描写？”…' : '描述你想找的人物、情节或设定…'} maxLength={500} rows={2}
         value={draft} onChange={event => setDraft(event.target.value)}
         onKeyDown={event => {
-          if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing && event.keyCode !== 229) {
+          if (sendIntent(event) === 'send') {
             event.preventDefault();
-            event.currentTarget.form.requestSubmit();
+            if (!running && draft.trim()) event.currentTarget.form.requestSubmit();
           }
         }} />
       <div className="composer-foot">
         {kbV2 ? <div className="segmented v2-mode-switch" role="group" aria-label="KB v2 检索模式">
-          <button type="button" aria-pressed={v2Mode === 'local'} onClick={() => setV2Mode('local')} title="毫秒级本地分词+语义向量混合检索">本地混合</button>
-          <button type="button" aria-pressed={v2Mode === 'fast'} onClick={() => setV2Mode('fast')} title="AI 具象化意图展开 + 多层候选精选导读">AI 快速</button>
-          <button type="button" aria-pressed={v2Mode === 'deep'} onClick={() => setV2Mode('deep')} title="Agent 多轮查场次/档案并翻阅原文核证细节">AI 深度翻书</button>
+          <button type="button" aria-pressed={v2Mode === 'local'} aria-label="本地混合" onClick={() => setV2Mode('local')} title="毫秒级本地分词+语义向量混合检索">{sidebar ? '本地' : '本地混合'}</button>
+          <button type="button" aria-pressed={v2Mode === 'fast'} aria-label="AI 快速" onClick={() => setV2Mode('fast')} title="AI 具象化意图展开 + 多层候选精选导读">{sidebar ? '快速' : 'AI 快速'}</button>
+          <button type="button" aria-pressed={v2Mode === 'deep'} aria-label="AI 深度翻书" onClick={() => setV2Mode('deep')} title="Agent 多轮查场次/档案并翻阅原文核证细节">{sidebar ? '深度' : 'AI 深度翻书'}</button>
         </div> : <label className="retrieval-toggle"><input type="checkbox" checked={useAi} onChange={event => setUseAi(event.target.checked)} />
           <span>外部 AI 辅助</span></label>}
         <div className="composer-actions">
-          {onSettings && <button type="button" className="quiet retrieval-settings-link" onClick={onSettings}><Icon name="settings" size={14} />接口设置</button>}
+          {onSettings && (sidebar
+            ? <button type="button" className="icon-button retrieval-settings-link" aria-label="接口设置" title="接口设置" onClick={onSettings}><Icon name="settings" size={15} /></button>
+            : <button type="button" className="quiet retrieval-settings-link" onClick={onSettings}><Icon name="settings" size={14} />接口设置</button>)}
           <button type="submit" className="send-button" aria-label="检索" disabled={!draft.trim() || running}><Icon name="send" size={17} /></button>
         </div>
       </div>
-      {kbV2 && v2Mode !== 'local' && <small className="retrieval-disclosure">问题、候选摘录及深度翻书所需的参考原文会发送至所选模型。</small>}
-      {(!kbV2 && useAi) && <small className="retrieval-disclosure">问题和候选卡摘录将发送到所配服务。</small>}
-      {(kbV2 && v2Mode !== 'local') && <small className="retrieval-disclosure">
-        {v2Mode === 'deep' ? '深度模式：AI 将多轮搜索场次/档案并翻阅原文段落核证细节（默认 Flash 桥接约 25–45 秒）。' : '快速模式：AI 自动展开具象情境线索并归纳创作看点（默认 Flash 桥接约 15–25 秒，直连 API 约 4–8 秒）。'}
+      {kbV2 && v2Mode !== 'local' && <small className="retrieval-disclosure">
+        {v2Mode === 'deep'
+          ? '将发送问题、候选摘录及所需参考原文；AI 多轮翻书核证细节（默认 Flash 桥接约 25–45 秒）。'
+          : '将发送问题及候选摘录；AI 自动展开情境线索并归纳看点（默认 Flash 桥接约 15–25 秒，直连 API 约 4–8 秒）。'}
       </small>}
+      {(!kbV2 && useAi) && <small className="retrieval-disclosure">问题和候选卡摘录将发送到所配服务。</small>}
     </form>
   </section>;
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { api, Card, categories, ErrorMessage, Icon, Modal, structureTypes } from './ui.jsx';
+import { api, Card, categories, ErrorMessage, Icon, Modal, PageHeader, structureTypes } from './ui.jsx';
 import { Conversation } from './Conversation.jsx';
 import { BookCover } from './BookCover.jsx';
 import './reference-bookshelf.css';
@@ -15,17 +15,24 @@ function revisionLabel(revision, index) {
   return `归档版本 ${index}${date ? ` · ${date}` : ''}`;
 }
 
-export function Reference({ works, refresh, conversation, openCard, openEvidence, openReader, onSettings, kbV2 = false }) {
-  const [mode, setMode] = useState('search');
-  const [archiveOpen, setArchiveOpen] = useState(false);
-  const [selected, setSelected] = useState('');
+export function Reference({
+  works, refresh, conversation, openCard, openEvidence, openReader, onSettings, kbV2 = false,
+  viewState, setViewState, shelfScroll
+}) {
+  const [localView, setLocalView] = useState({ mode: 'search', selected: '', archiveOpen: false, query: '' });
+  const currentView = viewState ?? localView;
+  const updateView = setViewState ?? setLocalView;
+  const { mode, selected, archiveOpen, query } = currentView;
+  const setMode = mode => updateView(current => ({ ...current, mode }));
+  const setSelected = selected => updateView(current => ({ ...current, selected }));
   const [listing, setListing] = useState(null);
   const [error, setError] = useState(null);
   const [importing, setImporting] = useState(false);
   const [confirmHide, setConfirmHide] = useState(false);
   const [notice, setNotice] = useState('');
-  const [query, setQuery] = useState('');
   const shelfBody = useRef(null);
+  const localShelfScroll = useRef(0);
+  const scrollRef = shelfScroll ?? localShelfScroll;
   const workHeading = useRef(null);
   const returnPosition = useRef(null);
   const work = works.find(item => item.work_id === selected);
@@ -39,14 +46,18 @@ export function Reference({ works, refresh, conversation, openCard, openEvidence
   useLayoutEffect(() => {
     if (mode !== 'shelf') return;
     const body = shelfBody.current;
+    if (!body) return;
     if (workId) {
       body.scrollTop = 0;
       workHeading.current?.focus({ preventScroll: true });
     } else if (returnPosition.current) {
       const { id, top } = returnPosition.current;
       returnPosition.current = null;
+      scrollRef.current = top;
       body.scrollTop = top;
       body.querySelector(`[data-reference-work="${CSS.escape(id)}"]`)?.focus({ preventScroll: true });
+    } else {
+      body.scrollTop = scrollRef.current;
     }
   }, [mode, workId]);
 
@@ -62,7 +73,9 @@ export function Reference({ works, refresh, conversation, openCard, openEvidence
   }, [work, mode]);
 
   function browseWork(id) {
-    returnPosition.current = { id, top: shelfBody.current.scrollTop };
+    const top = shelfBody.current?.scrollTop ?? 0;
+    scrollRef.current = top;
+    returnPosition.current = { id, top };
     setError(null);
     setSelected(id);
   }
@@ -96,8 +109,7 @@ export function Reference({ works, refresh, conversation, openCard, openEvidence
   }
 
   return <div className="reference-page">
-    <header className="topbar reference-toolbar">
-      <h1 className="topbar-title">参考库</h1>
+    <PageHeader title="参考库" className="reference-toolbar" actions={<>
       <div className="segmented" role="group" aria-label="参考库页面">
         <button type="button" aria-pressed={mode === 'search'} onClick={() => setMode('search')}>检索</button>
         <button type="button" aria-pressed={mode === 'shelf'} onClick={() => {
@@ -106,12 +118,14 @@ export function Reference({ works, refresh, conversation, openCard, openEvidence
         }}>书架</button>
       </div>
       {!kbV2 && <button type="button" className="reference-import" onClick={() => setImporting(true)}><Icon name="plus" size={15} />导入标准结果包</button>}
-    </header>
+    </>} />
     <ErrorMessage error={error} />
     {notice && <div className="notice success">{notice}<button className="quiet" onClick={() => setNotice('')}>关闭</button></div>}
     {mode === 'search'
       ? <Conversation state={conversation} works={works} openEvidence={openEvidence} openCard={openCard} onSettings={onSettings} kbV2={kbV2} />
-      : <div ref={shelfBody} className="reference-shelf-scroll">
+      : <div ref={shelfBody} className="reference-shelf-scroll" onScroll={event => {
+        if (!workId) scrollRef.current = event.currentTarget.scrollTop;
+      }}>
         {work ? <section className="reference-shelf-pane" aria-labelledby="reference-work-title">
           <button className="reference-shelf-back" type="button" onClick={returnToShelf}>
             <span aria-hidden="true">‹</span>返回书架
@@ -164,11 +178,14 @@ export function Reference({ works, refresh, conversation, openCard, openEvidence
               {shelfWorks.length > 0 && <label className="reference-shelf-filter">
                 <Icon name="search" size={16} />
                 <input type="search" aria-label="搜索参考作品" placeholder="搜索书名" value={query}
-                  onChange={event => setQuery(event.target.value)} />
+                  onChange={event => {
+                    const value = event.target.value;
+                    updateView(current => ({ ...current, query: value }));
+                  }} />
               </label>}
               {(archivedCount > 0 || archiveOpen) && <button type="button" className="quiet" onClick={() => {
-                setArchiveOpen(!archiveOpen);
-                setQuery('');
+                scrollRef.current = 0;
+                updateView(current => ({ ...current, archiveOpen: !current.archiveOpen, query: '' }));
               }}>{archiveOpen ? '返回参考书架' : `封存书目（${archivedCount}）`}</button>}
             </div>
           </header>
@@ -198,10 +215,9 @@ export function Reference({ works, refresh, conversation, openCard, openEvidence
       setNotice(`已入库。新增 ${stats.cardsAdded} 张，更新 ${stats.cardsUpdated} 张，保留 ${stats.cardsKept} 张，跳过 ${stats.cardsSkipped} 张。`);
       setImporting(false);
       returnPosition.current = null;
+      scrollRef.current = 0;
       if (shelfBody.current) shelfBody.current.scrollTop = 0;
-      setSelected('');
-      setQuery('');
-      setMode('shelf');
+      updateView(current => ({ ...current, selected: '', query: '', mode: 'shelf' }));
     }} />}
   </div>;
 }
@@ -274,7 +290,7 @@ function CardForm({ initial, volumes, submit, button = '保存知识卡', cancel
   </form>;
 }
 
-export function CardEditor({ card, works, close, openEvidence, onSaved }) {
+export function CardEditor({ card, works, close, openEvidence, onSaved, editable = true }) {
   const [live, setLive] = useState(null);
   const [error, setError] = useState(null);
   const [editing, setEditing] = useState(false);
@@ -289,16 +305,22 @@ export function CardEditor({ card, works, close, openEvidence, onSaved }) {
       .catch(failure => { if (alive) setError(failure); });
     return () => { alive = false; };
   }, [card]);
-  return <Modal title={editing ? '编辑知识卡' : '知识卡'} eyebrow={card.work_title} close={close} wide
+  const categoryLabel = live?.v2_badge ?? categories[live?.category ?? card.category];
+  const eyebrow = [live?.work_title ?? card.work_title, categoryLabel].filter(Boolean).join(' · ');
+  const dialogTitle = editing ? '编辑知识卡' : (live?.title ?? card.title ?? '知识卡');
+  return <Modal title={dialogTitle} eyebrow={eyebrow} close={close} wide
     className={editing ? '' : 'card-reader'}
-    actions={!editing && live && <button type="button" className="quiet" onClick={() => setEditing(true)}><Icon name="edit" size={15} />编辑</button>}>
+    actions={editable && !editing && live && <button type="button" className="quiet" onClick={() => setEditing(true)}><Icon name="edit" size={15} />编辑</button>}>
     <ErrorMessage error={error} />
-    {live ? editing
+    {live ? editing && editable
       ? <CardForm key={live.revision} initial={live} volumes={volumes} cancel={() => setEditing(false)} submit={async edited => {
         const value = await api('reference.editCard', { workId: live.work_id, expectedRevision: live.revision, card: edited });
         onSaved(value.warnings);
       }} />
-      : <Card card={live} openEvidence={openEvidence} collapseEvidence />
+      : <>
+        <Card card={live} openEvidence={openEvidence} collapseEvidence headless />
+        {!editable && <p className="muted card-readonly-note">此卡由参考库建库流程维护，在此只读。</p>}
+      </>
       : !error && <p className="inline-status"><span className="spinner" />正在读取</p>}
   </Modal>;
 }

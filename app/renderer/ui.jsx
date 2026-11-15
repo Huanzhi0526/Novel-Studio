@@ -15,9 +15,11 @@ const icons = {
   book: <><path d="M5 4.5h4.5c1.4 0 2.5.6 2.5 2v13c0-1.4-1.1-2-2.5-2H5z"/><path d="M19 4.5h-4.5c-1.4 0-2.5.6-2.5 2v13c0-1.4 1.1-2 2.5-2H19z"/></>,
   edit: <><path d="M4 20h4l11-11-4-4L4 16z"/><path d="m13 7 4 4m-1.5-6.5 1.3-1.3a1.6 1.6 0 0 1 2.3 0l1.7 1.7a1.6 1.6 0 0 1 0 2.3L19.5 8.5"/></>,
   library: <><path d="M5 4v16M10 4v16m4-15 5-1 3 15-5 1z"/></>,
-  settings: <><path d="M5 7h14M5 17h14"/><circle cx="9" cy="7" r="2.5" fill="var(--icon-fill, #fff)"/><circle cx="15" cy="17" r="2.5" fill="var(--icon-fill, #fff)"/></>,
+  settings: <><path d="M5 7h14M5 17h14"/><circle cx="9" cy="7" r="2.5" fill="var(--icon-fill, var(--panel))"/><circle cx="15" cy="17" r="2.5" fill="var(--icon-fill, var(--panel))"/></>,
   panel: <><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M14 5v14"/></>,
   search: <><circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 4 4"/></>,
+  chat: <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8A2.5 2.5 0 0 1 17.5 17H9l-5 3.5V6.5z"/>,
+  sparkPen: <><path d="M4 20h4l10-10-4-4L4 16z"/><path d="M18 3v4M16 5h4"/></>,
   send: <path d="M12 19V5m-5 5 5-5 5 5"/>,
   arrow: <path d="M7 17 17 7M8 7h9v9"/>,
   close: <path d="m7 7 10 10M17 7 7 17"/>,
@@ -51,17 +53,43 @@ export function Modal({ title, eyebrow, children, close, wide = false, className
   useEffect(() => {
     const previous = document.activeElement;
     pane.current?.focus();
-    return () => previous?.focus?.();
+    return () => {
+      if (previous?.isConnected) previous.focus?.({ preventScroll: true });
+    };
   }, []);
+  function handleKeyDown(event) {
+    if (event.key === 'Escape') {
+      if (event.nativeEvent?.isComposing || event.keyCode === 229) return;
+      event.stopPropagation();
+      close();
+      return;
+    }
+    if (event.key !== 'Tab' || !pane.current) return;
+    const focusables = [...pane.current.querySelectorAll(
+      'a[href], button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), summary, [tabindex]:not([tabindex="-1"])'
+    )].filter(el => el.getClientRects().length > 0 && !el.closest('[hidden], details:not([open]) > :not(summary)'));
+    if (!focusables.length) {
+      event.preventDefault();
+      pane.current.focus();
+      return;
+    }
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    const active = document.activeElement;
+    if (event.shiftKey) {
+      if (active === first || active === pane.current || !pane.current.contains(active)) {
+        event.preventDefault();
+        last.focus();
+      }
+    } else if (active === last || !pane.current.contains(active)) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
   return <div className="modal-shade">
     <section ref={pane} tabIndex={-1} aria-modal="true" aria-label={title} role="dialog"
       className={`modal ${wide ? 'modal-wide' : ''} ${className}`}
-      onKeyDown={event => {
-        if (event.key === 'Escape') {
-          event.stopPropagation();
-          close();
-        }
-      }}>
+      onKeyDown={handleKeyDown}>
       <header className="modal-head">
         <div>{eyebrow && <div className="eyebrow">{eyebrow}</div>}<h2>{title}</h2></div>
         <div className="button-row">
@@ -74,34 +102,80 @@ export function Modal({ title, eyebrow, children, close, wide = false, className
   </div>;
 }
 
-export function Card({ card, openCard, openEvidence, compact = false, collapseEvidence = false }) {
+export function ConfirmDialog({ open, title, message, confirmLabel = '确认', cancelLabel = '取消', danger = false, onConfirm, onCancel }) {
+  const dialog = useRef(null);
+  const cancelBtn = useRef(null);
+  useEffect(() => {
+    const node = dialog.current;
+    if (!open || !node) return;
+    const previous = document.activeElement;
+    if (!node.open) node.showModal();
+    cancelBtn.current?.focus({ preventScroll: true });
+    return () => {
+      if (node.open) node.close();
+      if (previous?.isConnected) previous.focus?.({ preventScroll: true });
+    };
+  }, [open]);
+  if (!open) return null;
+  return <dialog ref={dialog} className="modal confirm-dialog" aria-labelledby="confirm-dialog-title"
+    onCancel={event => {
+      event.preventDefault();
+      event.stopPropagation();
+      onCancel();
+    }}>
+    <header className="modal-head">
+      <h2 id="confirm-dialog-title">{title}</h2>
+      <button className="icon-button" type="button" onClick={onCancel} aria-label="关闭"><Icon name="close" /></button>
+    </header>
+    {message && <p className="confirm-dialog-message">{message}</p>}
+    <div className="button-row align-right confirm-dialog-actions">
+      <button ref={cancelBtn} type="button" onClick={onCancel}>{cancelLabel}</button>
+      <button type="button" className={danger ? 'danger-button' : 'primary'} onClick={onConfirm}>{confirmLabel}</button>
+    </div>
+  </dialog>;
+}
+
+export function PageHeader({ title, subtitle, actions, className = '' }) {
+  return <header className={`topbar page-header ${className}`.trim()}>
+    <div className="page-header-main">
+      <h1 className="topbar-title">{title}</h1>
+      {subtitle && <span className="page-header-subtitle">{subtitle}</span>}
+    </div>
+    {actions && <div className="page-header-actions">{actions}</div>}
+  </header>;
+}
+
+export function Card({ card, openCard, openEvidence, compact = false, collapseEvidence = false, headless = false }) {
   const evidence = openEvidence ? card.evidence.map((range, index) => <button key={index} type="button" className="evidence-link"
     onClick={() => openEvidence(card, range)}
     title={range.section && range.volume_title ? `${range.volume_title} · ${range.section}` : range.volume_title ?? '查看原文'}>
     <Icon name="arrow" size={13} />
     <span className="evidence-title">[{index + 1}] {range.section || range.volume_title || '查看原文'}</span>
-    {range.section && range.volume_title && <small>{range.volume_title}</small>}
   </button>) : [];
-  const links = openEvidence && <div className="evidence-links">
-    {compact ? evidence.slice(0, 2) : evidence}
-    {compact && evidence.length > 2 && <details className="evidence-more">
-      <summary>另有 {evidence.length - 2} 处原文证据</summary>
-      {evidence.slice(2)}
+  const visibleLimit = collapseEvidence ? 3 : compact ? 2 : Infinity;
+  const hiddenCount = Math.max(0, evidence.length - visibleLimit);
+  const links = openEvidence && evidence.length > 0 && <div className="evidence-links">
+    {evidence.slice(0, visibleLimit)}
+    {hiddenCount > 0 && <details className="evidence-more">
+      <summary>{collapseEvidence ? `另有 ${hiddenCount} 处` : `另有 ${hiddenCount} 处原文证据`}</summary>
+      {evidence.slice(visibleLimit)}
     </details>}
   </div>;
-  return <article className={`knowledge-card ${compact ? 'card-compact' : ''}`} data-category={card.category}>
+  return <article className={`knowledge-card ${compact ? 'card-compact' : ''} ${headless ? 'card-headless' : ''}`.trim()} data-category={card.category}>
     <div className="card-kicker">
       <span className="pill">{card.v2_badge ?? categories[card.category]}</span>
       {card.claim_type === 'interpretation' && <span className="pill amber">分析推断</span>}
-      {card.work_title && <span>{card.work_title}</span>}
+      {!headless && card.work_title && <span>{card.work_title}</span>}
     </div>
-    <h3>{openCard ? <button type="button" className="text-button" onClick={() => openCard(card)}>{card.title}</button> : card.title}</h3>
+    {!headless && <h3>{openCard ? <button type="button" className="text-button" onClick={() => openCard(card)}>{card.title}</button> : card.title}</h3>}
     <CardContent content={card.content} compact={compact} />
     {compact && openCard && card.content.length > 100 &&
-      <button className="text-button" type="button" onClick={() => openCard(card)}>查看完整卡片</button>}
-    {collapseEvidence && openEvidence ? <details className="card-evidence">
-      <summary>原文证据（{evidence.length}）</summary>
+      <div className="card-expand-row">
+        <button className="text-button card-expand-link" type="button" onClick={() => openCard(card)}>展开全文 →</button>
+      </div>}
+    {collapseEvidence && openEvidence && evidence.length > 0 ? <div className="card-evidence">
+      <div className="card-evidence-title">原文证据（{evidence.length}）</div>
       {links}
-    </details> : links}
+    </div> : links}
   </article>;
 }

@@ -8,14 +8,14 @@
 .topbar.reference-toolbar {
   flex: 0 0 auto;
   flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 6px 18px;
-  min-height: 64px;
-  padding: 10px var(--reference-gutter);
+  justify-content: space-between;
+  gap: 6px 16px;
+  min-height: 48px;
+  padding: 6px var(--reference-gutter);
 }
 
-.reference-toolbar h1 { font-size: 18px; white-space: nowrap; }
-.reference-toolbar .reference-import { margin-inline-start: auto; white-space: nowrap; }
+.reference-toolbar h1 { font-size: var(--fs-h2); white-space: nowrap; }
+.reference-toolbar .reference-import { white-space: nowrap; }
 .reference-page > .notice { margin: 8px var(--reference-gutter) 0; }
 
 .studio .reference-page > .conversation {
@@ -43,8 +43,8 @@
 .reference-page > .conversation .search-composer { margin: 8px var(--reference-inset) 18px; padding: 13px 15px 10px; border-radius: 12px; box-shadow: none; background: var(--panel); }
 .reference-page > .conversation .conversation-empty { max-width: 390px; padding: 30px 14px; }
 .reference-page > .conversation .empty-emblem { background: transparent; width: 42px; height: 42px; color: var(--muted); margin-bottom: 9px; }
-.reference-page > .conversation .conversation-empty h3 { font-size: 22px; margin-bottom: 8px; font-weight: 600; }
-.reference-page > .conversation .conversation-empty p { font-size: 12px; color: var(--muted); }
+.reference-page > .conversation .conversation-empty h3 { font-size: var(--fs-h1); margin-bottom: 8px; font-weight: 600; }
+.reference-page > .conversation .conversation-empty p { font-size: var(--fs-body); color: var(--muted); }
 
 .reference-shelf-scroll {
   flex: 1;
@@ -68,7 +68,7 @@
 }
 
 .reference-shelf-heading h2,
-.reference-work-heading h2 { font-size: 24px; }
+.reference-work-heading h2 { font-size: var(--fs-h1); }
 
 .reference-shelf-tools {
   display: flex;
@@ -127,11 +127,11 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  font-size: 13px;
+  font-size: var(--fs-ui);
   overflow-wrap: anywhere;
 }
 
-.reference-book-card > small { font-size: 11px; }
+.reference-book-card > small { font-size: var(--fs-meta); }
 .reference-book-card:focus-visible { outline-offset: 0; }
 
 .reference-shelf-back {
@@ -183,7 +183,7 @@
 .reference-volume-tile > div { display: grid; gap: 4px; padding-bottom: 3px; }
 .reference-volume-tile strong { overflow-wrap: anywhere; }
 .reference-volume-tile button { justify-content: space-between; min-height: 29px; padding: 5px 7px; }
-.reference-volume-archive { color: var(--muted); font-size: 12px; }
+.reference-volume-archive { color: var(--muted); font-size: var(--fs-meta); }
 .reference-volume-archive summary { padding: 4px 2px; cursor: pointer; }
 .reference-volume-archive button { width: 100%; margin: 4px 0 0; text-align: left; }
 

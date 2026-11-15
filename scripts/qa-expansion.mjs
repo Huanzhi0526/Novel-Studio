@@ -100,6 +100,14 @@ async function launch() {
 
 const editor = () => page.locator('.editor-manuscript .cm-content');
 const bookshelf = () => page.getByRole('region', { name: '我的作品' });
+async function reopenWorkAfterRestart(title) {
+  const workBtn = bookshelf().locator('.original-shelf-grid[aria-busy="false"]').getByRole('button', { name: title, exact: true });
+  await Promise.race([editor().waitFor(), workBtn.waitFor()]);
+  if (await workBtn.isVisible().catch(() => false)) {
+    await workBtn.click();
+    await editor().waitFor();
+  }
+}
 const expand = () => page.getByRole('button', { name: 'AI 扩写', exact: true });
 const dialog = () => page.getByRole('dialog', { name: 'AI 扩写', exact: true });
 const inlinePreview = () => page.locator('.expansion-inline-preview');
@@ -363,8 +371,7 @@ async function checkMock(chapterId) {
   await app.close();
   app = null;
   await launch();
-  await bookshelf().getByRole('button', { name: sample.work, exact: true }).click();
-  await editor().waitFor();
+  await reopenWorkAfterRestart(sample.work);
   assert.equal(await inlinePreview().count(), 0);
   assert.equal((await editorState()).text, draft);
   await expectSaved(chapterId, draft);
@@ -379,8 +386,7 @@ async function checkMock(chapterId) {
   await app.close();
   app = null;
   await launch();
-  await bookshelf().getByRole('button', { name: sample.work, exact: true }).click();
-  await editor().waitFor();
+  await reopenWorkAfterRestart(sample.work);
   assert.equal((await editorState()).text, replaced);
   await goto('资料与设置');
   const panel = preferences();

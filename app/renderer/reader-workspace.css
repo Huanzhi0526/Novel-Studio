@@ -42,8 +42,8 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.reader-breadcrumb h1 { font-size: 14px; }
-.reader-breadcrumb p { font-size: 11px; color: var(--muted); }
+.reader-breadcrumb h1 { font-size: var(--fs-body); }
+.reader-breadcrumb p { font-size: var(--fs-meta); color: var(--muted); }
 .reader-tools { position: relative; justify-self: end; display: flex; gap: 4px; }
 .reader-settings {
   position: absolute;
@@ -53,7 +53,7 @@
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--panel);
-  box-shadow: 0 10px 28px color-mix(in srgb, var(--ink) 14%, transparent);
+  box-shadow: var(--shadow);
   display: grid;
   gap: 9px;
 }
@@ -63,7 +63,7 @@
   gap: 7px;
   align-items: center;
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--fs-ui);
 }
 .reader-settings select { width: 100%; }
 
@@ -83,7 +83,7 @@
   overflow: auto;
   overscroll-behavior: contain;
 }
-.reader-toc h2 { padding: 0 9px 10px; font-size: 13px; color: var(--muted); }
+.reader-toc h2 { padding: 0 9px 10px; font-size: var(--fs-ui); color: var(--muted); }
 .reader-toc > p { padding: 0 9px; }
 .reader-workspace .reader-toc button {
   display: block;
@@ -118,7 +118,7 @@
   padding: 0 0 1.05em;
   border-bottom: 1px solid var(--border);
 }
-.reader-title p { margin-bottom: .35em; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.reader-title p { margin-bottom: .35em; color: var(--muted); font-size: var(--fs-ui); line-height: 1.5; }
 .reader-title h2 {
   font: 650 clamp(25px, 1.65em, 40px)/1.35 "Noto Serif SC", "Songti SC", SimSun, serif;
   overflow-wrap: anywhere;
@@ -145,7 +145,7 @@
   object-fit: contain;
   margin: 0 auto;
 }
-.reader-workspace .reader-block figcaption { margin-top: .5em; color: var(--muted); font-size: 12px; }
+.reader-workspace .reader-block figcaption { margin-top: .5em; color: var(--muted); font-size: var(--fs-meta); }
 .reader-workspace .reader-note { color: var(--muted); font-size: .9em; }
 .reader-note-link {
   min-height: 25px;
@@ -153,11 +153,11 @@
   border: 0;
   background: transparent;
   color: var(--link);
-  font-size: 12px;
+  font-size: var(--fs-meta);
 }
 .reader-note-link:hover { text-decoration: underline; }
-.reader-block summary { color: var(--link); font-size: 13px; cursor: pointer; }
-.reader-status { color: var(--muted); text-align: center; font-size: 13px; }
+.reader-block summary { color: var(--link); font-size: var(--fs-ui); cursor: pointer; }
+.reader-status { color: var(--muted); text-align: center; font-size: var(--fs-ui); }
 
 .reader-footer {
   display: grid;
@@ -176,7 +176,7 @@
 .reader-progress progress { flex: 1; min-width: 0; height: 5px; appearance: none; }
 .reader-progress progress::-webkit-progress-bar { border-radius: 5px; background: var(--border); }
 .reader-progress progress::-webkit-progress-value { border-radius: 5px; background: var(--accent); }
-.reader-progress small { min-width: 30px; text-align: right; font-variant-numeric: tabular-nums; font-size: 11px; }
+.reader-progress small { min-width: 30px; text-align: right; font-variant-numeric: tabular-nums; font-size: var(--fs-meta); }
 
 @media (max-width: 670px) {
   .reader-toolbar { grid-template-columns: auto minmax(0, 1fr) auto; gap: 5px; padding-inline: 8px; }

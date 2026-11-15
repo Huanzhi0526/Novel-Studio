@@ -113,8 +113,15 @@ function sideTool(name) {
 
 async function openFirstChapter() {
   await tab('原创写作');
-  await page.getByRole('region', { name: '我的作品' }).getByRole('button', { name: '中文写作验收', exact: true }).click();
-  await page.getByRole('heading', { name: '第一章', exact: true }).waitFor();
+  const firstHeading = page.getByRole('heading', { name: '第一章', exact: true });
+  const workButton = page.getByRole('region', { name: '我的作品' })
+    .locator('.original-shelf-grid[aria-busy="false"]')
+    .getByRole('button', { name: '中文写作验收', exact: true });
+  await Promise.race([firstHeading.waitFor(), workButton.waitFor()]);
+  if (await workButton.isVisible().catch(() => false)) {
+    await workButton.click();
+    await firstHeading.waitFor();
+  }
   await page.locator('.cm-content').waitFor();
 }
 
@@ -235,13 +242,13 @@ try {
   await editor.press('Delete');
   await page.locator('.mark-list .invalid').waitFor();
   assert.equal(dbValue('SELECT invalid FROM original_marks').invalid, 1);
-  await page.getByTitle('更多编辑操作').click();
+  await page.getByLabel('更多', { exact: true }).click();
   await page.getByRole('button', { name: '导出本章', exact: true }).click();
   await eventually(() => dbValue("SELECT body FROM original_docs WHERE kind='chapter'").body, '雨夜密门🙂绛星原稿隔离探针');
   await delay(300);
   assert.equal(await readFile(exportPath, 'utf8'), '雨夜密门🙂绛星原稿隔离探针');
   record('标记范围随插入移动，删字后标失效，TXT 导出一致');
-  await page.getByTitle('更多作品操作').click();
+  await page.getByLabel('更多', { exact: true }).click();
   await page.getByRole('button', { name: '导入 TXT', exact: true }).click();
   await page.locator('.doc-title').filter({ hasText: 'sample' }).waitFor();
   const importedRow = page.locator('.doc-title').filter({ hasText: 'sample' }).locator('..');
@@ -342,7 +349,7 @@ try {
   await sidebar.getByText('燈塔', { exact: true }).waitFor();
   await query.fill('绛星原稿隔离探针');
   await query.press('Enter');
-  await sidebar.getByText('没有找到匹配的知识卡。', { exact: true }).waitFor();
+  await sidebar.getByText('没有找到匹配的参考条目。', { exact: true }).waitFor();
   record('参考工具与资料互斥、切换与收起保留会话、真实命中、原创隔离、版本证据、图片和注释');
 
   await tab('资料与设置');

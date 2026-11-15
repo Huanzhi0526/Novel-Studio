@@ -41,9 +41,9 @@ try {
     await dialog.getByRole('button', { name: '编辑', exact: true }).waitFor();
     assert.equal(await dialog.locator('textarea,input,select').count(), 0);
     assert.equal(await dialog.locator('.knowledge-card p').count(), 1);
-    assert.equal(await dialog.locator('.evidence-link').first().isVisible(), false);
+    await dialog.locator('.evidence-link').first().waitFor({ state: 'visible' });
+    assert.equal(await dialog.locator('.evidence-link').first().isVisible(), true);
     await page.screenshot({ path: join(folder, 'read-wide.png') });
-    await dialog.getByText(/^原文证据/).click();
     await dialog.locator('.evidence-link').first().click();
     await page.locator('[data-highlighted=yes]').first().waitFor();
     await page.getByRole('button', { name: '返回', exact: true }).click();

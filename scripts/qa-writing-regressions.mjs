@@ -128,7 +128,7 @@ try {
   await hold('writing.save');
   await editor.press('Control+End');
   await page.keyboard.insertText('，暂存后整书导出');
-  await page.getByTitle('更多作品操作').click();
+  await page.getByLabel('更多', { exact: true }).click();
   await waiting();
   const workId = dbRow('SELECT id FROM original_works').id;
   const direct = await page.evaluate(id => window.studio.invoke('writing.exportTxt', { workId: id }), workId);

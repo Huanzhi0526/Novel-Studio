@@ -24,7 +24,7 @@ function entries(value) {
 }
 
 function normalizeSession(value) {
-  const { recent, positions, collapsed } = value ?? {};
+  const { recent, positions, collapsed, layout } = value ?? {};
   return {
     recent: validId(recent?.workId) && validId(recent?.docId) ? { workId: recent.workId, docId: recent.docId } : null,
     positions: Object.fromEntries(entries(positions).flatMap(([id, value]) => {
@@ -35,7 +35,10 @@ function normalizeSession(value) {
       if (!validId(id) || !Array.isArray(value)) return [];
       const volumes = [...new Set(value.filter(validId))].slice(-maxVolumesPerWork);
       return volumes.length ? [[id, volumes]] : [];
-    }).slice(-maxWorks))
+    }).slice(-maxWorks)),
+    layout: {
+      railCollapsed: layout?.railCollapsed === true
+    }
   };
 }
 

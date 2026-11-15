@@ -1,100 +1,28 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { api } from './ui.jsx';
+import {
+  appearances,
+  fonts,
+  loadPreferences,
+  normalizePreferences,
+  papers,
+  readerSizes,
+  rulings,
+  savePreferences,
+  themes,
+  writingDefaults,
+  writingSurface,
+  writingWidths
+} from './preferences-model.mjs';
 import './expansion-preferences.css';
 
-const storageKey = 'studio.preferences.v1';
-const themes = [
-  ['ink', '墨灰', '#25262b'],
-  ['indigo', '青黛', '#37538d'],
-  ['jade', '松绿', '#2d6658'],
-  ['rose', '烟紫', '#874965'],
-  ['amber', '琥珀', '#794d2a']
-];
-const papers = [
-  ['white', '白纸', '#ffffff'],
-  ['warm', '米纸', '#f8f2e5'],
-  ['green', '护眼', '#eaf2e7'],
-  ['dark', '夜写', '#252933']
-];
-const rulings = [
-  ['none', '空白'],
-  ['lines', '横线'],
-  ['grid', '方格']
-];
-const fonts = [
-  ['system', '系统黑体', '"Segoe UI Variable", "Microsoft YaHei UI", sans-serif'],
-  ['serif', '宋体', 'SimSun, "Microsoft YaHei", serif'],
-  ['mono', '等宽', 'Consolas, "Microsoft YaHei UI", monospace']
-];
-const readerSizes = [16, 18, 20, 22, 24];
-const writingWidths = [
-  ['window', '跟随窗口'],
-  ['limit', '限制宽度']
-];
-const writingDefaults = {
-  paper: 'white', ruling: 'none', font: 'system', fontSize: 16, lineHeight: 1.95, width: 680, widthMode: 'window', indent: false
+export {
+  loadPreferences,
+  normalizePreferences,
+  savePreferences,
+  writingDefaults,
+  writingSurface
 };
-const defaults = { ...writingDefaults, theme: 'ink', readerSize: 18 };
-
-function listed(value, entries, fallback) {
-  return entries.some(([id]) => id === value) ? value : fallback;
-}
-
-function bounded(value, fallback, min, max) {
-  return Number.isFinite(value) && value >= min && value <= max ? value : fallback;
-}
-
-export function normalizePreferences(values = {}) {
-  const prefs = values ?? {};
-  const width = bounded(prefs.width, defaults.width, 560, 1040);
-  return {
-    theme: listed(prefs.theme, themes, defaults.theme),
-    paper: listed(prefs.paper, papers, defaults.paper),
-    ruling: listed(prefs.ruling, rulings, defaults.ruling),
-    font: listed(prefs.font, fonts, defaults.font),
-    fontSize: bounded(prefs.fontSize, defaults.fontSize, 14, 28),
-    lineHeight: bounded(prefs.lineHeight, defaults.lineHeight, 1.5, 2.3),
-    width,
-    widthMode: listed(prefs.widthMode, writingWidths, width === defaults.width ? defaults.widthMode : 'limit'),
-    indent: prefs.indent === true,
-    readerSize: readerSizes.includes(prefs.readerSize) ? prefs.readerSize : defaults.readerSize
-  };
-}
-
-export function loadPreferences() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(storageKey)) ?? {};
-    const legacyReaderSize = Number(localStorage.getItem('reader-size'));
-    return normalizePreferences({ readerSize: legacyReaderSize, ...saved });
-  } catch {
-    return { ...defaults };
-  }
-}
-
-export function savePreferences(preferences) {
-  try {
-    localStorage.setItem(storageKey, JSON.stringify(preferences));
-  } catch (error) {
-    console.warn('保存写作偏好失败', error);
-  }
-}
-
-export function writingSurface(preferences) {
-  const { paper, ruling, font, fontSize, lineHeight, width, widthMode, indent } = preferences;
-  return {
-    'data-writing-paper': paper,
-    'data-writing-ruling': ruling,
-    'data-writing-indent': String(indent),
-    style: {
-      '--writing-font-family': fonts.find(([id]) => id === font)?.[2] ?? fonts[0][2],
-      '--writing-font-size': `${fontSize}px`,
-      '--writing-line-height': lineHeight,
-      '--writing-line-step': `${fontSize * lineHeight}px`,
-      '--writing-width': widthMode === 'limit' ? `${width}px` : '100%',
-      '--writing-indent': indent ? '2em' : '0em'
-    }
-  };
-}
 
 function Swatches({ label, options, value, onChange }) {
   return <fieldset className="preference-field">
@@ -116,7 +44,11 @@ function Slider({ label, value, display, min, max, step, onChange }) {
 }
 
 export function AppearancePreferences({ preferences, update }) {
-  return <Swatches label="主题色" options={themes} value={preferences.theme} onChange={theme => update({ theme })} />;
+  return <div className="writing-preferences">
+    <Swatches label="界面明暗" options={appearances} value={preferences.appearance} onChange={appearance => update({ appearance })} />
+    <Swatches label="主题色" options={themes} value={preferences.theme} onChange={theme => update({ theme })} />
+    <p className="muted preference-note">写作纸张在「写作偏好」中单独设置；夜间写作可搭配「夜写」纸张。</p>
+  </div>;
 }
 
 export function ReaderSizePreference({ preferences, update }) {
@@ -160,7 +92,7 @@ function expansionKeyStatus(hasKey, { addressChanged, apiKey, removeKey, reuseKe
   return ['未保存', '服务需要鉴权时，请填写 Key 并保存配置。'];
 }
 
-export function ExpansionPreferences({ purpose = 'expand' }) {
+export function ExpansionPreferences({ purpose = 'expand', kbV2 = false, collapsible = false, onConfigChange = null }) {
   const title = purpose === 'retrieval' ? 'AI 辅助检索' : 'AI 扩写';
   const sectionId = purpose === 'retrieval' ? 'retrieval-settings' : 'expansion-settings';
   const [saved, setSaved] = useState(null);
@@ -178,6 +110,7 @@ export function ExpansionPreferences({ purpose = 'expand' }) {
     api(`${purpose}.config.get`).then(config => {
       if (!mounted) return;
       setSaved(config);
+      onConfigChange?.(config);
       setFields(expansionFields(config));
       setStatus('idle');
     }).catch(error => {
@@ -208,6 +141,7 @@ export function ExpansionPreferences({ purpose = 'expand' }) {
     try {
       const config = await api(`${purpose}.config.${action}`, values);
       setSaved(config);
+      onConfigChange?.(config);
       setFields(expansionFields(config));
       setAdding(false);
       setConfirmRemove(false);
@@ -302,10 +236,11 @@ export function ExpansionPreferences({ purpose = 'expand' }) {
     <span>{notice.message}</span>
     {notice.detail && <span className="expansion-preferences-feedback-detail">{notice.detail}</span>}
   </p>;
-  return <section className="settings-preferences expansion-preferences" aria-labelledby={sectionId}>
-    <h2 id={sectionId}>{title}</h2>
+  const body = <>
     <p className="expansion-preferences-description">{purpose === 'retrieval'
-      ? '用外部模型理解问题并筛选知识卡。启用「外部 AI 辅助」时，会发送问题和候选卡摘录，结果可回到原文核对。'
+      ? (kbV2
+        ? '用外部模型理解问题并筛选参考条目。选择「AI 快速」或「AI 深度翻书」时，会发送问题、候选摘录及深度核证所需的参考原文，结果可回到原文核对。'
+        : '用外部模型理解问题并筛选知识卡。启用「外部 AI 辅助」时，会发送问题和候选卡摘录，结果可回到原文核对。')
       : '根据选中的提示补写正文。请求会包含当前章所需片段，可选择附上本书的大纲、角色和设定。'}</p>
     {!saved && feedback}
     {!saved && (busy
@@ -412,6 +347,21 @@ export function ExpansionPreferences({ purpose = 'expand' }) {
         ? <div className="inline-status" role="status"><span className="spinner" />{expansionProgress[status]}</div>
         : <small>{changed ? '保存或取消修改后，可以测试连接或切换配置。' : '连接测试只发送固定测试句。'}</small>}
     </form>}
+  </>;
+  if (collapsible) {
+    return <section className="settings-preferences settings-subcard expansion-preferences is-collapsible" aria-label={title}>
+      <h2 className="sr-only" aria-label={title}>{title}</h2>
+      <details className="settings-api-details">
+        <summary className="settings-api-summary">
+          <span>兼容 API 配置（{configured ? '已配置' : '未配置'}）</span>
+        </summary>
+        <div className="settings-api-details-body">{body}</div>
+      </details>
+    </section>;
+  }
+  return <section className="settings-preferences settings-subcard expansion-preferences" aria-label={title}>
+    <h2 aria-label={title}>兼容 API 配置</h2>
+    {body}
   </section>;
 }
 

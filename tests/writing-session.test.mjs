@@ -29,7 +29,8 @@ test('writing session persists only resume metadata and clears after a library r
   assert.deepEqual(reloaded, {
     recent: { workId: 'work-1', docId: 'doc-1' },
     positions: { 'doc-1': position },
-    collapsed: { 'work-1': ['volume-1'] }
+    collapsed: { 'work-1': ['volume-1'] },
+    layout: { railCollapsed: false }
   });
   assert.deepEqual(matchingPosition(reloaded, 'doc-1', 2, 15), position);
   assert.equal(matchingPosition(reloaded, 'doc-1', 2, 14), null);
@@ -52,7 +53,7 @@ test('writing session ignores corrupt storage and invalid entries', () => {
     collapsed: { 'work-1': [null, ' ', 'volume-1', 'volume-1'], invalid: {} }
   }));
   assert.deepEqual(readWritingSession(storage), {
-    recent: null, positions: { valid: position }, collapsed: { 'work-1': ['volume-1'] }
+    recent: null, positions: { valid: position }, collapsed: { 'work-1': ['volume-1'] }, layout: { railCollapsed: false }
   });
 
   const unavailable = () => { throw new Error('Storage unavailable'); };
@@ -76,4 +77,19 @@ test('writing session evicts the oldest positions and collapsed volume entries',
   for (let i = 1; i <= 20; i++) state = toggleCollapsedVolume(state, `work-${i}`, 'volume-1');
   assert.equal(Object.keys(state.collapsed).length, 20);
   assert.equal(state.collapsed['work-0'], undefined);
+});
+
+test('writing session persists layout railCollapsed boolean and resets invalid layout values', () => {
+  const storage = memoryStorage();
+  const base = readWritingSession(storage);
+  assert.deepEqual(base.layout, { railCollapsed: false });
+
+  writeWritingSession({ ...base, layout: { railCollapsed: true } }, storage);
+  assert.deepEqual(readWritingSession(storage).layout, { railCollapsed: true });
+
+  storage.setItem('', JSON.stringify({ layout: { railCollapsed: 'yes' } }));
+  assert.deepEqual(readWritingSession(storage).layout, { railCollapsed: false });
+
+  storage.setItem('', JSON.stringify({ layout: 'corrupt' }));
+  assert.deepEqual(readWritingSession(storage).layout, { railCollapsed: false });
 });
