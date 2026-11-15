@@ -2,7 +2,16 @@
 
 工作区 `D:\Vibe Coding\Novel Studio`。2026-11-12初始化本地Git，0.1.19基线371be17保留；2026-11-13已合并至main并正式升级0.2.0。此前无Git仓库的记录属于历史。本文记录当前状态，早期施工及逐轮验收保存在 [项目历史](docs/project-history.md)。
 
-## 2026-11-15：Claude方案 / Gemini前端成果已独立审查合并（未发布）
+## 0.2.8 已上线：前端体验改版（2026-11-15）
+
+- 用户在审查合并后明确要求升级试用。main合并基线09663c3，package.json和package-lock.json同步升0.2.8；Claude方案、Gemini实现及Codex三项补修随本版发布。当前源码/锁文件/正式安装resources/app/package.json均0.2.8，EXE文件版本不作为应用版本证据。
+- 升级前正常退出，完整复制正式资料和旧程序至.local/ux-release-028/before-formal-20261115，261文件（资料171、程序90）逐一SHA256核对。随后隔离安装0.2.8，实际运行qa-installed-smoke、qa-assistant-experience、qa-writing-regressions通过；安装版侧栏截图已目视自查。qa-assistant-responsiveness使用备份参考库、合成向量/查询和本机模拟检索AI通过，返回1卡、AI模拟调用2次，20次IPC最慢63.55ms，无外部模型请求。
+- 实际发布命令：NOVEL_STUDIO_MAKENSIS指向.local/nsis-official/nsis-3.13/makensis.exe后运行npm run package:windows；安装器/S /NOSHORTCUT /D=隔离目录；上述QA均显式传入隔离EXE；正式升级显式LOCALAPPDATA=C:\Users\78828\AppData\Local，pwsh -NoProfile -File scripts/upgrade-windows.ps1 -Version 0.2.8 -IsolatedInstall .local/ux-release-028/install -RecordFile .local/ux-release-028/upgrade-receipt.json -GracefulClose。正式程序与隔离安装主要文件摘要一致，桌面小说工作台快捷方式目标独立启动通过。
+- 正式既有171个资料文件全部摘要不变（含原创/参考库/配置/聊天/记忆）。证据.local/ux-release-028/{package.log,smoke.log,experience.log,writing.log,responsiveness.log,upgrade.log,upgrade-receipt.json,formal-verification.json}；安装版截图.local/assistant-027/experience-1794724573945，写作回归.local/writing-regressions-mYTtT8。
+- 交付release/NovelStudio-0.2.8-x64-Setup.exe、NovelStudio-0.2.8-source.zip、NovelStudio-0.2.8-SHA256.txt；完成文档后npm run package:source，校验ZIP完整性、版本与当前源码/文档字节一致。源码打包补入根目录两份前端专项文档，避免交接链接缺失。旧发布件、模型与原文保持不动。
+- 先前main构建和113项单测及前端独立审查仍有效，见下方历史记录；本轮无功能代码新增，不重复外部真实生成。已知非阻断项：深色冷启动可能短暂闪白。当前无升级阻塞，下一步由用户试用并反馈；不启动后台任务。
+
+## 历史：Claude方案 / Gemini前端成果独立审查合并（发布前快照）
 
 - 用户明确由Claude审查出方案、Gemini实施，本轮授权Codex审查并合并。交付分支feat/claude-frontend-ux，Gemini HEAD254a23f，基线main76e6f98，16个原始提交保留；Codex补修c77a24c。main通过--no-ff合并，实际合并提交b28bcdc；合并后在main重新构建与113项单测通过，代码与已验收分支完全一致。
 - 主要成果：全站语义字号/色彩令牌、独立深色与跟随系统、折叠侧栏、稳定工具栏/溢出菜单、历史正文预览、Markdown资料预览、v2卡只读呈现、助手专用记忆面板与应用内确认、闲置不轮询/忙碌可草拟、默认本地检索与跨页保留状态、重启回到最近作品。Enter发送/Shift+Enter换行、IME保护，旧Ctrl+Enter兼容。已有写作宽度偏好保留，新用户默认限制宽度。

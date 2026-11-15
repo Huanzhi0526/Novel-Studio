@@ -582,3 +582,8 @@ Codex接手时先检查你填写的记录与实际diff，独立重跑对应检�
 
 
 合并落地核验：main合并提交 `b28bcdc`。合并后在主工作区再次执行 `npm run build`、`npm test`（113/113），并通过 `git diff --exit-code feat/claude-frontend-ux -- app scripts tests package.json package-lock.json` 确认代码一致。日志 `.local/ux-merge-review/main-build.txt`、`main-tests.txt`。正式程序未升级。
+
+
+## 11. 0.2.8正式发布（2026-11-15）
+
+用户随后授权升级试用；已完成完整备份261文件、隔离安装启动/助手界面/写作回归/检索响应检查与正式升级。171个既有资料文件摘要全部未变，快捷方式目标单独启动通过。当前源码/锁文件/正式安装0.2.8；详见HANDOFF顶部与.local/ux-release-028。第10节“未发布”是此前阶段快照，现已接续完成。深色首帧闪白仍为非阻断已知项。

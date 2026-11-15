@@ -937,3 +937,13 @@ Automations工具已成功删除novel-studio，deleteStatus=deleted，不再自�
 - 本轮仅审查并合并代码，不改版本号、不重打release、不升级正式程序。源码package版本仍0.2.7但包含未发布前端；正式安装0.2.7仍为此前界面。后续发布须另做版本/打包/安装版检查与备份升级。
 - 已知非阻断项：深色冷启动首帧可能闪白（主进程backgroundColor未改）；失效标记仍不支持删除撤销；有效标记删除后若正文变动则明确拒绝旧位置恢复。
 - 合并方式：保留Gemini提交历史和Codex补修，main使用--no-ff合并feat/claude-frontend-ux；实际合并提交见git log。开发/测试进程已结束，不恢复后台任务或外部派工。
+
+
+## 0.2.8 已上线：前端体验改版（2026-11-15）
+
+- 用户在审查合并后明确要求升级试用。main合并基线09663c3，package.json和package-lock.json同步升0.2.8；Claude方案、Gemini实现及Codex三项补修随本版发布。当前源码/锁文件/正式安装resources/app/package.json均0.2.8，EXE文件版本不作为应用版本证据。
+- 升级前正常退出，完整复制正式资料和旧程序至.local/ux-release-028/before-formal-20261115，261文件（资料171、程序90）逐一SHA256核对。随后隔离安装0.2.8，实际运行qa-installed-smoke、qa-assistant-experience、qa-writing-regressions通过；安装版侧栏截图已目视自查。qa-assistant-responsiveness使用备份参考库、合成向量/查询和本机模拟检索AI通过，返回1卡、AI模拟调用2次，20次IPC最慢63.55ms，无外部模型请求。
+- 实际发布命令：NOVEL_STUDIO_MAKENSIS指向.local/nsis-official/nsis-3.13/makensis.exe后运行npm run package:windows；安装器/S /NOSHORTCUT /D=隔离目录；上述QA均显式传入隔离EXE；正式升级显式LOCALAPPDATA=C:\Users\78828\AppData\Local，pwsh -NoProfile -File scripts/upgrade-windows.ps1 -Version 0.2.8 -IsolatedInstall .local/ux-release-028/install -RecordFile .local/ux-release-028/upgrade-receipt.json -GracefulClose。正式程序与隔离安装主要文件摘要一致，桌面小说工作台快捷方式目标独立启动通过。
+- 正式既有171个资料文件全部摘要不变（含原创/参考库/配置/聊天/记忆）。证据.local/ux-release-028/{package.log,smoke.log,experience.log,writing.log,responsiveness.log,upgrade.log,upgrade-receipt.json,formal-verification.json}；安装版截图.local/assistant-027/experience-1794724573945，写作回归.local/writing-regressions-mYTtT8。
+- 交付release/NovelStudio-0.2.8-x64-Setup.exe、NovelStudio-0.2.8-source.zip、NovelStudio-0.2.8-SHA256.txt；完成文档后npm run package:source，校验ZIP完整性、版本与当前源码/文档字节一致。源码打包补入根目录两份前端专项文档，避免交接链接缺失。旧发布件、模型与原文保持不动。
+- 先前main构建和113项单测及前端独立审查仍有效，见下方历史记录；本轮无功能代码新增，不重复外部真实生成。已知非阻断项：深色冷启动可能短暂闪白。当前无升级阻塞，下一步由用户试用并反馈；不启动后台任务。
