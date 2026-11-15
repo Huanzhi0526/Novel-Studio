@@ -137,5 +137,8 @@ test('model discovery queues behind conflicting session startup and queued cance
  const {startupLane}=await import('../app/kb-v2/operation.mjs');let release,calls=0;
  const blocker=startupLane.run(()=>new Promise(resolve=>release=resolve));while(!release)await new Promise(resolve=>setImmediate(resolve));
  const {provider}=setup(t,{run:(_exe,_args,_options,done)=>{calls++;done(null,catalogue);}}),controller=new AbortController();
- const job=provider.listModels(undefined,{signal:controller.signal}),assertion=assert.rejects(job,{name:'AbortError'});controller.abort();await assertion;release();await blocker;await startupLane.tail.catch(()=>{});await provider.discovery?.catch(()=>{});assert.equal(calls,0);
+ const job=provider.listModels(undefined,{signal:controller.signal}),assertion=assert.rejects(job,{name:'AbortError'});
+ try{for(let i=0;i<200&&startupLane.size<2;i++)await new Promise(resolve=>setTimeout(resolve,5));assert.equal(startupLane.size,2);controller.abort();await assertion;}
+ finally{controller.abort();release();await blocker;await startupLane.tail.catch(()=>{});await provider.discovery?.catch(()=>{});}
+ assert.equal(calls,0);
 });
