@@ -920,3 +920,20 @@ Automations工具已成功删除novel-studio，deleteStatus=deleted，不再自�
 - `node scripts/qa-assistant-experience.mjs <隔离EXE>`通过：长中文Markdown、标题/段落/列表/引用排版、主视图/写作右侧/窄窗截图、关闭重开和两入口草稿保留，无pageerror。最终截图.local/assistant-027/experience-1794681847262。视觉为自查，brief见assistant-ui-brief.md。隐藏窗口普通截图超时/旧帧未当作通过，采用既有原生刷新捕获后检查。
 - `npm run package:windows`、隔离NSIS安装、`qa-installed-smoke.mjs <EXE> 0.2.7`、`qa-assistant.mjs <EXE>`及上述experience通过。`qa-assistant-responsiveness.mjs <EXE> <正式参考库只读路径>`：本机模拟AI两次规划/筛选，1卡，20次IPC最慢55.54ms且页面可切换；无正文外传。
 - 全资料+旧程序备份261文件摘要通过；`upgrade-windows.ps1 -Version 0.2.7 -IsolatedInstall .local/assistant-027/install -RecordFile .local/assistant-027/upgrade-receipt.json -GracefulClose`（显式真实LOCALAPPDATA）成功。快捷方式目标启动与171个既有资料文件摘要核验通过；原稿、参考库、配置、聊天、记忆未变。安装器、源码ZIP及SHA清单在release/下单独发布。
+
+
+## 2026-11-15：Claude方案/Gemini前端成果独立合并验收（源码未发布）
+
+
+角色澄清：Claude负责审查与方案，Gemini完成B0～B11实现；本节为Codex实际独立验收，不把交付方报告当作独立通过。Gemini交付HEAD为254a23f，基线main为76e6f98；原交付16个提交保留，Codex补修单独提交c77a24c。
+
+- 差异核对：原交付44文件，集中renderer、共享纯函数、测试及文档；无app/main、app/kb-v2、依赖版本、数据库、IPC、CLI调度、权限修改。补修同样没有后端改动。
+- 补修1：refreshState的epoch比较由>=改为严格相等；reset返回也检查书籍与请求代次，避免旧异步返回覆盖新状态。
+- 补修2：MessageList缓存不再只比较条数和末条，而比较全部消息；已实测两书条数/末句相同但前文不同时能正确切换，避免上一本书内容残留。
+- 补修3：删除标记保存正文快照；5秒内若正文已变，不把旧偏移重新标到新内容，明确提示重新选择；新删除清理旧撤销条。
+- 独立验证：构建通过；修正前后npm test均113/113通过；qa-writing-workflow、qa-writing-regressions、qa-workspace-ui、qa-assistant-experience、qa-expansion、qa-retrieval、qa-card-viewer、qa-card-markdown、qa-desktop共9项通过；qa-agy-model-settings及qa-agy-expansion-settings（无--real-test）2项通过，动态15模型及隔离API配置字节保护通过。
+- 新增scripts/qa-ux-merge-review.mjs：旧响应晚到、同末句两书消息、正文变化后撤销标记的实际交互保护均通过，并检查深色窄窗无横向溢出。报告/截图在本worktree的.local/ux-acceptance-1794719901348。独立助手侧栏截图在.local/assistant-027/experience-1794719638119。视觉自查通过，不冒充全主题WCAG独立认证。
+- 汇总日志位于原项目根.local/ux-merge-review。所有写入为隔离合成资料；未外发原稿或真实小说，未运行真实生成。单次真实CLI长任务、全库性能、安装器/安装版、全部主题对比度矩阵本轮独立NOT_RUN；后端未改，不重跑原模型验收。
+- 本轮仅审查并合并代码，不改版本号、不重打release、不升级正式程序。源码package版本仍0.2.7但包含未发布前端；正式安装0.2.7仍为此前界面。后续发布须另做版本/打包/安装版检查与备份升级。
+- 已知非阻断项：深色冷启动首帧可能闪白（主进程backgroundColor未改）；失效标记仍不支持删除撤销；有效标记删除后若正文变动则明确拒绝旧位置恢复。
+- 合并方式：保留Gemini提交历史和Codex补修，main使用--no-ff合并feat/claude-frontend-ux；实际合并提交见git log。开发/测试进程已结束，不恢复后台任务或外部派工。
