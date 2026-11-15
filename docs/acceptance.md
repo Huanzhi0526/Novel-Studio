@@ -981,3 +981,11 @@ Automations工具已成功删除novel-studio，deleteStatus=deleted，不再自�
 - 最终候选安装于.local/stability-20261115/install，/NOSHORTCUT未改正式快捷方式。smoke、阅读、助手体验、侧栏、写作回归、扩写、旧检索通过。亮暗各32次导航/118帧、200条聊天及长章修改重启通过，P95有效反馈35.9/43.6ms、无采样整窗白帧；frames-E23xiW。MCP和备份末次补修后worker字节一致，主进程/worker/renderer独立重bundle与最终安装完全一致；最终维护handler双库导出/恢复、助手文件保留及新查询通过maintenance-imur5i。
 - 实际账号合成冷/热六项通过：检索Flash Medium7.149/2.734秒、扩写Hydrogen Medium7.240/2.801秒、助手Flash Medium含领取34.024/22.505秒，助手明确保留无向量时关键词降级，结果各2条。只新造合成书/固定句，未发真实小说/私人聊天；不承诺上游持续稳定。证据real-KcwdiK/report.json。
 - 安装器/源码ZIP/SHA清单在release/0.2.11；源码228项CRC/版本/文件集合及逐文件字节核验通过，SHA清单与产物一致；回执.local/stability-20261115/source-package-verification.json。正式备份/升级NOT_RUN，既有资料不在本轮重盘/覆盖验收范围。全部早期脚本失败和纠正记录保留，详见[实施与验收](audits/20261115/实施与验收记录.md)。
+
+
+## 2026-11-15：0.2.11正式升级与用户体验启动
+
+- 用户在候选全部验收后明确授权正式升级。开始时正式应用未运行，完整备份资料172文件+0.2.10旧程序90文件，约5.04GB，逐文件SHA256及源文件稳定性核验通过。备份.local/stability-20261115/before-formal-20261115-34c34c4a；这是升级时点快照，不可恢复覆盖后续新稿。
+- 显式LOCALAPPDATA=C:\Users\78828\AppData\Local运行upgrade-windows.ps1 -Version 0.2.11 -IsolatedInstall .local/stability-20261115/install -RecordFile .local/stability-20261115/formal-upgrade/upgrade-receipt.json -GracefulClose，通过。安装器SHA 7801213d34adea7863d1a2feecab860f6e150850486db4c22640f66ce5f00f16，正式resources/app/package.json为0.2.11，91个程序/运行时/资源文件与隔离安装一致（不含卸载器）。
+- 正式目标EXE使用隔离资料的smoke通过；打开正式资料前，172个既有资料文件摘要与文件集合完全不变，覆盖原创/双库/配置/助手聊天记忆。快捷方式目标及空参数核验通过。从桌面快捷方式打开正式0.2.11，可见窗口响应正常，留给用户体验；之后正常应用写入不属于安装不变断言。
+- 证据.local/stability-20261115/formal-upgrade/{backup-receipt.json,upgrade.log,upgrade-receipt.json,formal-verification.json,opened-for-user.json}。main快进已验收分支，文档后重做源码ZIP/逐文件/SHA，安装器不重打；本阶段不重跑代码/外部模型，不外发正式内容，下一步等用户反馈。

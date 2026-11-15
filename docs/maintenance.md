@@ -1,6 +1,6 @@
 # 维护地图
 
-2026-11-15整理，正式0.2.10；稳定性源码候选0.2.11。当前版本、证据与待办以[HANDOFF](../HANDOFF.md)顶部为准；产品术语在[CONTEXT](../CONTEXT.md)，操作在[README](../README.md)，构建部署在[发布清单](release-checklist.md)。旧版流程与夜间日志已[原文归档](history/maintenance-20261115-整理前.md)，不是当前任务。
+2026-11-15整理，正式0.2.11，已按用户后续授权从0.2.10升级。当前版本、证据与待办以[HANDOFF](../HANDOFF.md)顶部为准；产品术语在[CONTEXT](../CONTEXT.md)，操作在[README](../README.md)，构建部署在[发布清单](release-checklist.md)。旧版流程与夜间日志已[原文归档](history/maintenance-20261115-整理前.md)，不是当前任务。
 
 ## 代码入口
 
@@ -73,4 +73,4 @@ worker须单独打包ESM bundle并带createRequire banner；仅源代码单测�
 - 普通与助手查询均用AssistantSearch的有界队列（20项），worker保留24个分页状态；库/模型配置变动或线程退出使旧游标过期。不静默退回主线程全量扫描。备份维护窗口暂停新操作，abort后await检索/SQLite任务句柄退出再换库。应用退出也先完成持有资源的回收。
 - assistant-jobs.mjs分离本轮queued/running任务，入队前检查容量，book/turn/job同时约束领取。sourceVersion/messageVersion及partial尾部减少忙时轮询；单飞完成后再延迟1秒，闲置不轮询，活动视图处理重Markdown。
 - writing.checkpoint仅传id和expectedRevision，服务端建立原有历史边界；有脏稿仍走stage/save全文与版本/标记保护。主题首帧用appearance.js读取既有偏好，window-appearance.json只保存light/dark/system供原生窗口背景使用。
-- 复跑命令与真实范围见[本轮记录](audits/20261115/实施与验收记录.md)。正式0.2.10与源码候选0.2.11分开，未通过本轮升级正式应用。真实模型抽验只使用新造合成作品/固定句，不扩大旧正文外发许可。
+- 复跑命令与真实范围见[本轮记录](audits/20261115/实施与验收记录.md)。0.2.11候选验收后，用户已另行授权并完成正式升级；发布与安装前后保护证据见HANDOFF顶部。真实模型抽验只使用新造合成作品/固定句，不扩大旧正文外发许可。

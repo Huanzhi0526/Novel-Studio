@@ -3,7 +3,7 @@
 ## 接手入口与当前基线
 
 - 工作区`D:\Vibe Coding\Novel Studio`；先读[HANDOFF当前快照](HANDOFF.md)、[产品术语](CONTEXT.md)、[维护地图](docs/maintenance.md)、[发布清单](docs/release-checklist.md)及[最新验收](docs/acceptance.md)。接手提示词在[这里](docs/开发与运维接管提示词.md)。
-- 2026-11-15正式已发布0.2.10；稳定性优化源码候选0.2.11（本轮隔离验收，不代表正式升级），状态见HANDOFF顶部。0.2.10/main包含Claude方案、Gemini前端实现及Codex复核补修；候选开发期间源码/正式版本可不同，须分别记录。实际仍须核对package.json、package-lock.json、正式resources/app/package.json，快捷方式目标另记，不能用Electron EXE版本代替应用版本。
+- 2026-11-15正式已升级0.2.11，稳定性优化已验收并部署，源码/锁文件/正式应用一致；已验分支随发布快进至main，状态见HANDOFF顶部。包含此前Claude方案、Gemini实现及Codex复核补修；后续候选开发期间源码/正式版本若不同，须分别记录。实际仍须核对package.json、package-lock.json、正式resources/app/package.json，快捷方式目标另记，不能用Electron EXE版本代替应用版本。
 - 原创、参考检索、主动AI扩写、按书创作助手职责分开。正式参考为独立KB v2；旧九类卡/ZIP流程为兼容历史，不能套用到v2生产流程。历史书库统计和覆盖结论以HANDOFF注明的时点与检查范围为准。
 
 ## 数据与执行边界
