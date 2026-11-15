@@ -39,6 +39,7 @@ await build({
   legalComments: 'linked', logLevel: 'info'
 });
 await build({absWorkingDir:root,entryPoints:['app/main/assistant-search-worker.mjs'],outfile:join(app,'app/main/assistant-search-worker.mjs'),bundle:true,format:'esm',platform:'node',target:'node24',banner:{js:"import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);"}});
+await build({absWorkingDir:root,entryPoints:['app/main/sqlite-worker.mjs'],outfile:join(app,'app/main/sqlite-worker.mjs'),bundle:true,format:'esm',platform:'node',target:'node24',banner:{js:"import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);"}});
 await cp(join(root, 'app/main/preload.cjs'), join(app, 'app/main/preload.cjs'));
 await cp(join(root, 'dist'), join(app, 'dist'), { recursive: true });
 await cp(join(root, 'model'), join(app, 'model'), {

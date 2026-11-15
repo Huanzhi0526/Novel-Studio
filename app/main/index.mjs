@@ -1,3 +1,4 @@
+import { sqliteTasks } from './sqlite-tasks.mjs';
 import { AssistantSearch } from './assistant-search.mjs';
 import { AssistantService } from './assistant.mjs';
 import { app, BrowserWindow, dialog, ipcMain, Menu, nativeTheme, protocol, safeStorage, session, shell } from 'electron';
@@ -141,6 +142,7 @@ function register(writing, reference, imports, search, backup, expansion, retrie
     'list', 'searchWork', 'open', 'preview', 'createWork', 'createVolume', 'createDoc', 'rename', 'move',
     'stage', 'save', 'checkpoint', 'addMark', 'deleteMark', 'history', 'restoreHistory', 'trash', 'restore'
   ]);
+  handlers.set('writing.searchWork',(args,context)=>sqliteTasks.run({method:'writingSearch',filename:store.filename,args},context));
   expose('reference', reference, ['list', 'setHidden', 'getCard', 'listCards', 'editCard', 'read', 'asset']);
   expose('import', imports, ['preview', 'commit', 'cancel']);
   expose('search', search, ['prepare']);
@@ -219,8 +221,8 @@ function register(writing, reference, imports, search, backup, expansion, retrie
     if(restoring)fail('BACKUP_BUSY','资料维护正在进行');
     restoring=true;
     for(const request of requests.values())request.abort(cancellation());
-    try{await readSearch?.close();return await backup.export(filename);}
-    finally{restoring=false;}
+    try{await readSearch?.close();await sqliteTasks.close();sqliteTasks.blocked=false;return await backup.export(filename);}
+    finally{sqliteTasks.blocked=false;restoring=false;}
   });
   handlers.set('backup.restore', async () => {
     const filename = await chooseFile('工作台备份', ['zip']);
@@ -237,7 +239,7 @@ function register(writing, reference, imports, search, backup, expansion, retrie
     for (const request of requests.values()) request.abort(cancellation());
     try {
       await readSearch?.close();
-      
+      await sqliteTasks.close();sqliteTasks.blocked=false;
       return await backup.restore(filename);
     } finally {
       restoring = false;
@@ -320,6 +322,7 @@ async function launch() {
   if (useKbV2) {
     storeV2 = new ReferenceStoreV2(v2DbPath);
     const searchV2 = new SearchEngineV2(storeV2, embedding);
+    searchV2.readRows=(sql,params,signal)=>sqliteTasks.run({method:'rows',filename:storeV2.filename,sql,params},{signal});
     const retrievalConfigFile = join(dataDir, 'retrieval-api.json');
     agyClient = new AgyRetrievalProvider(dataDir);
     const retrievalV2 = new RetrievalEngineV2(searchV2, {
@@ -382,7 +385,7 @@ if (!app.requestSingleInstanceLock()) {
     if(drained)return;
     event.preventDefault();
     for(const request of requests.values())request.abort(cancellation());
-    void Promise.allSettled([embedding?.close(),agyClient?.close(),expansionProvider?.close(),assistantService?.close()]).then(()=>{
+    void Promise.allSettled([embedding?.close(),agyClient?.close(),expansionProvider?.close(),assistantService?.close(),sqliteTasks.close()]).then(()=>{
       storeV2?.close();store?.close();drained=true;app.quit();
     });
   });

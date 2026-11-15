@@ -121,3 +121,12 @@ npm run package:source
 ## 助手/检索阅读布局改动
 
 运行`node scripts/qa-readability.mjs $testedExe`验证长/短表、短卡网格、全文入口、细滚动条和深色窄窗；采用合成资料、无外部模型请求。此脚本使用showInactive的可见窗口，以实际触发布局测量。`qa-assistant-experience.mjs`继续验证发送快捷键/草稿/记忆；`qa-assistant-layout.mjs`验证拖动与宽度记忆。全文Markdown和证据由`qa-card-markdown.mjs`、`qa-card-viewer.mjs`、`qa-retrieval.mjs`覆盖，别用短预览替代详情验收。
+
+## 0.2.11稳定性候选补充
+
+- 正式版本0.2.10与源码/隔离候选0.2.11分开记录。本轮实现/隔离打包授权不等于正式升级；正式处理仍按本清单备份、资料摘要保护和当次授权执行。
+- 安装包必须同时包含assistant-search-worker.mjs和sqlite-worker.mjs，ESM bundle带createRequire banner。用真实UI发起普通查询和助手任务，不能只直接new Worker冒充普通入口验收。
+- node scripts/qa-stability.mjs <隔离EXE>：约2GB合成库，三入口真实handler、50ms轻量IPC、切页、取消、保存及重启；不访问账号。pointerdown到取消状态与Playwright自动滚动耗时分别记录。NOVEL_STUDIO_QA_LONG=1加185秒延迟；NOVEL_STUDIO_QA_REUSE只可指向合成profile，禁止正式目录。
+- node scripts/qa-cli-stability.mjs执行三轮故障注入。node scripts/qa-stability-frames.mjs <隔离EXE>保存亮暗各32次操作的原生快照/CDP帧，区分自动化总耗时与pointerdown反馈，不当作所有GPU首帧保证。
+- 真实账号合成抽验需显式NOVEL_STUDIO_REAL_QA=1 node scripts/qa-real-stability.mjs；会消耗额度，按现有模型选择承担调用结果，不自动换模型或重放。只新造作品/固定句，不拷贝正式两库、凭证或聊天。
+- 源码与安装器最终摘要核验后，交接只引用本轮真实回执，不能把历史117项或时点172资料摘要当作重新验证。

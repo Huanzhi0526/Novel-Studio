@@ -59,3 +59,33 @@ test('configured v2 API preserves retrieval output budgets and disableThinking',
   assert.equal(await engine.setting('complete', build, signal, options), 'ok');
   assert.deepEqual(captured, [build, signal, options]);
 });
+
+
+test('second database replacement failure rolls back the first and preserves the pair',async t=>{
+ const {renameSync}=await import('node:fs');
+ const {dir,writing,reference}=fixture(t);
+ const standard=new BackupService(writing,reference),archive=join(dir,'replace-fault.zip');await standard.export(archive);
+ writing.db.exec("UPDATE original_works SET title='new manuscript'");reference.db.exec("UPDATE works SET title='new reference'");
+ let calls=0;
+ const faulty=new BackupService(writing,reference,{replace:(a,b)=>{if(++calls===2)throw Object.assign(new Error('injected second replacement busy'),{code:'EBUSY'});return renameSync(a,b);}});
+ await assert.rejects(faulty.restore(archive),{code:'EBUSY'});
+ assert.equal(writing.db.prepare('SELECT title FROM original_works').get().title,'new manuscript');assert.equal(reference.db.prepare('SELECT title FROM works').get().title,'new reference');
+ assert.equal(writing.db.prepare('PRAGMA quick_check').get().quick_check,'ok');assert.equal(reference.db.prepare('PRAGMA quick_check').get().quick_check,'ok');
+});
+
+
+test('disk-full snapshot failure leaves live databases untouched',async t=>{
+ const {sqliteTasks}=await import('../app/main/sqlite-tasks.mjs');
+ const {dir,writing,reference,service}=fixture(t);const original=sqliteTasks.run;
+ sqliteTasks.run=()=>Promise.reject(Object.assign(new Error('injected disk full'),{code:'ENOSPC'}));
+ try{await assert.rejects(service.export(join(dir,'full.zip')),{code:'ENOSPC'});}finally{sqliteTasks.run=original;}
+ assert.equal(writing.db.prepare('SELECT title FROM original_works').get().title,'before');assert.equal(reference.db.prepare('SELECT title FROM works').get().title,'reference-before');
+});
+
+test('rollback can rename verified snapshots when copying fails with disk full',async t=>{
+ const {renameSync}=await import('node:fs');const {dir,writing,reference,service}=fixture(t);const archive=join(dir,'disk-full-rollback.zip');await service.export(archive);
+ writing.db.exec("UPDATE original_works SET title='new manuscript'");reference.db.exec("UPDATE works SET title='new reference'");let calls=0;
+ const faulty=new BackupService(writing,reference,{replace:(a,b)=>{if(++calls===2)throw Object.assign(new Error('second replacement busy'),{code:'EBUSY'});return renameSync(a,b);},copy:async()=>{throw Object.assign(new Error('injected disk full'),{code:'ENOSPC'});}});
+ await assert.rejects(faulty.restore(archive),{code:'EBUSY'});assert.equal(writing.db.prepare('SELECT title FROM original_works').get().title,'new manuscript');assert.equal(reference.db.prepare('SELECT title FROM works').get().title,'new reference');
+ assert.equal(writing.db.prepare('PRAGMA quick_check').get().quick_check,'ok');assert.equal(reference.db.prepare('PRAGMA quick_check').get().quick_check,'ok');
+});

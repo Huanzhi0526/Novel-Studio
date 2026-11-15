@@ -972,3 +972,12 @@ Automations工具已成功删除novel-studio，deleteStatus=deleted，不再自�
 - 当前代码基线d013f5c，未修改程序或正式资料。只读核对源码/锁文件/正式应用版本0.2.10，桌面快捷方式目标正确；安装器SHA仍EA9CC3B9F1243250999E435897DE902E947A89B41937501EE655F071AE07B927，与上轮升级回执一致。
 - 更新AGENTS/HANDOFF、README/CONTEXT、维护地图、助手/UI说明、主管提示词及Claude/方向评估的历史标记；整理前规则/术语/README/维护地图/接手提示词原文归档docs/history。补清旧ZIP与v2、单库与全资料备份、原117项结果与本轮文档核验的区别。
 - 本轮运行文档链接与入口核对、git diff --check、npm run package:source及ZIP完整/文件字节/版本检查，证据.local/docs-maintenance-20261115。代码单测、桌面操作、外部模型NOT_RUN（无代码变更），旧发布成绩不冒充重跑。当前源码ZIP/SHA同步，安装器不重打、不重装，旧发布件保留。
+
+## 2026-11-15：0.2.11稳定性候选（未升级正式应用）
+
+- 按Astra四阶段方案实施普通检索线程化/分页与同版证据、CLI准备/总期限/取消/配置快照、助手回合任务与增量轮询、干净章节checkpoint/深色背景、维护快照/校验/原创查找线程化。未迁移正式两库、重向量化或改正式配置/聊天。源码/锁文件0.2.11，正式应用仍0.2.10；分支codex/stability-20261115。
+- npm run build及最终132项单测通过；三轮CLI/嵌入故障注入通过。新增MCP慢请求体不能跨回合写记忆、20项容量、同修订/原文范围、磁盘满/第二库换入失败/复制失败回滚、10本书闲置回收和20轮worker取消检查。证据.local/stability-20261115/unit-release.log、cli-faults-{1,2,3}.log。
+- 真实UI源码三入口240,000×1,536向量扫描期间IPC P95 2.3～2.6ms，模拟185秒检索后领取done；最终安装版三入口1516/1248/1317个有效采样，IPC P95 3.513/2.963/3.679ms，pointerdown取消56ms、worker释放717ms、之后新worker可查，0页面错误、原稿重启字节一致。源码ui-CwBkjh、安装版ui-5EVVii；扫描本身仍需数十秒，不能写成查询毫秒级或真实整库验收。
+- 最终候选安装于.local/stability-20261115/install，/NOSHORTCUT未改正式快捷方式。smoke、阅读、助手体验、侧栏、写作回归、扩写、旧检索通过。亮暗各32次导航/118帧、200条聊天及长章修改重启通过，P95有效反馈35.9/43.6ms、无采样整窗白帧；frames-E23xiW。MCP和备份末次补修后worker字节一致，主进程/worker/renderer独立重bundle与最终安装完全一致；最终维护handler双库导出/恢复、助手文件保留及新查询通过maintenance-n5Mxdu。
+- 实际账号合成冷/热六项通过：检索Flash Medium7.149/2.734秒、扩写Hydrogen Medium7.240/2.801秒、助手Flash Medium含领取34.024/22.505秒，助手明确保留无向量时关键词降级，结果各2条。只新造合成书/固定句，未发真实小说/私人聊天；不承诺上游持续稳定。证据real-KcwdiK/report.json。
+- 安装器/源码ZIP/SHA清单在release/0.2.11；源码校验以.local/stability-20261115/source-package-verification.json实际回执为准。正式备份/升级NOT_RUN，既有资料不在本轮重盘/覆盖验收范围。全部早期脚本失败和纠正记录保留，详见[实施与验收](audits/20261115/实施与验收记录.md)。

@@ -1,8 +1,9 @@
+import { sqliteTasks } from './sqlite-tasks.mjs';
+import { copyFile } from 'node:fs/promises';
 import { createHash, randomUUID } from 'node:crypto';
-import { copyFileSync, createReadStream, createWriteStream, existsSync, renameSync, unlinkSync } from 'node:fs';
+import { createReadStream, createWriteStream, existsSync, renameSync, unlinkSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { pipeline } from 'node:stream/promises';
-import { DatabaseSync } from 'node:sqlite';
 import yauzl from 'yauzl';
 import yazl from 'yazl';
 import { databaseVersion, fail } from './store.mjs';
@@ -32,19 +33,9 @@ function signature(db) {
 }
 
 function verifyDatabase(filename, expectedSignature, expectedVersion = databaseVersion) {
-  const db = new DatabaseSync(filename, { readOnly: true });
-  try {
-    db.exec('PRAGMA trusted_schema=OFF; PRAGMA query_only=ON;');
-    if (db.prepare('PRAGMA user_version').get().user_version !== expectedVersion || signature(db) !== expectedSignature) {
-      fail('BACKUP_SCHEMA', '备份资料库版本或表结构与当前应用不兼容');
-    }
-    if (db.prepare('PRAGMA quick_check').get().quick_check !== 'ok' || db.prepare('PRAGMA foreign_key_check').get()) {
-      fail('BACKUP_INTEGRITY', '备份资料库完整性校验未通过');
-    }
-  } finally {
-    db.close();
-  }
+  return sqliteTasks.run({method:'verify',filename,signature:expectedSignature,version:expectedVersion});
 }
+function snapshot(store,target){return sqliteTasks.run({method:'snapshot',filename:store.filename,target});}
 
 async function readBackup(filename, staged, stagedReference) {
   const zip = await new Promise((resolve, reject) => {
@@ -93,8 +84,8 @@ async function readBackup(filename, staged, stagedReference) {
 }
 
 export class BackupService {
-  constructor(store, referenceStore = null) {
-    this.store = store;
+  constructor(store, referenceStore = null, {replace=renameSync,copy=copyFile}={}) {
+    this.store = store;this.replace=replace;this.copy=copy;
     this.referenceStore = referenceStore;
   }
 
@@ -103,11 +94,11 @@ export class BackupService {
     const tempZip = join(dirname(filename), `.backup-${randomUUID()}.tmp`);
     const tempReference = join(dirname(this.store.filename), `reference-snapshot-${randomUUID()}.sqlite`);
     try {
-      this.store.db.prepare('VACUUM INTO ?').run(tempDb);
-      verifyDatabase(tempDb, signature(this.store.db));
+      await snapshot(this.store,tempDb);
+      await verifyDatabase(tempDb, signature(this.store.db));
       if (this.referenceStore) {
-        this.referenceStore.db.prepare('VACUUM INTO ?').run(tempReference);
-        verifyDatabase(tempReference, signature(this.referenceStore.db), this.referenceStore.db.prepare('PRAGMA user_version').get().user_version);
+        await snapshot(this.referenceStore,tempReference);
+        await verifyDatabase(tempReference, signature(this.referenceStore.db), this.referenceStore.db.prepare('PRAGMA user_version').get().user_version);
       }
       const zip = new yazl.ZipFile();
       const manifest = {
@@ -140,18 +131,18 @@ export class BackupService {
     const previousReference = join(directory, `before-reference-restore-${randomUUID()}.sqlite`);
     try {
       const manifest = await readBackup(filename, staged, stagedReference);
-      verifyDatabase(staged, signature(this.store.db));
+      await verifyDatabase(staged, signature(this.store.db));
       if (manifest.reference && !this.referenceStore) fail('BACKUP_REFERENCE', '此备份包含新版参考库，请先启用新版参考库再恢复');
       if (manifest.reference) {
         const expectedVersion = this.referenceStore.db.prepare('PRAGMA user_version').get().user_version;
         if (manifest.reference.version !== expectedVersion) fail('BACKUP_SCHEMA', '参考库版本不兼容');
-        verifyDatabase(stagedReference, signature(this.referenceStore.db), expectedVersion);
+        await verifyDatabase(stagedReference, signature(this.referenceStore.db), expectedVersion);
       }
       const targets = [{ store: this.store, staged, previous }];
       if (manifest.reference) targets.push({ store: this.referenceStore, staged: stagedReference, previous: previousReference });
       for (const target of targets) {
-        target.store.db.prepare('VACUUM INTO ?').run(target.previous);
-        verifyDatabase(target.previous, signature(target.store.db), target.store.db.prepare('PRAGMA user_version').get().user_version);
+        await snapshot(target.store,target.previous);
+        await verifyDatabase(target.previous, signature(target.store.db), target.store.db.prepare('PRAGMA user_version').get().user_version);
       }
       for (const target of targets) target.store.close();
       let replacementStarted = false;
@@ -160,17 +151,29 @@ export class BackupService {
           if (existsSync(target.store.filename + '-wal') || existsSync(target.store.filename + '-shm')) fail('BACKUP_BUSY', '仍有进程打开资料库，恢复已停止');
         }
         replacementStarted = true;
-        for (const target of targets) renameSync(target.staged, target.store.filename);
+        for (const target of targets) this.replace(target.staged, target.store.filename);
         for (const target of targets) target.store.open();
       } catch (error) {
         for (const target of targets) target.store.close();
+        const recoveryErrors=[];
         if (replacementStarted) {
           for (const target of targets) {
-            copyFileSync(target.previous, target.staged);
-            renameSync(target.staged, target.store.filename);
+            try {
+              try {
+                await this.copy(target.previous, target.staged);
+                this.replace(target.staged, target.store.filename);
+              } catch {
+                // A full disk must not prevent rollback. The verified snapshot is
+                // on this same volume; rename it back without allocating a copy.
+                this.replace(target.previous, target.store.filename);
+              }
+            } catch (failure) { recoveryErrors.push(failure); }
           }
         }
-        for (const target of targets) target.store.open();
+        for (const target of targets) {
+          try { target.store.open(); } catch (failure) { recoveryErrors.push(failure); }
+        }
+        if(recoveryErrors.length)throw Object.assign(new Error('恢复未完成，部分文件仍被占用；已保留可用的恢复前快照，请停止写作并检查资料目录。'),{code:'BACKUP_ROLLBACK',details:{snapshots:targets.map(t=>t.previous).filter(existsSync)}});
         throw error;
       }
       return { previous, previousReference: manifest.reference ? previousReference : null, referenceRestored: Boolean(manifest.reference) };
