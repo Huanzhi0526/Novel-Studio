@@ -93,3 +93,15 @@ test('writing session persists layout railCollapsed boolean and resets invalid l
   storage.setItem('', JSON.stringify({ layout: 'corrupt' }));
   assert.deepEqual(readWritingSession(storage).layout, { railCollapsed: false });
 });
+
+
+test('sidebar width persists with other layout preferences and rejects invalid saved sizes', () => {
+  const storage = memoryStorage();
+  const empty = readWritingSession(storage);
+  writeWritingSession({ ...empty, layout: { railCollapsed: true, drawerWidth: 527 } }, storage);
+  assert.deepEqual(readWritingSession(storage).layout, { railCollapsed: true, drawerWidth: 527 });
+  for (const drawerWidth of [-1, 279, 961, '500', null]) {
+    writeWritingSession({ ...empty, layout: { railCollapsed: true, drawerWidth } }, storage);
+    assert.deepEqual(readWritingSession(storage).layout, { railCollapsed: true });
+  }
+});

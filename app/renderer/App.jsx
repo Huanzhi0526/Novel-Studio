@@ -194,7 +194,8 @@ function App() {
   function toggleRail() {
     setRailCollapsed(current => {
       const next = !current;
-      writeWritingSession({ ...readWritingSession(), layout: { railCollapsed: next } });
+      const session = readWritingSession();
+      writeWritingSession({ ...session, layout: { ...session.layout, railCollapsed: next } });
       return next;
     });
   }

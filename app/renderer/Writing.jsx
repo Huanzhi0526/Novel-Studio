@@ -13,6 +13,7 @@ import { enclosingExpansionPair, expansionSelection } from '../shared/expansion-
 import { orderedChapters } from './writing-order.mjs';
 import { matchingPosition, readWritingSession, rememberPosition, toggleCollapsedVolume, writeWritingSession } from './writing-session.mjs';
 import { Icon } from './ui.jsx';
+import { PanelResizer } from './PanelResizer.jsx';
 import './writing.css';
 
 const flushers = new Set();
@@ -203,6 +204,8 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
   const [formatStatus, setFormatStatus] = useState('');
   const session = useRef(null);
   if (!session.current) session.current = readWritingSession();
+  const [drawerWidth, setDrawerWidth] = useState(session.current.layout.drawerWidth ?? 364);
+  const [shellWidth, setShellWidth] = useState(0);
   const [collapsed, setCollapsed] = useState(session.current.collapsed);
   const [wideWindow, setWideWindow] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 1120);
   const [dialog, setDialog] = useState(null);
@@ -935,13 +938,34 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
       if (previewRequest.current === request) setPreview({ ...item, error: error.message || '资料读取失败' });
     }
   }
+  useLayoutEffect(() => {
+    const shell = shellRef.current;
+    if (!shell) return;
+    const measure = () => {
+      if (shell.clientWidth > 0) setShellWidth(shell.clientWidth);
+    };
+    const observer = new ResizeObserver(measure);
+    observer.observe(shell);
+    window.addEventListener('resize', measure);
+    measure();
+    return () => { observer.disconnect(); window.removeEventListener('resize', measure); };
+  }, [inBookshelf, railTarget]);
+
+  function rememberDrawerWidth(width) {
+    const saved = readWritingSession();
+    writeWritingSession({ ...saved, layout: { ...saved.layout, drawerWidth: width } });
+  }
+
   const activeWork = listing.works.find(w=>w.id===selectedWork);
   const activeVolume = listing.volumes.find(v=>v.id===doc?.volume_id);
   const liveTitle = listing.docs.find(item => item.id === doc?.id)?.title ?? doc?.title;
   const isReference = ['reference','assistant'].includes(toolPanel);
   const dockPanel = wideWindow && !focusMode && Boolean(toolPanel);
   const showResourceTools = !focusMode;
-  useEffect(() => { viewRef.current?.requestMeasure(); }, [dockPanel, railTarget, focusMode, preferences]);
+  const inlineRailWidth = railTarget || focusMode ? 0 : (shellWidth <= 900 ? 220 : 268);
+  const maxDrawerWidth = Math.max(280, Math.min(960, shellWidth - 50 - (dockPanel ? inlineRailWidth + 320 : 0)));
+  const visibleDrawerWidth = Math.min(drawerWidth, maxDrawerWidth);
+  useEffect(() => { viewRef.current?.requestMeasure(); }, [dockPanel, railTarget, focusMode, preferences, visibleDrawerWidth]);
 
   function documentActions(item) {
     return [
@@ -1049,12 +1073,14 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
       </> : <p className="panel-empty">当前章节还没有历史版本。</p>}
     </section>;
   const drawer = !focusMode && toolPanel && <aside ref={drawerRef} className={`writing-drawer ${dockPanel?'is-docked':''} ${isReference?'is-reference':''}`}
-    aria-label={panelTitle} onKeyDown={event => {
+    id="writing-right-panel" aria-label={panelTitle} onKeyDown={event => {
       if (event.key === 'Escape' && !event.nativeEvent.isComposing && !event.defaultPrevented) {
         event.preventDefault();
         closeToolPanel(true);
       }
     }}>
+    <PanelResizer width={visibleDrawerWidth} min={280} max={maxDrawerWidth}
+      onChange={setDrawerWidth} onCommit={rememberDrawerWidth} />
     {toolPanel==='assistant' ? renderAssistant(()=>closeToolPanel(true),selectedWork) : isReference ? renderReference(() => closeToolPanel(true)) :
       <><header className="drawer-head"><strong>{panelTitle}</strong><button className="icon-button" aria-label="关闭侧栏" onClick={() => closeToolPanel(true)}>×</button></header><div className="drawer-content">{panelContent}</div></>}
   </aside>;
@@ -1107,7 +1133,7 @@ export function Writing({ api, renderReference, renderAssistant, setFocused, rai
       ]
     }
   ];
-  const canvas = <div ref={shellRef} hidden={inBookshelf} className={`writing-shell ${focusMode?'is-focused':''} ${dockPanel?'has-docked-panel':''} ${toolPanel && !isReference ? 'has-work-panel' : ''} ${inlineRail?'has-inline-rail':''} ${showResourceTools?'has-resource-tools':''}`}>
+  const canvas = <div ref={shellRef} style={{ '--drawer-width': `${visibleDrawerWidth}px` }} hidden={inBookshelf} className={`writing-shell ${focusMode?'is-focused':''} ${dockPanel?'has-docked-panel':''} ${toolPanel && !isReference ? 'has-work-panel' : ''} ${inlineRail?'has-inline-rail':''} ${showResourceTools?'has-resource-tools':''}`}>
     {inlineRail}
     <section className="writing-main">
       <header className="writing-toolbar"><div className="toolbar-inner">

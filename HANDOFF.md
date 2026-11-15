@@ -2,6 +2,15 @@
 
 工作区 `D:\Vibe Coding\Novel Studio`。2026-11-12初始化本地Git，0.1.19基线371be17保留；2026-11-13已合并至main并正式升级0.2.0。此前无Git仓库的记录属于历史。本文记录当前状态，早期施工及逐轮验收保存在 [项目历史](docs/project-history.md)。
 
+## 0.2.9 已上线：自适应对话与可拖动写作侧栏（2026-11-15）
+
+- 用户反馈创作助手文字挤在中间、写作右侧栏不可调宽。本轮从main55a968f调整并发布0.2.9：去除助手消息/参考/进度的74ch居中上限，助手回复使用可用宽度、用户气泡靠右，消息与输入区保留自适应边距。
+- 写作右侧栏左缘新增可抓取分界线，适用于助手、参考及其他工具面板；支持指针捕获拖动、方向键10px微调（Shift为40px）、Home/End边界、双击恢复364px。宽度280～960px，停靠时按窗口限制并为正文保留至少320px；窄窗沿用覆盖侧栏。仅用户拖动/键盘操作保存layout.drawerWidth，临时缩窗不覆盖偏好，折叠主侧栏保留此值；旧布局与正文位置兼容，不作数据库迁移。
+- 主要代码：app/renderer/{assistant.css,Writing.jsx,PanelResizer.jsx,writing.css,writing-session.mjs,App.jsx}。补充writing-session的可选宽度/非法值回归及scripts/qa-assistant-layout.mjs，实际覆盖1800/1200/900三种窗口、回复宽度/无溢出、364→604→494px拖动、键盘边界、缩窗与重载恢复、正文和草稿保护、侧栏折叠保留偏好。主窗口隐藏时ResizeObserver验收不能可靠反映可见交互，专项QA使用showInactive的隔离可见窗口，避免将后台节流误判为实际布局失败。
+- 验证：npm run build通过，npm test在允许本机模拟HTTP的环境114/114通过；首次受限环境测试的网络失败不作产品失败结论。npm run package:windows后安装至.local/ux-layout-029/install；安装版qa-installed-smoke、qa-assistant-layout、qa-assistant-experience、qa-writing-regressions全部通过。宽窗助手回复实际1451px，1200/900窗口为875/625px；截图full-chat.png和resized-sidebar.png已目视自查，0页面错误。日志.local/ux-layout-029，安装版专项证据qa-1794726181263；助手原交互证据.local/assistant-027/experience-1794726191668，写作.local/writing-regressions-kxUpHk。无外部模型调用，真实生成/全库内容质量NOT_RUN（本轮仅布局及本地偏好）。
+- 正常退出后完整备份正式资料和0.2.8旧程序至.local/ux-layout-029/before-formal-20261115，262文件SHA256逐一核验（资料172/程序90）。正式升级命令：显式LOCALAPPDATA=C:\Users\78828\AppData\Local后，pwsh -NoProfile -File scripts/upgrade-windows.ps1 -Version 0.2.9 -IsolatedInstall .local/ux-layout-029/install -RecordFile .local/ux-layout-029/upgrade-receipt.json -GracefulClose。安装文件与隔离安装摘要一致，桌面小说工作台快捷方式正式目标单独启动通过；全部172个既有资料文件摘要未变，含原稿、参考库、配置、聊天及记忆。详见upgrade-receipt.json、formal-verification.json。
+- 当前main源码/锁文件/正式安装resources/app/package.json均0.2.9。release交付NovelStudio-0.2.9-x64-Setup.exe、源码ZIP及SHA256清单；最终文档完成后npm run package:source，ZIP完整性、全部打包文件与工作区字节一致及版本核验通过。保留旧发布件、原文和模型；未恢复后台任务。已知深色冷启动短暂闪白未涉及。下一步由用户试用本轮布局。
+
 ## 0.2.8 已上线：前端体验改版（2026-11-15）
 
 - 用户在审查合并后明确要求升级试用。main合并基线09663c3，package.json和package-lock.json同步升0.2.8；Claude方案、Gemini实现及Codex三项补修随本版发布。当前源码/锁文件/正式安装resources/app/package.json均0.2.8，EXE文件版本不作为应用版本证据。

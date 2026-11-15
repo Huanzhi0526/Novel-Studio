@@ -16,7 +16,7 @@
 }
 .writing-shelf-host { flex: 1; display: flex; min-height: 0; min-width: 0; }
 .writing-shell.has-inline-rail { display: grid; grid-template-columns: 268px minmax(0,1fr); }
-.writing-shell.has-work-panel { --drawer-width: 320px; }
+
 .writing-shell.has-docked-panel { display: grid; grid-template-columns: minmax(0,1fr) var(--drawer-width); }
 .writing-shell.has-inline-rail.has-docked-panel { grid-template-columns: 268px minmax(0,1fr) var(--drawer-width); }
 .writing-shell.has-resource-tools.has-docked-panel { grid-template-columns: minmax(0,1fr) var(--drawer-width) 50px; }
@@ -277,4 +277,30 @@
   .toolbar-buttons { width: 100%; justify-content: space-between; }
   .editor-host .cm-content { padding-top: 35px; }
   .writing-drawer { top: 0; width: min(370px, 92vw); box-shadow: -100vw 0 0 100vw var(--scrim); }
+}
+
+/* Overlay the divider hit area so dragging does not introduce another grid column. */
+.writing-panel-resizer {
+  position: absolute;
+  z-index: 20;
+  inset: 0 auto 0 -5px;
+  width: 10px;
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+  outline: none;
+}
+.writing-panel-resizer::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 4px;
+  width: 2px;
+  background: transparent;
+}
+.writing-panel-resizer:hover::after,
+.writing-panel-resizer:focus-visible::after,
+.writing-panel-resizer.is-dragging::after { background: var(--accent); }
+.writing-panel-resizer:focus-visible { box-shadow: inset 0 0 0 1px var(--focus); }
+@media (max-width: 640px) {
+  .writing-drawer { width: min(var(--drawer-width), calc(100% - 50px)); }
 }

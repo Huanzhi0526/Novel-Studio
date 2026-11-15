@@ -37,7 +37,9 @@ function normalizeSession(value) {
       return volumes.length ? [[id, volumes]] : [];
     }).slice(-maxWorks)),
     layout: {
-      railCollapsed: layout?.railCollapsed === true
+      railCollapsed: layout?.railCollapsed === true,
+      ...(Number.isFinite(layout?.drawerWidth) && layout.drawerWidth >= 280 && layout.drawerWidth <= 960
+        ? { drawerWidth: Math.round(layout.drawerWidth) } : {})
     }
   };
 }

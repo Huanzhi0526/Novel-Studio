@@ -7,7 +7,7 @@
 | 任务 | 入口与责任 |
 | --- | --- |
 | 桌面壳与 IPC | `app/main/index.mjs` 启动 Electron、设置资料根目录和注册白名单 IPC。渲染页通过 `app/main/preload.cjs` 暴露的接口访问本地服务。 |
-| 原创书架与编辑 | `app/renderer/App.jsx` 负责导航。书架与封面用 `OriginalBookshelf.jsx`、`BookCover.jsx`、`book-cover.css`。正文、卷章和资料由 `Writing.jsx`、`ManuscriptDirectory.jsx`、`WritingResources.jsx` 负责。 |
+| 原创书架与编辑 | `app/renderer/App.jsx` 负责导航。书架与封面用 `OriginalBookshelf.jsx`、`BookCover.jsx`、`book-cover.css`。正文、卷章和资料由 `Writing.jsx`、`ManuscriptDirectory.jsx`、`WritingResources.jsx` 负责。`PanelResizer.jsx` 管理右侧栏拖动与键盘调宽，宽度保存在既有writingSession.layout.drawerWidth；专项QA为qa-assistant-layout。 |
 | 原创存储 | `app/main/writing.mjs` 处理卷章、资料、恢复稿、历史与标记。保存和切换按正文修订号校验。界面续写位置在 `app/renderer/writing-session.mjs`。 |
 | 参考导入与阅读 | `app/main/protocol.mjs` 校验结果包，`reference.mjs` 事务入库、读正文与卡片。界面由 `Reference.jsx`、`reader-workspace.css` 提供。 |
 | 知识卡详情与编辑 | `Reference.jsx` 的 `CardEditor` 默认提供阅读视图，原文证据折叠。点编辑后挂载同文件的 `CardForm`，取消时丢弃表单并回到阅读。共享弹窗与卡片展示位于 `ui.jsx`。`CardContent.jsx` 使用锁定的 `react-markdown` 渲染受限格式、识别标准标签分组；`card-content.css` 统一九类配色、标签色和摘要高度。 |
